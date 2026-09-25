@@ -331,3 +331,17 @@ Component then be inserted into another email?
 Unchanged: content surface stays white (#FFFFFF) on the cream page; footer #006747/white; sender name/email (still not set).
 
 Tier table layout v2 uses top-level Columns (2×2 tier cards) — these save correctly; only Columns *inside* a Section fail.
+
+## 13. Help-centre findings (help.spoks.com reachable from 25 Sep, later in the session)
+
+- **Components** are created only in Content → Components → Create component (pop-up, no URL). Inserted via the Components
+  block; editing updates every email; can be detached. Not visible to the MCP at all (not listed by `search_campaigns`).
+- **No design import.** No HTML/code block. The Klaviyo migration copies flows only; the article says templates must be
+  recreated in the Spoks editor "instead of arriving as a Klaviyo layout". Imported images only.
+- **Templates:** any campaign or flow email step can be "Save as template" (three-dot menu) and new campaigns created from it
+  in the app. The MCP cannot create a post from a template.
+- **Styling:** Section → Looks override → Background colour / image, border, radius, inner padding. Every block has a Looks
+  override (text colour, margins, max width). Email width fixed at 600px.
+- **Pricing correction:** free under 1,000 Shopify contacts (5,000 sends/month); **$35/month above that** — the paid plan has no
+  monthly send cap (per `whoami` notes). So the go-live blocker in §1 is the $35 subscription, not a volume limit. SMS is
+  credit-priced separately.
