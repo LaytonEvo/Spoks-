@@ -312,3 +312,22 @@ Findings from the MCP side:
 
 Waiting on Layton (in the editor): can the Section be styled (cream background) and saved as a Component, and can that
 Component then be inserted into another email?
+
+## 12. Workspace looks applied (25 Sep, approved by Layton)
+
+`update_settings` with acknowledgement. Impact at time of change: 0 published web posts, 0 scheduled, 0 active flows.
+
+| Setting | Before | After |
+|---|---|---|
+| Background / header | #FAFAFA / #FAFAFA | #FAF7F1 / #FAF7F1 |
+| Title text / heading colour | #000000 / off | #003D27 / on (#003D27) |
+| Body text on surface | #000000 | #1E1E1E |
+| Link | inherit | #006747 |
+| Heading font | Noto Sans 400 (Arial) | Fraunces 600 (Georgia) — accepted |
+| Body font | Noto Sans (Arial) | Inter (Arial) — accepted |
+| Button radius | 4 | 6 |
+| Logo link | `https://www.evolu` (broken) | https://evolutiongolf.co.uk |
+
+Unchanged: content surface stays white (#FFFFFF) on the cream page; footer #006747/white; sender name/email (still not set).
+
+Tier table layout v2 uses top-level Columns (2×2 tier cards) — these save correctly; only Columns *inside* a Section fail.
