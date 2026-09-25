@@ -1,7 +1,9 @@
 # Evolution Golf → Spoks flow programme (draft-only build)
 
-Source brief: `CLAUDE_CODE_PROMPT_spoks_flow_build.md` (Layton). Source of truth for flow logic and copy:
-`Evolution Golf – Klaviyo Flow Architecture - Build Pack.docx`. Context: `Evolution Golf – Klaviyo Flow Audit` (25 Sep 2026).
+Source brief: `docs/source/CLAUDE_CODE_PROMPT_spoks_flow_build.md` (Layton). Source of truth for flow logic and copy:
+`docs/source/Evolution Golf – Klaviyo Flow Architecture - Build Pack.md` (+ .docx). Context: `docs/source/Evolution Golf – Klaviyo Flow Audit.docx` (25 Sep 2026).
+
+Spoks store id: `2745819a-e9db-41a1-8f76-442730a6a213` (workspace "Evolution Golf "). Phase 0 findings: `docs/00-spoks-capabilities.md`.
 
 ## GUARDRAILS (non-negotiable)
 
