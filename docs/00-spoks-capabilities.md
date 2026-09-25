@@ -296,3 +296,19 @@ there), coupons `…/content/coupons`, looks `…/settings/look`, email & SMS `�
 4. **Components can't be made or placed by the MCP** → biggest single design decision (question 1).
 5. **"From Alex" sender** may be impossible per email (question 12).
 6. **Free plan: 5,000 emails/month and no SMS** → fine for a draft build; blocks go-live.
+
+## 11. Component test (25 Sep) — "EG · Component source – Tier table"
+
+Draft campaign `b01c1aa5-09ce-47a6-b524-e74816092d6c` (not in a flow, never sent):
+https://app.spoks.com/evolutiongolf/post/b01c1aa5-09ce-47a6-b524-e74816092d6c/edit — copy in `content/components/tier-table.md`.
+
+Findings from the MCP side:
+- **Columns nested inside a Section save empty.** The call succeeds, the plain-text summary contains the copy, but every
+  column's `blocks` array comes back `[]` from `get_campaign`. Rebuilt as a Section of stacked text blocks, which saved intact.
+  Rule for Phase 2: no Columns inside Sections via the MCP (top-level Columns still untested).
+- `isFullWidth` on a `link` button is not echoed back — may be ignored; set full width in the editor.
+- Link URLs are rewritten to a tracked `r.spoksmail.com` redirect (expected).
+- A plain `\n` inside a text block is kept as a line break.
+
+Waiting on Layton (in the editor): can the Section be styled (cream background) and saved as a Component, and can that
+Component then be inserted into another email?
