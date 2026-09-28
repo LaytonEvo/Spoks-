@@ -345,3 +345,11 @@ Tier table layout v2 uses top-level Columns (2×2 tier cards) — these save cor
 - **Pricing correction:** free under 1,000 Shopify contacts (5,000 sends/month); **$35/month above that** — the paid plan has no
   monthly send cap (per `whoami` notes). So the go-live blocker in §1 is the $35 subscription, not a volume limit. SMS is
   credit-priced separately.
+
+## 14. Canva route — tested 28 Sep, rejected by Layton
+
+- Generated a USP bar with the "Evolution Golf" Canva brand kit (design DAHWelD4H6Y). Canva added an unrequested
+  "Your Premier UK Golf Retailer" heading and built a full email layout rather than a strip.
+- Canva "email" designs export only as PDF/HTML (no PNG). `design.canva.ai` and `export-download.canva.com` are blocked by
+  this environment, so results can't be viewed or transferred from here.
+- Layton's verdict: quality not good enough. Route dropped.
