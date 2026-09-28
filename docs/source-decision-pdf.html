@@ -1,0 +1,136 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><title>Evolution Golf – Email platform decision</title>
+<style>
+@page{size:A4;margin:16mm 16mm 18mm}
+:root{--g:#006747;--dg:#003D27;--cream:#FAF7F1;--line:#E6E3DA;--ink:#1E1E1E;--mute:#5b5b5b}
+*{box-sizing:border-box}
+body{font-family:"Liberation Sans",Arial,Helvetica,sans-serif;color:var(--ink);font-size:10pt;line-height:1.45;margin:0}
+.brand{color:var(--g);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:9pt}
+h1.title{font-family:"Liberation Serif",Georgia,serif;color:var(--dg);font-size:24pt;margin:4px 0 6px;line-height:1.15}
+.sub{color:var(--mute);font-style:italic;font-size:9pt;border-bottom:2px solid var(--g);padding-bottom:10px;margin-bottom:14px}
+h2{font-family:"Liberation Serif",Georgia,serif;color:var(--dg);font-size:14pt;margin:18px 0 6px;break-after:avoid}
+h3{color:var(--g);font-size:10.5pt;margin:10px 0 4px;break-after:avoid}
+p{margin:0 0 7px}
+ul{margin:0 0 8px;padding-left:18px}li{margin:0 0 3px}
+thead{display:table-header-group}
+table{width:100%;border-collapse:collapse;margin:6px 0 10px;font-size:8.8pt;break-inside:auto}
+tr{break-inside:avoid}
+th{background:var(--dg);color:#fff;text-align:left;padding:6px 7px;font-weight:700}
+td{border:1px solid var(--line);padding:5px 7px;vertical-align:top}
+td:first-child{background:var(--cream);font-weight:700}
+.callout{background:var(--cream);border-left:4px solid var(--g);padding:9px 12px;margin:8px 0 10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{border:1px solid var(--line);border-radius:6px;padding:10px 12px;break-inside:avoid}
+.card h3{margin-top:0}
+.pro{color:var(--g);font-weight:700}.con{color:#8a3b12;font-weight:700}
+.small{font-size:8.3pt;color:var(--mute)}
+.keep{break-inside:avoid}
+</style></head><body>
+
+<div class="brand">Evolution Golf</div>
+<h1 class="title">Email platform decision:<br>Klaviyo, Spoks or an alternative</h1>
+<div class="sub">For discussion between Layton and his business partner · 28 September 2026 · prepared with Claude from hands-on tests of Klaviyo and Spoks, plus web research on alternatives</div>
+
+<h2>1. The decision</h2>
+<p>We have a complete build pack for a new email and SMS flow programme — 14 flows covering welcome, membership, abandonment, post-purchase, winback and sunset. It was written for Klaviyo. We are testing whether to build it somewhere cheaper, using Claude connected to each platform to do most of the work.</p>
+<div class="callout"><b>The question:</b> stay on Klaviyo, move to Spoks, or trial another platform first?</div>
+
+<h2>2. At a glance</h2>
+<table><thead><tr><th style="width:24%"></th><th style="width:38%">Klaviyo</th><th>Spoks</th></tr></thead>
+<tr><td>Monthly cost</td><td>About $720/month list price at ~46k active profiles (≈£535 + VAT), SMS extra. <i>Confirm against our actual bill.</i></td><td>$35/month, no send cap. SMS extra, on credits.</td></tr>
+<tr><td>Email design quality</td><td>High. Claude can write fully designed, branded HTML emails.</td><td>Basic. Claude can only place plain blocks; colours, backgrounds and card styling are set by hand.</td></tr>
+<tr><td>Reusable blocks (tier table, USP bar, banners)</td><td>Claude creates and updates them. They need Klaviyo’s “hybrid” template format, not pure code.</td><td>Built by hand in a pop-up. Claude cannot see or insert them.</td></tr>
+<tr><td>Building the flows</td><td>By hand in Klaviyo. The build pack gives click-by-click steps.</td><td>Automatic. Claude creates every flow, step, delay and filter — all inactive until we switch them on.</td></tr>
+<tr><td>Fit with our build pack</td><td>Native — it was written for Klaviyo.</td><td>Needs translating, with gaps (section 4).</td></tr>
+<tr><td>Account readiness</td><td>Ready: 46k list, SMS live, reporting history.</td><td>Not ready: 6,059 subscribed contacts (vs 46,334 in Klaviyo — unexplained), SMS off, sender email not set, paid plan needed.</td></tr>
+<tr><td>Our manual effort</td><td>Wiring ~14 flows by hand, then attaching Claude’s designs.</td><td>Building ~3–4 text blocks by hand, styling each email layout once, placing blocks into ~40 emails.</td></tr>
+</table>
+
+<div class="two">
+<div class="card">
+<h3>3. Klaviyo</h3>
+<p class="pro">Pros</p>
+<ul>
+<li>Best-looking emails for the least effort: Claude writes the designs and reusable blocks.</li>
+<li>Everything in the build pack works as written: splits, smart sending, bounce filters, A/B subject tests, emails sent “from Alex”.</li>
+<li>No migration risk: list, consent, SMS and history already in place.</li>
+<li>The existing flows can be edited in place.</li>
+</ul>
+<p class="con">Cons</p>
+<ul>
+<li>Flow wiring is manual: ~14 flows in the Klaviyo UI.</li>
+<li>Cost: ~$720/month, around 20× Spoks. Suppressing unengaged profiles lowers it.</li>
+<li>Klaviyo’s raw API can now create flows (beta) but not edit them or add A/B tests; the connector Claude uses can’t, so flows stay manual in practice.</li>
+</ul>
+</div>
+<div class="card">
+<h3>4. Spoks</h3>
+<p class="pro">Pros</p>
+<ul>
+<li>Much cheaper: $35/month, no send cap.</li>
+<li>Claude builds all the flows: triggers, delays, “next day at 09:30” timing, audience filters.</li>
+<li>Membership tier tags already sync from Shopify, so membership flows can trigger directly.</li>
+<li>Abandonment emails show the customer’s real basket with a link back.</li>
+<li>Brand colours and fonts are already applied.</li>
+</ul>
+<p class="con">Cons</p>
+<ul>
+<li>Limited design: no HTML/code and no design import.</li>
+<li>Reusable blocks built and placed by hand.</li>
+<li>Gaps: no per-email “from Alex” sender; no bounce filter; no A/B subject tests via Claude; tag-triggered flows enrol a customer only once; category paths become separate flows.</li>
+<li>Go-live work: paid plan, sender and domain, SMS set-up, explain the 6k vs 46k contact gap.</li>
+</ul>
+</div>
+</div>
+
+<h2>5. Tests we ran that didn’t work</h2>
+<ul>
+<li><b>Spoks components via Claude:</b> not possible — Spoks components can only be built by hand.</li>
+<li><b>Designing visuals in Canva for Spoks:</b> quality wasn’t good enough; dropped.</li>
+</ul>
+
+<h2>6. Other platforms researched</h2>
+<p>Each checked against the same test: can Claude build the flows, can Claude build designed emails, and how well does it know Shopify. <span class="small">Figures come from web search results, not the vendors’ own pricing pages — treat prices as indicative and confirm before signing up.</span></p>
+<table><thead><tr><th style="width:17%">Platform</th><th style="width:21%">Claude builds flows?</th><th style="width:23%">Claude builds designed emails?</th><th style="width:21%">Shopify depth</th><th>Approx. cost at our size</th></tr></thead>
+<tr><td>Spoks</td><td>Yes (tested)</td><td>No — basic blocks only (tested)</td><td>Good</td><td>$35/month</td></tr>
+<tr><td>Klaviyo</td><td>No via connector; beta API only</td><td>Yes (tools confirmed, not yet trialled)</td><td>Best</td><td>~$720/month</td></tr>
+<tr><td>Omnisend</td><td>Possibly — its official connector claims it can; unconfirmed</td><td>Yes — HTML import and reusable “Universal Layouts”</td><td>Good (Shopify-first); “delivered” and back-in-stock need extras</td><td>Not found — needs a quote</td></tr>
+<tr><td>Brevo</td><td>No — built by hand</td><td>Yes — HTML templates; synced reusable sections</td><td>Moderate, via the PushOwl app</td><td>~$100–130/month</td></tr>
+<tr><td>MailerLite</td><td>Probably — guided automation builder</td><td>Yes</td><td>Weak</td><td>~$160+/month</td></tr>
+<tr><td>Mailchimp, Drip, ActiveCampaign, Dotdigital</td><td>No</td><td>Mostly yes</td><td>Mixed</td><td>$450–970/month or quote</td></tr>
+<tr><td>Shopify Messaging + Flow</td><td>Only Shopify’s own in-app AI</td><td>No</td><td>Native</td><td>Very cheap</td></tr>
+</table>
+<div class="keep">
+<h3>What this means</h3>
+<ul>
+<li><b>No platform we could confirm lets Claude build both the flows and the designs.</b> Everyone else splits the work like Klaviyo or Spoks.</li>
+<li><b>Omnisend is the one to check.</b> If its connector really builds automations, it could automate both halves with good Shopify coverage at a mid price. Needs a free-trial test first.</li>
+<li><b>Brevo is a cheaper Klaviyo.</b> Claude builds the designs; we wire the flows. Thinner Shopify link, and its discount codes share one fixed expiry date rather than “7 days from sending”, which clashes with our coupon rules.</li>
+<li><b>MailerLite</b> is cheap and AI-buildable, but too thin on Shopify for our membership tiers and category routing.</li>
+<li>Everything else costs more than Klaviyo for less, or can’t be built by an AI at all.</li>
+</ul>
+</div>
+
+<div class="keep">
+<h2>7. What drives the choice</h2>
+<table><thead><tr><th style="width:45%">If this matters most…</th><th>…lean towards</th></tr></thead>
+<tr><td>Lowest running cost</td><td>Spoks, then Brevo</td></tr>
+<tr><td>Best-looking emails, fastest</td><td>Klaviyo</td></tr>
+<tr><td>Least risk / fastest to go live</td><td>Klaviyo (nothing to migrate)</td></tr>
+<tr><td>Least manual setup of flows</td><td>Spoks (Omnisend if its test passes)</td></tr>
+<tr><td>Automation of both flows and design</td><td>Omnisend — only if the trial confirms it</td></tr>
+<tr><td>Following the build pack exactly</td><td>Klaviyo</td></tr>
+</table>
+<div class="callout"><b>Either way:</b> the copy, rules and flow logic in the build pack stay the same. Prices, warranty terms, delivery times and other items marked [CONFIRM] still need checking before anything goes live, and nothing is activated without our sign-off.</div>
+</div>
+
+<div class="keep">
+<h2>8. Next steps</h2>
+<ul>
+<li>Confirm our current Klaviyo monthly cost so the saving is a real number.</li>
+<li>Optional: a short Omnisend trial — connect it to Claude and test one abandonment flow with one designed email, draft only.</li>
+<li>Decide the platform.</li>
+<li>If Spoks: subscribe to the paid plan, set up the sender, and investigate the 6,059 vs 46,334 contact gap.</li>
+<li>If Klaviyo: Claude builds the designs and reusable blocks while we wire the flows.</li>
+</ul>
+</div>
+</body></html>
