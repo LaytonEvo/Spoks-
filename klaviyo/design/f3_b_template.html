@@ -1,0 +1,199 @@
+<title>Evolution Golf Email Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: review bench. Controls on top; per email: brief left, desktop + phone renders right; then the image brief table and the SMS. */
+:root{
+  --bg:#F3F1EB; --surface:#FFFFFF; --fg:#1F2A24; --muted:#5E6B63; --line:#DDD8CC;
+  --accent:#006747; --accent-ink:#FFFFFF; --deep:#003D27; --gold:#8F6D2F; --frame:#1B2520;
+  --need-bg:#F6E7C8; --need-fg:#6B4A10; --gap-bg:#E9EEF0; --gap-fg:#34505C; --have-bg:#DDEFE5; --have-fg:#0F5234;
+  --display:"Fraunces",Georgia,"Times New Roman",serif; --body:"Inter",Arial,Helvetica,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121815; --surface:#1A221E; --fg:#E7ECE8; --muted:#9DAAA2; --line:#2E3934;
+  --accent:#4FB88A; --accent-ink:#0B1A13; --deep:#BFE3D0; --gold:#D4B06A; --frame:#050807;
+  --need-bg:#4A3712; --need-fg:#F4D99A; --gap-bg:#243740; --gap-fg:#BFDCE8; --have-bg:#173A29; --have-fg:#A9E2C3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121815; --surface:#1A221E; --fg:#E7ECE8; --muted:#9DAAA2; --line:#2E3934;
+  --accent:#4FB88A; --accent-ink:#0B1A13; --deep:#BFE3D0; --gold:#D4B06A; --frame:#050807;
+  --need-bg:#4A3712; --need-fg:#F4D99A; --gap-bg:#243740; --gap-fg:#BFDCE8; --have-bg:#173A29; --have-fg:#A9E2C3; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--body);margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:20px;padding-block:32px 64px}
+.eyebrow{font:600 11px/1.4 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+h1{font:600 clamp(28px,4vw,40px)/1.12 var(--display);color:var(--deep);margin:0 0 12px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--display);color:var(--deep);margin:0 0 8px;text-wrap:balance}
+h3{font:600 12px/1.4 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px}
+.lede{max-width:70ch;margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;margin:28px 0 24px;padding-block:14px;border-block:1px solid var(--line)}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ctl-label{font:500 13px/1 var(--body);color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{font:500 14px/1 var(--body);color:var(--fg);background:transparent;border:0;padding:11px 14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.mode-note{font-size:14px;color:var(--muted);margin:-8px 0 22px;max-width:80ch}
+.panel{display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);gap:32px;align-items:start}
+.notes{min-width:0}
+dl{margin:0;display:grid;gap:10px}
+dt{font:600 11px/1.3 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+dd{margin:2px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--body);padding:6px 8px;border-radius:4px}
+.chip.Needed{background:var(--need-bg);color:var(--need-fg)}
+.chip.Stop-gap{background:var(--gap-bg);color:var(--gap-fg)}
+.chip.Have{background:var(--have-bg);color:var(--have-fg)}
+.renders{display:flex;gap:24px;align-items:flex-start;min-width:0}
+.desk{flex:1 1 auto;min-width:0}
+.cap{font:500 12px/1.3 var(--body);color:var(--muted);margin:0 0 8px}
+.desk-box{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#FAF7F1}
+.desk-box iframe{display:block;border:0;width:640px;transform-origin:0 0}
+.phone{flex:0 0 auto}
+.phone-shell{width:299px;padding:10px;border-radius:34px;background:var(--frame)}
+.screen{width:279px;height:560px;border-radius:26px;overflow-y:auto;overflow-x:hidden;background:#FAF7F1;scrollbar-width:none}
+.sizer{overflow:hidden;width:279px}
+.sizer iframe{display:block;border:0;width:375px;transform:scale(.744);transform-origin:0 0}
+section.block{margin-top:52px;padding-top:24px;border-top:1px solid var(--line)}
+.tbl{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table.brief{border-collapse:collapse;width:100%;min-width:900px;font-size:14px}
+.brief th{font:600 11px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.brief td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.brief tr:last-child td{border-bottom:0}
+.brief .slot{font:600 18px/1 var(--display);color:var(--deep)}
+.sms{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:14px}
+.bubble{max-width:320px;background:var(--surface);border:1px solid var(--line);border-radius:18px 18px 18px 4px;padding:14px 16px;font-size:15px}
+.flags ol{margin:12px 0 0;padding-left:20px;max-width:82ch}
+.flags li{margin:0 0 10px}
+@media (max-width:1000px){.panel{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:720px){.renders{flex-direction:column;align-items:center}.desk{width:100%}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Evolution Golf · F3 Checkout abandonment · Trolleys · Design B</p>
+  <h1>The trolley checkout sequence, on the course</h1>
+  <p class="lede">All four emails in the chosen design, with the approved copy. Use <strong>Images</strong> to see where photography is needed, what the emails look like with the images we already hold, and how they still work if nothing new is ever sourced. Dashed labels mark facts still to confirm.</p>
+
+  <div class="controls">
+    <div class="ctl"><span class="ctl-label" id="l-email">Email</span><div class="seg" id="email" role="group" aria-labelledby="l-email"></div></div>
+    <div class="ctl"><span class="ctl-label" id="l-mode">Images</span><div class="seg" id="mode" role="group" aria-labelledby="l-mode">
+      <button type="button" id="m-slots" data-v="slots">Image slots</button>
+      <button type="button" id="m-now" data-v="now">What we have now</button>
+      <button type="button" id="m-none" data-v="none">No new images</button></div></div>
+    <div class="ctl"><span class="ctl-label" id="l-font">Fonts</span><div class="seg" id="font" role="group" aria-labelledby="l-font">
+      <button type="button" id="f-web" data-v="web">Apple Mail</button>
+      <button type="button" id="f-gmail" data-v="gmail">Gmail / Outlook</button></div></div>
+  </div>
+  <p class="mode-note" id="mode-note"></p>
+
+  <section class="panel" aria-live="polite">
+    <div class="notes">
+      <h2 id="e-name"></h2>
+      <dl>
+        <div><dt>When</dt><dd id="e-timing"></dd></div>
+        <div><dt>From</dt><dd id="e-sender"></dd></div>
+        <div><dt>Subject</dt><dd id="e-subject"></dd></div>
+        <div><dt>Preview text</dt><dd id="e-preview"></dd></div>
+        <div><dt>Images in this email</dt><dd><div class="chips" id="e-slots"></div></dd></div>
+      </dl>
+    </div>
+    <div class="renders">
+      <div class="desk"><p class="cap">Desktop · 600px email</p><div class="desk-box" id="desk-box"><iframe id="desk" title="Desktop render"></iframe></div></div>
+      <div class="phone"><p class="cap">Phone · 375px</p><div class="phone-shell"><div class="screen"><div class="sizer"><iframe id="ph" title="Phone render" scrolling="no"></iframe></div></div></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <p class="eyebrow">Image brief</p>
+    <h2>What to shoot or source, and the fallback</h2>
+    <p class="lede">Six image positions across the sequence. Two need new photography, three have stop-gaps from your Klaviyo library or Shopify, and the product photos come in automatically. Every email still works with none of the new images.</p>
+    <div class="tbl"><table class="brief"><thead><tr>
+      <th scope="col">Slot</th><th scope="col">Used in</th><th scope="col">Where</th><th scope="col">What it should show</th><th scope="col">Size</th><th scope="col">Today</th><th scope="col">If nothing is sourced</th>
+    </tr></thead><tbody id="brief"></tbody></table></div>
+  </section>
+
+  <section class="block">
+    <p class="eyebrow">Day 2, 18:00 · SMS consent only</p>
+    <h2>SMS 1</h2>
+    <div class="sms">
+      <div class="bubble">Evolution Golf: your basket's still saved, [first name]. Free UK delivery, spread the cost with Klarna. Finish here: evolutiongolf.co.uk/…</div>
+      <p class="lede" style="max-width:52ch">No images, no code, no deadline. "Klarna" is still to confirm. If Klaviyo adds your company name automatically, the "Evolution Golf:" at the start comes out so it isn't shown twice.</p>
+    </div>
+  </section>
+
+  <section class="block flags">
+    <p class="eyebrow">Still open</p>
+    <h2>Before this goes into Klaviyo</h2>
+    <ol>
+      <li><strong>Product photos:</strong> every trolley's main Shopify photo needs to be badge-free. The M1 DHC's carries "FREE GIFT".</li>
+      <li><strong>M1 stop-gap rights:</strong> the membership card image shows The Open's logo. Confirm you can use it, or we crop it or leave the panel text-only.</li>
+      <li><strong>E2 hero stop-gap:</strong> the folded-trolley shot is the M1 DHC, so everyone sees that model whatever they left in their basket. Fine for a short while, but H2 should replace it.</li>
+      <li><strong>The copy deck questions</strong> (member 10% on trolleys, Klarna, other brands' warranties, review video link, Trustpilot rating) still apply.</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const NOTES = {
+  slots: "Gold dashed boxes are image positions, each with its brief. Product photos come from Shopify automatically.",
+  now: "The best images we already hold. Stop-gaps are labelled; they work for launch but should be replaced.",
+  none: "The emails exactly as they'd go out if no new image is ever sourced: heroes dropped, panels text-only."
+};
+let st = {email: "e1", mode: "slots", font: "web"};
+try { Object.assign(st, JSON.parse(localStorage.getItem("eg-f3b-view") || "{}")); } catch (e) {}
+if (!DATA.emails.some(e => e.key === st.email)) st.email = "e1";
+
+const emailSeg = document.getElementById("email");
+DATA.emails.forEach(e => { const b = document.createElement("button"); b.type = "button"; b.id = "em-" + e.key; b.dataset.v = e.key; b.textContent = e.name.split(" · ")[0]; emailSeg.appendChild(b); });
+
+function status(s) { return s.now_status.startsWith("Have") ? "Have" : s.now_status; }
+const brief = document.getElementById("brief");
+Object.entries(DATA.slots).forEach(([k, s]) => {
+  const tr = document.createElement("tr");
+  const cells = [k, s.emails, s.where, s.what, s.size, null, s.none];
+  cells.forEach((c, i) => {
+    const td = document.createElement("td");
+    if (i === 0) { td.className = "slot"; td.textContent = c; }
+    else if (i === 5) { const ch = document.createElement("span"); ch.className = "chip " + status(s); ch.textContent = s.now_status; const p = document.createElement("div"); p.style.marginTop = "6px"; p.textContent = s.now; td.append(ch, p); }
+    else td.textContent = c;
+    tr.appendChild(td);
+  });
+  brief.appendChild(tr);
+});
+
+function withImages(html) {
+  let out = html.replace(/__IMG_(\w+)__/g, (m, k) => DATA.images[k] || "");
+  if (st.font === "gmail") out = out.replace(/<link href="https:\/\/fonts\.googleapis\.com[^>]*>/, "");
+  return out;
+}
+const desk = document.getElementById("desk"), deskBox = document.getElementById("desk-box"), ph = document.getElementById("ph");
+let deskH = 1400;
+function scaleDesk() { const s = Math.min(1, deskBox.clientWidth / 640); desk.style.height = deskH + "px"; desk.style.transform = "scale(" + s + ")"; deskBox.style.height = Math.ceil(deskH * s) + "px"; }
+function fit(f, cb) { f.addEventListener("load", () => { let h = 1400; try { const d = f.contentDocument; h = Math.max(d.body.scrollHeight, d.documentElement.scrollHeight); } catch (e) {} cb(h); }); }
+fit(desk, h => { deskH = h; scaleDesk(); });
+fit(ph, h => { ph.style.height = h + "px"; ph.parentNode.style.height = Math.ceil(h * .744) + "px"; });
+new ResizeObserver(scaleDesk).observe(deskBox);
+
+function render() {
+  [["email", st.email], ["mode", st.mode], ["font", st.font]].forEach(([id, v]) =>
+    document.querySelectorAll("#" + id + " button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === v))));
+  const e = DATA.emails.find(x => x.key === st.email);
+  document.getElementById("e-name").textContent = e.name;
+  document.getElementById("e-timing").textContent = e.timing;
+  document.getElementById("e-sender").textContent = e.sender;
+  document.getElementById("e-subject").textContent = e.subject;
+  document.getElementById("e-preview").textContent = e.preview;
+  const chips = document.getElementById("e-slots"); chips.replaceChildren();
+  e.slots.forEach(k => { const s = DATA.slots[k]; const c = document.createElement("span"); c.className = "chip " + status(s); c.textContent = k + " · " + s.now_status; chips.appendChild(c); });
+  document.getElementById("mode-note").textContent = NOTES[st.mode];
+  const html = withImages(DATA.frames[st.email + "|" + st.mode]);
+  desk.srcdoc = html; ph.srcdoc = html;
+  try { localStorage.setItem("eg-f3b-view", JSON.stringify(st)); } catch (e) {}
+}
+[["email", "email"], ["mode", "mode"], ["font", "font"]].forEach(([id, key]) =>
+  document.getElementById(id).addEventListener("click", ev => { const b = ev.target.closest("button"); if (b) { st[key] = b.dataset.v; render(); } }));
+render();
+</script>

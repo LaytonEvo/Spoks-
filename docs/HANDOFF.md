@@ -60,3 +60,8 @@ pack, and a recommendation on building the other flows this way. Then stop.
 - Design options preview (A Clubhouse / B On the course / C Letter, on F3 Trolleys E1): https://claude.ai/artifact/9KL6Zw1qgmFaJMxWe5pt2u
   Source: `klaviyo/design/build_options.py` + `preview_template.html` (needs the scratchpad image folder; images: logo 07b49b80…, roundel 4aa15d13…, lifestyle 648eead5…).
   Brand gold from the logo: #B2893F (pack's #F1DA01 yellow isn't in any live asset). M1 DHC main Shopify photo carries a "FREE GIFT" badge.
+- **Design B chosen** (29 Sep). F3 Trolleys E1/E2/E2m/E3 built in B: `klaviyo/design/build_f3_b.py` + `f3_b_template.html`
+  → preview (same URL as above, v2) and live-URL HTML in `klaviyo/design/f3-b/<email>-<slots|now|none>.html`.
+  Image slots: H1 E1 hero (stop-gap 490px), V1 E1 video still (needed), H2 E2/E2m hero (stop-gap: M1 folded product shot),
+  M1 E2 membership still-life (stop-gap "member access" image, shows The Open logo — rights?), A1 Alex headshot (needed, optional), P1 dynamic product photos (badge-free).
+  Every email works in "none" mode (no new images). Not yet created in Klaviyo.
