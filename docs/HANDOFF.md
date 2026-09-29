@@ -38,3 +38,12 @@ pack, and a recommendation on building the other flows this way. Then stop.
 - So: templates via the Klaviyo MCP (`create_email_template`), then Windsor `create_flow` referencing them. Per-email sender
   ("Alex at Evolution Golf") IS possible. Category routing must use the metric `trigger_filter` (one flow per path) because splits are
   profile-only.
+
+## F3 Trolleys (TEST): status 29 Sep 2026
+
+- Klaviyo templates created (CODE editor, drafts): E1 `THeprK`, E2 `WqkQJ7`, E2m `WS7nDW`, E3 `Sf6hhp`.
+  Source: `klaviyo/templates/` (generator `klaviyo/build_templates.py`). E1 test-rendered OK in Klaviyo.
+- Flow definition ready: `klaviyo/flows/f3-trolleys-test.json` (Windsor `create_flow`, account `SiyYRR`).
+- **Blocked:** Windsor rejected `execute_action`: write actions are disabled for the Windsor user.
+  Layton to enable under Windsor Settings > API Access ("Enable write actions for Claude, ChatGPT & API"), then re-run with that JSON unchanged.
+- Unverified filter shapes (first attempt will tell): `$value` `greater-than-or-equal` in trigger filter; `MemberTier` `existence/exists` split.

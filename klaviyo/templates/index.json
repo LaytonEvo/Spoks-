@@ -1,0 +1,22 @@
+{
+ "E1": {
+  "name": "EG · F3 Trolleys E1 – Basket saved (TEST)",
+  "subject": "Your trolley's saved, {{ person.first_name|default:'there' }}",
+  "preheader": "Free UK delivery, 2-year warranty, spread the cost. Pick up where you left off."
+ },
+ "E2": {
+  "name": "EG · F3 Trolleys E2 – How to be sure it's the right one (TEST)",
+  "subject": "How to be sure it's the right trolley",
+  "preheader": "Battery range, boot space, hills. Then a note on member pricing."
+ },
+ "E2m": {
+  "name": "EG · F3 Trolleys E2m – Member (TEST)",
+  "subject": "Your member price is already on this",
+  "preheader": "Log in and it applies at checkout. Anything else we can answer?"
+ },
+ "E3": {
+  "name": "EG · F3 Trolleys E3 – Want a second opinion? (TEST)",
+  "subject": "Want a second opinion on that trolley?",
+  "preheader": "Tell me your course and how you play and I'll tell you if it's the right model."
+ }
+}

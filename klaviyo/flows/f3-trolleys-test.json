@@ -1,0 +1,420 @@
+{
+ "name": "EG · F3 Checkout abandonment · Trolleys (TEST)",
+ "trigger": {
+  "type": "metric",
+  "metric_id": "SwrKKw",
+  "trigger_filter": {
+   "condition_groups": [
+    {
+     "conditions": [
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Push & Electric Golf Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Electric Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "GPS Electric Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Remote Electric Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Motocaddy Electric Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Motocaddy Electric Golf Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Motocaddy Golf Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Motocaddy Push Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "PowaKaddy Electric & Push Golf Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "PowaKaddy Electric Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "PowaKaddy Push Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Push/Pull Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Push Golf Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Cube Golf Push Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Skymax Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "NAVEE Golf Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "2026 Motocaddy Trolley Range"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "New In Golf Trolleys"
+       }
+      },
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "Collections",
+       "filter": {
+        "type": "list",
+        "operator": "contains",
+        "value": "Electric Trolley Batteries & Chargers"
+       }
+      }
+     ]
+    },
+    {
+     "conditions": [
+      {
+       "type": "metric-property",
+       "metric_id": "SwrKKw",
+       "field": "$value",
+       "filter": {
+        "type": "numeric",
+        "operator": "greater-than-or-equal",
+        "value": 30
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "profile_filter": {
+  "condition_groups": [
+   {
+    "conditions": [
+     {
+      "type": "profile-metric",
+      "metric_id": "T9sNn9",
+      "measurement": "count",
+      "measurement_filter": {
+       "type": "numeric",
+       "operator": "equals",
+       "value": 0
+      },
+      "timeframe_filter": {
+       "type": "date",
+       "operator": "flow-start"
+      },
+      "metric_filters": null
+     }
+    ]
+   },
+   {
+    "conditions": [
+     {
+      "type": "profile-metric",
+      "metric_id": "Y2WUPe",
+      "measurement": "count",
+      "measurement_filter": {
+       "type": "numeric",
+       "operator": "equals",
+       "value": 0
+      },
+      "timeframe_filter": {
+       "type": "date",
+       "operator": "in-the-last",
+       "unit": "day",
+       "quantity": 30
+      },
+      "metric_filters": null
+     }
+    ]
+   }
+  ]
+ },
+ "entry_action_id": "wait_1h",
+ "actions": [
+  {
+   "temporary_id": "wait_1h",
+   "type": "time-delay",
+   "unit": "hours",
+   "value": 1,
+   "links": {
+    "next": "e1"
+   }
+  },
+  {
+   "temporary_id": "e1",
+   "type": "send-email",
+   "template_id": "THeprK",
+   "from_email": "info@evolutiongolf.co.uk",
+   "from_label": "⛳ Evolution Golf",
+   "subject_line": "Your trolley's saved, {{ person.first_name|default:'there' }}",
+   "smart_sending_enabled": true,
+   "links": {
+    "next": "wait_d1"
+   }
+  },
+  {
+   "temporary_id": "wait_d1",
+   "type": "time-delay",
+   "unit": "days",
+   "value": 1,
+   "links": {
+    "next": "split_member"
+   }
+  },
+  {
+   "temporary_id": "split_member",
+   "type": "conditional-split",
+   "profile_filter": {
+    "condition_groups": [
+     {
+      "conditions": [
+       {
+        "type": "profile-property",
+        "property": "properties['MemberTier']",
+        "filter": {
+         "type": "existence",
+         "operator": "exists"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "next_if_true": "e2m",
+   "next_if_false": "e2"
+  },
+  {
+   "temporary_id": "e2m",
+   "type": "send-email",
+   "template_id": "WS7nDW",
+   "from_email": "info@evolutiongolf.co.uk",
+   "from_label": "⛳ Evolution Golf",
+   "subject_line": "Your member price is already on this",
+   "smart_sending_enabled": true,
+   "links": {
+    "next": "wait_d2_m"
+   }
+  },
+  {
+   "temporary_id": "e2",
+   "type": "send-email",
+   "template_id": "WqkQJ7",
+   "from_email": "info@evolutiongolf.co.uk",
+   "from_label": "⛳ Evolution Golf",
+   "subject_line": "How to be sure it's the right trolley",
+   "smart_sending_enabled": true,
+   "links": {
+    "next": "wait_d2"
+   }
+  },
+  {
+   "temporary_id": "wait_d2_m",
+   "type": "time-delay",
+   "unit": "days",
+   "value": 1,
+   "links": {
+    "next": "sms1_m"
+   }
+  },
+  {
+   "temporary_id": "wait_d2",
+   "type": "time-delay",
+   "unit": "days",
+   "value": 1,
+   "links": {
+    "next": "sms1"
+   }
+  },
+  {
+   "temporary_id": "sms1_m",
+   "type": "send-sms",
+   "body": "Evolution Golf: your basket's still saved, {{ person.first_name|default:'' }}. Free UK delivery, spread the cost with Klarna. Finish here: {{ event.extra.checkout_url }}",
+   "smart_sending_enabled": true,
+   "links": {
+    "next": "wait_d3_m"
+   }
+  },
+  {
+   "temporary_id": "wait_d3_m",
+   "type": "time-delay",
+   "unit": "days",
+   "value": 1,
+   "links": {
+    "next": "e3_m"
+   }
+  },
+  {
+   "temporary_id": "e3_m",
+   "type": "send-email",
+   "template_id": "Sf6hhp",
+   "from_email": "info@evolutiongolf.co.uk",
+   "from_label": "Alex at Evolution Golf",
+   "subject_line": "Want a second opinion on that trolley?",
+   "smart_sending_enabled": true,
+   "links": {
+    "next": null
+   }
+  },
+  {
+   "temporary_id": "sms1",
+   "type": "send-sms",
+   "body": "Evolution Golf: your basket's still saved, {{ person.first_name|default:'' }}. Free UK delivery, spread the cost with Klarna. Finish here: {{ event.extra.checkout_url }}",
+   "smart_sending_enabled": true,
+   "links": {
+    "next": "wait_d3"
+   }
+  },
+  {
+   "temporary_id": "wait_d3",
+   "type": "time-delay",
+   "unit": "days",
+   "value": 1,
+   "links": {
+    "next": "e3"
+   }
+  },
+  {
+   "temporary_id": "e3",
+   "type": "send-email",
+   "template_id": "Sf6hhp",
+   "from_email": "info@evolutiongolf.co.uk",
+   "from_label": "Alex at Evolution Golf",
+   "subject_line": "Want a second opinion on that trolley?",
+   "smart_sending_enabled": true,
+   "links": {
+    "next": null
+   }
+  }
+ ]
+}
