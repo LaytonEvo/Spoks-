@@ -26,9 +26,6 @@ SLOTS = {
                size="1200 × 720 px (5:3), JPG, under 250 KB",
                now="Klaviyo library photo (Motocaddy lifestyle), only 490 px wide: soft on phones", now_status="Stop-gap",
                none="Hero dropped. The headline leads and the product card becomes the main image."),
-    "V1": dict(emails="E1", where="Under the four answers (\"Right model?\")", what="Still from your own trolley review video, with a play button drawn on.",
-               size="1200 × 675 px (16:9), JPG", now="Nothing suitable in the library", now_status="Needed",
-               none="Text link \"Watch our trolley reviews\" only."),
     "H2": dict(emails="E2, E2m", where="Hero, under the header", what="A folded trolley going into a car boot, next to a golf bag. Backs up the \"Boot\" check.",
                size="1200 × 720 px (5:3), JPG, under 250 KB",
                now="Shopify product shot of the M1 DHC folded, on cream: shows one model to everyone", now_status="Stop-gap",
@@ -66,8 +63,14 @@ def confirm(note=""):
 
 
 class Ctx:
-    def __init__(self, img, mode, web_fonts):
-        self.img, self.mode, self.web_fonts = img, mode, web_fonts
+    def __init__(self, img, mode, web_fonts, live=False):
+        self.img, self.mode, self.web_fonts, self.live = img, mode, web_fonts, live
+
+    def if_motocaddy(self, html):
+        """Show only for Motocaddy baskets (Klaviyo tag in live files; always shown in preview)."""
+        if not self.live:
+            return html
+        return "{% if event.extra.line_items.0.product.vendor == 'Motocaddy' %}" + html + "{% endif %}"
 
     def slot(self, key, w, h, style="", caption=True):
         """Image slot: placeholder, stop-gap image, or nothing."""
@@ -141,7 +144,7 @@ def product_card(ctx, big=True):
 
 def trust():
     return (f'<tr><td class="px" style="padding:0 44px 32px;"><p style="margin:0;font:14px/20px {SANS};color:{INK};">'
-            f'<strong style="font-weight:600;">Trustpilot</strong> &nbsp;Rated Excellent {confirm("live rating")}</p></td></tr>')
+            f'Rated <strong style="font-weight:600;">4.8 out of 5</strong> on <a href="https://uk.trustpilot.com/review/evolutiongolf.co.uk" style="color:{G};font-weight:600;">Trustpilot</a> from 611 reviews</p></td></tr>')
 
 
 def usp():
@@ -162,16 +165,17 @@ def footer(ctx):
             f'<a href="#" style="color:#CFE0D6;">Unsubscribe</a> · <a href="#" style="color:#CFE0D6;">Manage preferences</a></p></td></tr>')
 
 
-def ruled_rows(items):
+def ruled_rows(items, ctx):
     out = ""
     for label, text in items:
-        out += (f'<tr><td class="stack" width="150" style="padding:16px 16px 6px 0;border-top:1px solid {LINE};vertical-align:top;'
+        row = (f'<tr><td class="stack" width="150" style="padding:16px 16px 6px 0;border-top:1px solid {LINE};vertical-align:top;'
                 f'font:500 17px/24px {SERIF};color:{DG};">{label}</td>'
                 f'<td class="stack nb" style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:15px/23px {SANS};color:{INK};">{text}</td></tr>')
+        out += ctx.if_motocaddy(row) if label == "Warranty" else row
     return f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>'
 
 
-CHECKS = [("Range.", f"Does the battery cover your usual round with margin? 18-hole lithium suits most; go 36 if you play twice on a Saturday {confirm()}."),
+CHECKS = [("Range.", f"Does the battery cover your usual round with margin? 18-hole lithium suits most; go 36 if you play twice on a Saturday."),
           ("Boot.", "Fold it in your head: will it go in with your bag?"),
           ("Hills.", "If your course has them, downhill control matters more than any gadget.")]
 
@@ -187,20 +191,24 @@ def checks_block():
 
 # ---------------- emails ----------------
 def e1(ctx):
-    video = ctx.slot("V1", 512, 288)
-    video = f'<tr><td class="px" style="padding:0 44px 28px;">{video}</td></tr>' if video else ""
+    yt = ("https://www.youtube.com/results?search_query={{ event.extra.line_items.0.product.title|urlencode }}+review"
+          if ctx.live else "https://www.youtube.com/results?search_query=Motocaddy+M1+DHC+review")
+    rows = [("Delivery", "Free to the UK mainland, usually 3 to 5 working days."),
+            ("Warranty", "2 years on the trolley."),
+            ("Paying for it", "Klarna or Clearpay at checkout if you'd rather spread it."),
+            ("Right model?", f'Watch independent reviews of the {PRODUCT[0] if not ctx.live else "{{ event.extra.line_items.0.product.title }}"} on YouTube, '
+                             f'or reply to this email and we\'ll help you choose.<br><a href="{yt}" style="color:{G};font-weight:600;">Watch reviews on YouTube →</a>')]
     body = (hero_block(ctx, "H1")
             + intro("Your basket is saved", "Still deciding? Fair enough. It's a big buy.", "Your basket is exactly where you left it.")
             + product_card(ctx)
             + f'<tr><td class="px" style="padding:20px 44px 36px;">{button("Back to my basket")}</td></tr>'
             + f'<tr><td class="px" style="padding:0 44px 8px;"><p style="margin:0 0 6px;font:500 20px/28px {SERIF};color:{DG};">The things people usually want to know before they commit:</p></td></tr>'
-            + f'<tr><td class="px" style="padding:0 44px 28px;">' + ruled_rows([
-                ("Delivery", "Free to the UK mainland, usually 3 to 5 working days."),
-                ("Warranty", f"2 years on the trolley. {confirm('per brand')}"),
-                ("Paying for it", f"Klarna or Clearpay at checkout if you'd rather spread it. {confirm()}"),
-                ("Right model?", f'Our team has filmed straight-talking reviews of the Motocaddy range.<br><a href="#" style="color:{G};font-weight:600;">Watch our trolley reviews →</a> {confirm("URL")}')]) + '</td></tr>'
-            + video + trust() + usp() + footer(ctx))
-    return shell(ctx, body, "Free UK delivery, 2-year warranty, spread the cost. Pick up where you left off.")
+            + f'<tr><td class="px" style="padding:0 44px 28px;">' + ruled_rows(rows, ctx) + '</td></tr>'
+            + trust() + usp() + footer(ctx))
+    moto = "Free UK delivery, 2-year warranty, spread the cost. Pick up where you left off."
+    other = "Free UK delivery, and you can spread the cost. Pick up where you left off."
+    pre = ("{% if event.extra.line_items.0.product.vendor == 'Motocaddy' %}" + moto + "{% else %}" + other + "{% endif %}") if ctx.live else moto
+    return shell(ctx, body, pre)
 
 
 def membership_panel(ctx):
@@ -218,12 +226,11 @@ def membership_panel(ctx):
             f'<tr><td style="padding:28px 28px 30px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">{img_row}</table>{stop}'
             f'<p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">Evolution Golf Membership · £36 a year</p>'
             f'<p style="margin:0 0 12px;font:500 22px/29px {SERIF};color:{WHITE};">Still happy with your pick? Good. One more thing before you check out.</p>'
-            f'<p style="margin:0 0 14px;font:15px/23px {SANS};color:#E3ECE7;">Join before you check out and 10% comes off this order, then 10% off one order every month after '
-            f'<span style="border:1px dashed #CFE0D6;border-radius:3px;padding:0 4px;font:600 10px/16px {SANS};color:#CFE0D6;">CONFIRM trolleys + basket</span>. '
-            f'On an £800 trolley, that first 10% is £80.</p>'
+            f'<p style="margin:0 0 14px;font:15px/23px {SANS};color:#E3ECE7;">Join before you check out and 10% comes off this order, then 10% off one order every month after. '
+                        f'On an £800 trolley, that first 10% is £80.</p>'
             f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">{lis}</table>'
             f'<p style="margin:0 0 20px;font:13px/19px {SANS};color:#A9C2B5;">Renews at £36 a year. We\'ll remind you before it does, and you can cancel any time from your account. Member discounts can\'t be combined with other codes.</p>'
-            + button("Join for £36 a year", href="#", bg=GOLD, fg=DG) +
+            + button("Join for £36 a year", href="https://evolutiongolf.co.uk/pages/members-page", bg=GOLD, fg=DG) +
             f'</td></tr></table></td></tr>')
 
 
@@ -254,7 +261,7 @@ def e2m(ctx):
     note = (f'<tr><td class="px" style="padding:12px 44px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:{CREAM};">'
             f'<tr><td style="padding:22px 24px;"><p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">For members</p>'
             f'<p style="margin:0 0 10px;font:16px/24px {SANS};color:{INK};">You\'re an Evolution Golf member, so if you haven\'t used this month\'s 10% yet, it can go on this order. '
-            f'Log in at checkout and it\'s applied. {confirm("trolleys, monthly count")}</p>'
+            f'Log in at checkout and it\'s applied.</p>'
             f'<p style="margin:0;font:16px/24px {SANS};color:{INK};">Your free returns and trade-in bonus apply too. Any question about the trolley itself, just reply.</p></td></tr></table></td></tr>')
     body = (hero_block(ctx, "H2") + intro("Before you buy", "Three quick checks") + checks_block() + note
             + f'<tr><td class="px" style="padding:24px 44px 0;">{product_card(ctx, big=False)}</td></tr>'
@@ -288,7 +295,7 @@ def e3(ctx):
 
 EMAILS = [
     dict(key="e1", fn=e1, name="E1 · Basket saved", timing="1 hour after checkout", sender="⛳ Evolution Golf",
-         subject="Your trolley's saved, {{ first name }}", preview="Free UK delivery, 2-year warranty, spread the cost. Pick up where you left off.", slots=["H1", "P1", "V1"]),
+         subject="Your trolley's saved, {{ first name }}", preview="Free UK delivery, 2-year warranty, spread the cost. Pick up where you left off.", slots=["H1", "P1"]),
     dict(key="e2", fn=e2, name="E2 · Non-member", timing="Next day, 09:30 · no MemberTier", sender="⛳ Evolution Golf",
          subject="How to be sure it's the right trolley", preview="Battery range, boot space, hills. Then a note on membership.", slots=["H2", "M1", "P1"]),
     dict(key="e2m", fn=e2m, name="E2m · Member", timing="Next day, 09:30 · has MemberTier", sender="⛳ Evolution Golf",
@@ -306,7 +313,7 @@ def build():
     frames = {}
     for e in EMAILS:
         for m in MODES:
-            (live_dir / f"{e['key']}-{m}.html").write_text(e["fn"](Ctx(LIVE, m, True)))
+            (live_dir / f"{e['key']}-{m}.html").write_text(e["fn"](Ctx(LIVE, m, True, live=True)))
             frames[f"{e['key']}|{m}"] = e["fn"](Ctx(prev, m, True))
     meta = [{k: v for k, v in e.items() if k != "fn"} for e in EMAILS]
     tpl = (OUT / "f3_b_template.html").read_text()

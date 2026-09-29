@@ -186,16 +186,6 @@
         "operator": "contains",
         "value": "New In Golf Trolleys"
        }
-      },
-      {
-       "type": "metric-property",
-       "metric_id": "SwrKKw",
-       "field": "Collections",
-       "filter": {
-        "type": "list",
-        "operator": "contains",
-        "value": "Electric Trolley Batteries & Chargers"
-       }
       }
      ]
     },

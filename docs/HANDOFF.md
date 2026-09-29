@@ -65,3 +65,9 @@ pack, and a recommendation on building the other flows this way. Then stop.
   Image slots: H1 E1 hero (stop-gap 490px), V1 E1 video still (needed), H2 E2/E2m hero (stop-gap: M1 folded product shot),
   M1 E2 membership still-life (stop-gap "member access" image, shows The Open logo — rights?), A1 Alex headshot (needed, optional), P1 dynamic product photos (badge-free).
   Every email works in "none" mode (no new images). Not yet created in Klaviyo.
+- **Layton's copy answers (29 Sep, in the copy deck):** member 10% applies to trolleys and to a basket already waiting;
+  Klarna + Clearpay confirmed; members link https://evolutiongolf.co.uk/pages/members-page; warranty line only for Motocaddy
+  (Klaviyo `{% if …vendor == 'Motocaddy' %}`); no in-house videos → link to YouTube search (V1 slot dropped);
+  Trustpilot 4.8 / 611 (re-check quarterly); battery range advice OK; info@ read daily; batteries/chargers not in trolley flow
+  (removed from `klaviyo/flows/f3-trolleys-test.json`). Still open: trade-in quote URL + accepted brands; which free-delivery threshold for other flows.
+  To verify at build: Klaviyo accepts `|urlencode` and `product.vendor` on the Checkout Started line items (render API).
