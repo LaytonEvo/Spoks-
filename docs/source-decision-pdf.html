@@ -36,7 +36,7 @@ td:first-child{background:var(--cream);font-weight:700}
 
 <h2>2. At a glance</h2>
 <table><thead><tr><th style="width:24%"></th><th style="width:38%">Klaviyo</th><th>Spoks</th></tr></thead>
-<tr><td>Monthly cost</td><td>About $720/month list price at ~46k active profiles (≈£535 + VAT), SMS extra. <i>Confirm against our actual bill.</i></td><td>$35/month, no send cap. SMS extra, on credits.</td></tr>
+<tr><td>Monthly cost</td><td><b>£250/month</b> (our current bill), SMS extra. Klaviyo bills on marketable profiles, so it rises as the list grows.</td><td>$35/month (≈£26), no send cap. SMS extra, on credits.</td></tr>
 <tr><td>Email design quality</td><td>High. Claude can write fully designed, branded HTML emails.</td><td>Basic. Claude can only place plain blocks; colours, backgrounds and card styling are set by hand.</td></tr>
 <tr><td>Reusable blocks (tier table, USP bar, banners)</td><td>Claude creates and updates them. They need Klaviyo’s “hybrid” template format, not pure code.</td><td>Built by hand in a pop-up. Claude cannot see or insert them.</td></tr>
 <tr><td>Building the flows</td><td>By hand in Klaviyo. The build pack gives click-by-click steps.</td><td>Automatic. Claude creates every flow, step, delay and filter — all inactive until we switch them on.</td></tr>
@@ -58,7 +58,7 @@ td:first-child{background:var(--cream);font-weight:700}
 <p class="con">Cons</p>
 <ul>
 <li>Flow wiring is manual: ~14 flows in the Klaviyo UI.</li>
-<li>Cost: ~$720/month, around 20× Spoks. Suppressing unengaged profiles lowers it.</li>
+<li>Cost: £250/month today — roughly 10× Spoks — and it rises as the list grows.</li>
 <li>Klaviyo’s raw API can now create flows (beta) but not edit them or add A/B tests; the connector Claude uses can’t, so flows stay manual in practice.</li>
 </ul>
 </div>
@@ -91,10 +91,10 @@ td:first-child{background:var(--cream);font-weight:700}
 <h2>6. Other platforms researched</h2>
 <p>Each checked against the same test: can Claude build the flows, can Claude build designed emails, and how well does it know Shopify. <span class="small">Figures come from web search results, not the vendors’ own pricing pages — treat prices as indicative and confirm before signing up.</span></p>
 <table><thead><tr><th style="width:17%">Platform</th><th style="width:21%">Claude builds flows?</th><th style="width:23%">Claude builds designed emails?</th><th style="width:21%">Shopify depth</th><th>Approx. cost at our size</th></tr></thead>
-<tr><td>Spoks</td><td>Yes (tested)</td><td>No — basic blocks only (tested)</td><td>Good</td><td>$35/month</td></tr>
-<tr><td>Klaviyo</td><td>No via connector; beta API only</td><td>Yes (tools confirmed, not yet trialled)</td><td>Best</td><td>~$720/month</td></tr>
+<tr><td>Spoks</td><td>Yes (tested)</td><td>No — basic blocks only (tested)</td><td>Good</td><td>$35/month (≈£26)</td></tr>
+<tr><td>Klaviyo</td><td>No via connector; beta API only</td><td>Yes (tools confirmed, not yet trialled)</td><td>Best</td><td>£250/month (our bill)</td></tr>
 <tr><td>Omnisend</td><td>Possibly — its official connector claims it can; unconfirmed</td><td>Yes — HTML import and reusable “Universal Layouts”</td><td>Good (Shopify-first); “delivered” and back-in-stock need extras</td><td>Not found — needs a quote</td></tr>
-<tr><td>Brevo</td><td>No — built by hand</td><td>Yes — HTML templates; synced reusable sections</td><td>Moderate, via the PushOwl app</td><td>~$100–130/month</td></tr>
+<tr><td>Brevo</td><td>No — built by hand</td><td>Yes — HTML templates; synced reusable sections</td><td>Moderate, via the PushOwl app</td><td>~$100–130/month (≈£75–100)</td></tr>
 <tr><td>MailerLite</td><td>Probably — guided automation builder</td><td>Yes</td><td>Weak</td><td>~$160+/month</td></tr>
 <tr><td>Mailchimp, Drip, ActiveCampaign, Dotdigital</td><td>No</td><td>Mostly yes</td><td>Mixed</td><td>$450–970/month or quote</td></tr>
 <tr><td>Shopify Messaging + Flow</td><td>Only Shopify’s own in-app AI</td><td>No</td><td>Native</td><td>Very cheap</td></tr>
@@ -111,7 +111,18 @@ td:first-child{background:var(--cream);font-weight:700}
 </div>
 
 <div class="keep">
-<h2>7. What drives the choice</h2>
+<h2>7. What the saving is worth</h2>
+<table><thead><tr><th style="width:34%">Platform</th><th style="width:22%">Per month</th><th style="width:22%">Saving vs Klaviyo / month</th><th>Saving / year</th></tr></thead>
+<tr><td>Klaviyo (today)</td><td>£250</td><td>—</td><td>—</td></tr>
+<tr><td>Spoks</td><td>≈£26</td><td>≈£224</td><td>≈£2,700</td></tr>
+<tr><td>Brevo</td><td>≈£75–100</td><td>≈£150–175</td><td>≈£1,800–2,100</td></tr>
+</table>
+<p class="small">Converted from USD at about £0.74 per $1, before VAT; SMS excluded on all platforms. Omnisend not priced (quote needed).</p>
+<div class="callout"><b>Put another way:</b> moving to Spoks saves about £2,700 a year, but costs more hands-on time now (styling, components) and loses some build-pack features. The saving is real but modest next to email’s revenue — flows made about £110k in the last 12 months — so a platform that performs even slightly worse would cost more than it saves.</div>
+</div>
+
+<div class="keep">
+<h2>8. What drives the choice</h2>
 <table><thead><tr><th style="width:45%">If this matters most…</th><th>…lean towards</th></tr></thead>
 <tr><td>Lowest running cost</td><td>Spoks, then Brevo</td></tr>
 <tr><td>Best-looking emails, fastest</td><td>Klaviyo</td></tr>
@@ -124,9 +135,8 @@ td:first-child{background:var(--cream);font-weight:700}
 </div>
 
 <div class="keep">
-<h2>8. Next steps</h2>
+<h2>9. Next steps</h2>
 <ul>
-<li>Confirm our current Klaviyo monthly cost so the saving is a real number.</li>
 <li>Optional: a short Omnisend trial — connect it to Claude and test one abandonment flow with one designed email, draft only.</li>
 <li>Decide the platform.</li>
 <li>If Spoks: subscribe to the paid plan, set up the sender, and investigate the 6,059 vs 46,334 contact gap.</li>
