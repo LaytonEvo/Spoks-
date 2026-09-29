@@ -1,0 +1,166 @@
+<title>Evolution Golf Email Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: review bench. Header + controls, then one option at a time: notes left, desktop and phone renders right. */
+:root{
+  --bg:#F3F1EB; --surface:#FFFFFF; --fg:#1F2A24; --muted:#5E6B63; --line:#DDD8CC;
+  --accent:#006747; --accent-ink:#FFFFFF; --deep:#003D27; --gold:#8F6D2F; --frame:#1B2520;
+  --display:"Fraunces",Georgia,"Times New Roman",serif; --body:"Inter",Arial,Helvetica,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121815; --surface:#1A221E; --fg:#E7ECE8; --muted:#9DAAA2; --line:#2E3934;
+  --accent:#4FB88A; --accent-ink:#0B1A13; --deep:#BFE3D0; --gold:#D4B06A; --frame:#050807; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121815; --surface:#1A221E; --fg:#E7ECE8; --muted:#9DAAA2; --line:#2E3934;
+  --accent:#4FB88A; --accent-ink:#0B1A13; --deep:#BFE3D0; --gold:#D4B06A; --frame:#050807; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--body);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:32px 64px}
+.eyebrow{font:600 11px/1.4 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+h1{font:600 clamp(28px,4vw,40px)/1.12 var(--display);color:var(--deep);margin:0 0 12px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--display);color:var(--deep);margin:0 0 8px;text-wrap:balance}
+h3{font:600 12px/1.4 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px}
+.lede{max-width:66ch;color:var(--fg);margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin:28px 0 24px;padding-block:14px;border-block:1px solid var(--line)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{font:500 14px/1 var(--body);color:var(--fg);background:transparent;border:0;padding:11px 16px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.ctl-label{font:500 13px/1 var(--body);color:var(--muted);margin-right:8px}
+.panel{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;align-items:start}
+.notes{min-width:0}
+.notes p{margin:0 0 4px}
+.notes ul{margin:0;padding-left:18px}
+.notes li{margin:2px 0}
+.pros li::marker{color:var(--accent)} .cons li::marker{color:var(--gold)}
+.renders{display:flex;gap:24px;align-items:flex-start;min-width:0}
+.desk{flex:1 1 auto;min-width:0}
+.cap{font:500 12px/1.3 var(--body);color:var(--muted);margin:0 0 8px;letter-spacing:.02em}
+.desk-box{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#FAF7F1}
+.desk-box iframe{display:block;border:0;width:640px;transform-origin:0 0}
+.phone{flex:0 0 auto}
+.phone-shell{width:299px;padding:10px;border-radius:34px;background:var(--frame)}
+.phone-shell .screen{width:279px;height:560px;border-radius:26px;overflow-y:auto;overflow-x:hidden;background:#FAF7F1;scrollbar-width:none}
+.sizer{overflow:hidden;width:279px}
+.phone-shell iframe{display:block;border:0;width:375px;height:753px;transform:scale(.744);transform-origin:0 0}
+.compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;justify-items:center}
+.compare .cap{text-align:center}
+.flags{margin-top:48px;padding-top:24px;border-top:1px solid var(--line)}
+.flags ol{margin:12px 0 0;padding-left:20px;max-width:80ch}
+.flags li{margin:0 0 10px}
+.tag{font:600 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+@media (max-width:980px){.panel{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:720px){.renders{flex-direction:column;align-items:center}.desk{width:100%}.compare{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Evolution Golf · F3 Checkout abandonment · Trolleys E1</p>
+  <h1>Three ways to evolve the checkout email</h1>
+  <p class="lede">Each option uses the same approved copy, your logo and roundel, and a real basket (Motocaddy M1 DHC, £799). They differ in layout and tone only. Pick one, or mix parts, and every flow will be built from that system. Dashed labels mark facts still to confirm and won't appear once answered.</p>
+
+  <div class="controls" role="group" aria-label="View controls">
+    <div><span class="ctl-label" id="lbl-opt">Option</span>
+      <div class="seg" id="opt" role="group" aria-labelledby="lbl-opt"></div></div>
+    <div><span class="ctl-label" id="lbl-font">Fonts</span>
+      <div class="seg" id="font" role="group" aria-labelledby="lbl-font">
+        <button type="button" id="font-web" data-v="web" aria-pressed="true">Apple Mail / iPhone</button>
+        <button type="button" id="font-gmail" data-v="gmail" aria-pressed="false">Gmail / Outlook</button>
+      </div></div>
+  </div>
+
+  <section id="single" class="panel" aria-live="polite">
+    <div class="notes">
+      <p class="tag" id="n-tag"></p>
+      <h2 id="n-name"></h2>
+      <p id="n-summary"></p>
+      <h3>Strengths</h3><ul class="pros" id="n-pros"></ul>
+      <h3>Watch-outs</h3><ul class="cons" id="n-cons"></ul>
+    </div>
+    <div class="renders">
+      <div class="desk"><p class="cap">Desktop · 600px email</p><div class="desk-box" id="desk-box"><iframe id="desk" title="Desktop render"></iframe></div></div>
+      <div class="phone"><p class="cap">Phone · 375px</p><div class="phone-shell"><div class="screen"><div class="sizer" id="ph-sizer"><iframe id="ph" title="Phone render" scrolling="no"></iframe></div></div></div></div>
+    </div>
+  </section>
+
+  <section id="cmp" hidden>
+    <div class="compare" id="cmp-grid"></div>
+  </section>
+
+  <section class="flags">
+    <p class="eyebrow">Before we build</p>
+    <h2>Four things the designs surfaced</h2>
+    <ol>
+      <li><strong>Gold, not yellow.</strong> Your logo's accent is a warm gold (#B2893F). The Build Pack's bright yellow (#F1DA01) isn't in any of your live assets, so all three options use the logo gold for small accents. Say if you want the yellow kept.</li>
+      <li><strong>"FREE GIFT" badge in product photos.</strong> The basket block shows each product's main Shopify photo. For the M1 DHC that photo carries a "FREE GIFT" roundel, which would keep showing after the offer ends. The mock-ups use the clean second photo; in the live email, the product's main photo needs to be badge-free.</li>
+      <li><strong>Lifestyle photos need to be bigger.</strong> The photo in option B is from your Klaviyo library and is only 490px wide, so it will look soft on phones and retina screens. For option B we'd want originals at least 1200px wide. Your own shots of the shop, fitting bay or team would beat manufacturer imagery.</li>
+      <li><strong>Web fonts only show in Apple Mail.</strong> Fraunces and Inter load on iPhone and Mac Mail. Gmail and Outlook fall back to Georgia and Arial. Use the Fonts switch to see both.</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+let state = {opt: "a", font: "web"};
+try { const s = JSON.parse(localStorage.getItem("eg-design-view") || "{}"); if (s.opt) state.opt = s.opt; if (s.font) state.font = s.font; } catch (e) {}
+
+const optSeg = document.getElementById("opt");
+DATA.options.forEach(o => {
+  const b = document.createElement("button"); b.type = "button"; b.id = "opt-" + o.key; b.dataset.v = o.key;
+  b.textContent = o.key.toUpperCase() + " · " + o.name; optSeg.appendChild(b);
+});
+const cmpBtn = document.createElement("button"); cmpBtn.type = "button"; cmpBtn.id = "opt-compare"; cmpBtn.dataset.v = "compare";
+cmpBtn.textContent = "Compare all"; optSeg.appendChild(cmpBtn);
+
+function fit(iframe, onH) {
+  iframe.addEventListener("load", () => {
+    try { const d = iframe.contentDocument; const h = Math.max(d.body.scrollHeight, d.documentElement.scrollHeight); onH(h); } catch (e) { onH(1400); }
+  });
+}
+const desk = document.getElementById("desk"), deskBox = document.getElementById("desk-box"), ph = document.getElementById("ph");
+let deskH = 1400;
+function scaleDesk() {
+  const w = deskBox.clientWidth, s = Math.min(1, w / 640);
+  desk.style.height = deskH + "px"; desk.style.transform = "scale(" + s + ")"; deskBox.style.height = Math.ceil(deskH * s) + "px";
+}
+fit(desk, h => { deskH = h; scaleDesk(); });
+fit(ph, h => { ph.style.height = h + "px"; ph.parentNode.style.height = Math.ceil(h * .744) + "px"; });
+new ResizeObserver(scaleDesk).observe(deskBox);
+
+function list(el, items) { el.replaceChildren(...items.map(t => { const li = document.createElement("li"); li.textContent = t; return li; })); }
+
+function render() {
+  optSeg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === state.opt)));
+  document.querySelectorAll("#font button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === state.font)));
+  const single = document.getElementById("single"), cmp = document.getElementById("cmp");
+  if (state.opt === "compare") {
+    single.hidden = true; cmp.hidden = false;
+    const grid = document.getElementById("cmp-grid"); grid.replaceChildren();
+    DATA.options.forEach(o => {
+      const col = document.createElement("div");
+      col.innerHTML = '<p class="cap"></p><div class="phone-shell"><div class="screen"><div class="sizer"><iframe scrolling="no"></iframe></div></div></div>';
+      col.querySelector(".cap").textContent = o.key.toUpperCase() + " · " + o.name;
+      const f = col.querySelector("iframe"); f.title = o.name + " phone render";
+      fit(f, h => { f.style.height = h + "px"; f.parentNode.style.height = Math.ceil(h * .744) + "px"; });
+      f.srcdoc = DATA.frames[o.key][state.font];
+      grid.appendChild(col);
+    });
+  } else {
+    single.hidden = false; cmp.hidden = true;
+    const o = DATA.options.find(x => x.key === state.opt);
+    document.getElementById("n-tag").textContent = "Option " + o.key.toUpperCase();
+    document.getElementById("n-name").textContent = o.name;
+    document.getElementById("n-summary").textContent = o.summary;
+    list(document.getElementById("n-pros"), o.pros); list(document.getElementById("n-cons"), o.cons);
+    const src = DATA.frames[o.key][state.font];
+    desk.srcdoc = src; ph.srcdoc = src;
+  }
+  try { localStorage.setItem("eg-design-view", JSON.stringify(state)); } catch (e) {}
+}
+optSeg.addEventListener("click", e => { const b = e.target.closest("button"); if (b) { state.opt = b.dataset.v; render(); } });
+document.getElementById("font").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { state.font = b.dataset.v; render(); } });
+render();
+</script>

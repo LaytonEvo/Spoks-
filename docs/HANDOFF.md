@@ -57,3 +57,6 @@ pack, and a recommendation on building the other flows this way. Then stop.
 - Hero product for mock-ups: Motocaddy 2026 M1 DHC Standard Lithium, £799 (gid://shopify/Product/8502252830978).
 - Blocked for design previews: sandbox can't fetch d3k81ch9hvuctc.cloudfront.net (Klaviyo images), cdn.shopify.com, evolutiongolf.co.uk.
 - Next: master email design (evolved from live template XhSB6r) + preview page, after copy sign-off.
+- Design options preview (A Clubhouse / B On the course / C Letter, on F3 Trolleys E1): https://claude.ai/artifact/9KL6Zw1qgmFaJMxWe5pt2u
+  Source: `klaviyo/design/build_options.py` + `preview_template.html` (needs the scratchpad image folder; images: logo 07b49b80…, roundel 4aa15d13…, lifestyle 648eead5…).
+  Brand gold from the logo: #B2893F (pack's #F1DA01 yellow isn't in any live asset). M1 DHC main Shopify photo carries a "FREE GIFT" badge.
