@@ -62,6 +62,17 @@ def confirm(note=""):
             f'font:600 10px/16px {SANS};letter-spacing:.04em;color:{MUTED};vertical-align:1px;">{("CONFIRM " + note).strip()}</span>')
 
 
+SOCIAL = {"Instagram": "https://www.instagram.com/evolutiongolfuk", "Facebook": "https://www.facebook.com/share/18DSf8wH84/",
+          "YouTube": "https://www.youtube.com/@evolutiongolfuk"}
+NEW_IN = "https://evolutiongolf.co.uk/collections/new-in-golf-equipment"
+
+
+def unsub(ctx, color):
+    if ctx.live:
+        return "{% unsubscribe 'Unsubscribe' %} · {% manage_preferences 'Manage preferences' %}"
+    return f'<a href="#" style="color:{color};">Unsubscribe</a> · <a href="#" style="color:{color};">Manage preferences</a>'
+
+
 class Ctx:
     def __init__(self, img, mode, web_fonts, live=False):
         self.img, self.mode, self.web_fonts, self.live = img, mode, web_fonts, live
@@ -84,7 +95,7 @@ class Ctx:
         if self.mode == "none" or key not in self.img:
             return ""
         tag = ""
-        if caption and s["now_status"] == "Stop-gap":
+        if caption and s["now_status"] == "Stop-gap" and not self.live:
             tag = (f'<p style="margin:6px 12px 0;font:600 10px/14px {SANS};letter-spacing:.06em;color:{MUTED};">'
                    f'<span style="border:1px dashed {MUTED};border-radius:3px;padding:1px 4px;">STOP-GAP {key}</span></p>')
         return (f'<img class="full" src="{self.img[key]}" width="{w}" alt="" style="width:{w}px;max-width:100%;height:auto;{style}">{tag}')
@@ -95,11 +106,12 @@ def shell(ctx, body, preheader, bg=WHITE, header=True):
     fonts = ('<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600'
              '&family=Inter:wght@400;600&display=swap" rel="stylesheet">') if ctx.web_fonts else ""
     head = (f'<tr><td bgcolor="{DG}" style="background:{DG};padding:18px 32px;">'
-            f'<img src="{ctx.img["logo"]}" width="170" alt="Evolution Golf" style="width:170px;height:auto;"></td></tr>') if header else ""
+            f'<a href="https://evolutiongolf.co.uk/"><img src="{ctx.img["logo"]}" width="170" alt="Evolution Golf" style="width:170px;height:auto;"></a></td></tr>') if header else ""
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Evolution Golf</title>{fonts}
 <style>
 body{{margin:0;padding:0;background:{bg};-webkit-text-size-adjust:100%}} img{{border:0;display:block}} a{{color:{G}}}
+.foot a{{color:#CFE0D6!important}} .foot-light a{{color:{MUTED}!important}}
 @media (max-width:620px){{
  .card{{width:100%!important}} .px{{padding-left:22px!important;padding-right:22px!important}}
  .stack{{display:block!important;width:100%!important;box-sizing:border-box}} .nb{{border-top:0!important;padding-top:0!important}}
@@ -120,6 +132,14 @@ def button(label, href="{{ event.extra.checkout_url }}", bg=G, fg=WHITE):
 
 
 def hero_block(ctx, key):
+    if ctx.live and ctx.mode == "now":
+        # Live stop-gaps: H1 source is 490px with rounded corners, so it sits inset; H2 source is a square cut-out.
+        if key == "H1":
+            return (f'<tr><td class="px" style="padding:28px 44px 0;"><img class="full" src="{ctx.img[key]}" width="512" alt="Golfer walking with an electric trolley" '
+                    f'style="width:512px;max-width:100%;height:auto;"></td></tr>')
+        if key == "H2":
+            return (f'<tr><td align="center" style="padding:20px 44px 0;"><img src="{ctx.img[key]}" width="360" alt="Folded electric trolley" '
+                    f'style="width:360px;max-width:100%;height:auto;margin:0 auto;"></td></tr>')
     s = ctx.slot(key, 600, 360)
     return f'<tr><td style="padding:0;">{s}</td></tr>' if s else ""
 
@@ -133,14 +153,20 @@ def intro(eyebrow, headline, text=""):
 
 def product_card(ctx, big=True):
     t, q, p = PRODUCT
+    if ctx.live:
+        t, q, p = "{{ item.product.title }}", "{{ item.quantity }}", "£{{ item.line_price|floatformat:2 }}"
+        img = "{{ item.product.images.0.src }}"
+    else:
+        img = ctx.img["product"]
+    loop_open, loop_close = ("{% for item in event.extra.line_items %}", "{% endfor %}") if ctx.live else ("", "")
     if big:
-        return (f'<tr><td class="px" style="padding:26px 44px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid {LINE};">'
-                f'<tr><td align="center" style="padding:20px 20px 4px;"><img src="{ctx.img["product"]}" width="220" alt="{t}" style="width:220px;height:auto;margin:0 auto;"></td></tr>'
+        return (f'<tr><td class="px" style="padding:26px 44px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid {LINE};">{loop_open}'
+                f'<tr><td align="center" style="padding:20px 20px 4px;"><img src="{img}" width="220" alt="{t}" style="width:220px;height:auto;margin:0 auto;"></td></tr>'
                 f'<tr><td align="center" style="padding:6px 24px 22px;font:15px/22px {SANS};color:{INK};"><strong style="font-weight:600;">{t}</strong><br>'
-                f'<span style="color:{MUTED};">Qty {q} · </span><strong style="font-weight:600;">{p}</strong></td></tr></table></td></tr>')
-    return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid {LINE};border-bottom:1px solid {LINE};"><tr>'
-            f'<td width="84" style="padding:12px 12px 12px 0;"><img src="{ctx.img["product"]}" width="72" height="72" alt="{t}" style="width:72px;height:72px;"></td>'
-            f'<td style="padding:12px 0;font:14px/20px {SANS};color:{INK};"><strong style="font-weight:600;">{t}</strong><br><span style="color:{MUTED};">Qty {q} · {p}</span></td></tr></table>')
+                f'<span style="color:{MUTED};">Qty {q} · </span><strong style="font-weight:600;">{p}</strong></td></tr>{loop_close}</table></td></tr>')
+    return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid {LINE};border-bottom:1px solid {LINE};">{loop_open}<tr>'
+            f'<td width="84" style="padding:12px 12px 12px 0;"><img src="{img}" width="72" height="72" alt="{t}" style="width:72px;height:72px;"></td>'
+            f'<td style="padding:12px 0;font:14px/20px {SANS};color:{INK};"><strong style="font-weight:600;">{t}</strong><br><span style="color:{MUTED};">Qty {q} · {p}</span></td></tr>{loop_close}</table>')
 
 
 def trust():
@@ -161,9 +187,9 @@ def footer(ctx):
     return (f'<tr><td align="center" bgcolor="{DG}" style="background:{DG};padding:32px 24px 28px;">'
             f'<img src="{ctx.img["roundel"]}" width="44" height="44" alt="Evolution Golf" style="width:44px;height:44px;margin:0 auto 16px;">'
             f'<p style="margin:0 0 12px;font:13px/20px {SANS};color:#CFE0D6;">Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL</p>'
-            f'<p style="margin:0 0 18px;font:600 13px/20px {SANS};"><a href="#" {a}>Instagram</a>{dot}<a href="#" {a}>Facebook</a>{dot}<a href="#" {a}>YouTube</a></p>'
-            f'<p style="margin:0;font:12px/18px {SANS};color:#A9C2B5;">You\'re receiving this because you started a checkout at evolutiongolf.co.uk.<br>'
-            f'<a href="#" style="color:#CFE0D6;">Unsubscribe</a> · <a href="#" style="color:#CFE0D6;">Manage preferences</a></p></td></tr>')
+            f'<p style="margin:0 0 18px;font:600 13px/20px {SANS};">' + dot.join(f'<a href="{u}" {a}>{n}</a>' for n, u in SOCIAL.items()) + '</p>'
+            f'<p class="foot" style="margin:0;font:12px/18px {SANS};color:#A9C2B5;">You\'re receiving this because you started a checkout at evolutiongolf.co.uk.<br>'
+            + unsub(ctx, "#CFE0D6") + '</p></td></tr>')
 
 
 def ruled_rows(items, ctx):
@@ -213,11 +239,12 @@ def e1(ctx):
 
 
 def membership_panel(ctx):
-    img = ctx.slot("M1", 520, 300, caption=False)
+    # Live drafts skip M1: the stop-gap shows The Open's logo and rights are unconfirmed.
+    img = "" if ctx.live else ctx.slot("M1", 520, 300, caption=False)
     img_row = f'<tr><td style="padding:0 0 22px;">{img}</td></tr>' if img else (
         f'<tr><td style="padding:0 0 16px;"><img src="{ctx.img["roundel"]}" width="48" height="48" alt="" style="width:48px;height:48px;"></td></tr>')
     stop = ""
-    if ctx.mode == "now":
+    if ctx.mode == "now" and not ctx.live:
         stop = (f'<p style="margin:0 0 14px;font:600 10px/14px {SANS};letter-spacing:.06em;color:#CFE0D6;">'
                 f'<span style="border:1px dashed #CFE0D6;border-radius:3px;padding:1px 4px;">STOP-GAP M1</span></p>')
     benefits = ["Free returns (4 a year)", "Free shipping over £10", "+5% trade-in value after 60 days", "48 hours' early access to new kit"]
@@ -246,7 +273,7 @@ def trade_in():
 def seasonal():
     return (f'<tr><td class="px" style="padding:28px 44px 32px;"><p style="margin:0;padding:14px 0;border-top:1px solid {LINE};border-bottom:1px solid {LINE};'
             f'font:15px/22px {SANS};color:{INK};"><span style="font:600 11px/16px {SANS};letter-spacing:.14em;color:{GOLD};">SEASONAL&nbsp;&nbsp;</span>'
-            f'New season, new kit. Trolleys, clubs and shoes are in. <a href="#" style="color:{G};font-weight:600;">See what\'s new</a></p></td></tr>')
+            f'New season, new kit. Trolleys, clubs and shoes are in. <a href="{NEW_IN}" style="color:{G};font-weight:600;">See what\'s new</a></p></td></tr>')
 
 
 def e2(ctx):
@@ -254,7 +281,7 @@ def e2(ctx):
             + membership_panel(ctx)
             + f'<tr><td class="px" style="padding:28px 44px 0;">{product_card(ctx, big=False)}</td></tr>'
             + f'<tr><td class="px" style="padding:16px 44px 0;">{button("Back to my basket")}</td></tr>'
-            + trade_in() + seasonal() + usp() + footer(ctx))
+            + seasonal() + usp() + footer(ctx))  # trade-in panel left out until quote URL + brands are confirmed
     return shell(ctx, body, "Battery range, boot space, hills. Then a note on membership.")
 
 
@@ -282,15 +309,18 @@ def e3(ctx):
         photo = ""
     sig = (f'<table role="presentation" cellpadding="0" cellspacing="0"><tr>{photo}<td style="vertical-align:top;font:16px/24px {SANS};color:{INK};">'
            f'Alex<br><span style="color:{MUTED};">Head of Ecommerce, Evolution Golf</span></td></tr></table>')
+    hi = "{{ person.first_name|default:'there' }}" if ctx.live else "there"
+    prod = "{{ event.extra.line_items.0.product.title }}" if ctx.live else PRODUCT[0]
+    basket = "{{ event.extra.checkout_url }}" if ctx.live else "#"
     body = (f'<tr><td class="px" style="padding:36px 44px 28px;">'
-            f'<p style="{p}">Hi there,</p>'
-            f'<p style="{p}">Alex from Evolution Golf. I can see you were looking at the Motocaddy 2026 M1 DHC Standard Lithium Electric Golf Trolley. Good trolley.</p>'
+            f'<p style="{p}">Hi {hi},</p>'
+            f'<p style="{p}">Alex from Evolution Golf. I can see you were looking at the {prod}. Good trolley.</p>'
             f'<p style="{p}">If you\'re not sure it\'s the right one — the course you play, how often, whether you\'d use GPS — reply to this and I\'ll give you a straight answer. If a cheaper model would do the job, I\'ll say so.</p>'
             f'<p style="{p}">If you\'ve already bought elsewhere, no problem at all. Ignore this one.</p>'
-            f'{sig}<p style="margin:22px 0 0;font:15px/22px {SANS};"><a href="#" style="color:{G};">My basket</a></p></td></tr>'
-            f'<tr><td class="px" style="padding:18px 44px 24px;border-top:1px solid {LINE};font:12px/18px {SANS};color:{MUTED};">'
+            f'{sig}<p style="margin:22px 0 0;font:15px/22px {SANS};"><a href="{basket}" style="color:{G};">My basket</a></p></td></tr>'
+            f'<tr><td class="px foot-light" style="padding:18px 44px 24px;border-top:1px solid {LINE};font:12px/18px {SANS};color:{MUTED};">'
             f'Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL<br>'
-            f'<a href="#" style="color:{MUTED};">Unsubscribe</a> · <a href="#" style="color:{MUTED};">Manage preferences</a></td></tr>')
+            + unsub(ctx, MUTED) + '</td></tr>')
     return shell(ctx, body, "Tell me your course and how you play and I'll tell you if it's the right model.", bg=WHITE, header=False)
 
 

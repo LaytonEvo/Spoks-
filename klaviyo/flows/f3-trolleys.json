@@ -1,5 +1,5 @@
 {
- "name": "EG · F3 Checkout abandonment · Trolleys (TEST)",
+ "name": "EG · F3 Checkout abandonment · Trolleys",
  "trigger": {
   "type": "metric",
   "metric_id": "SwrKKw",
@@ -264,7 +264,7 @@
   {
    "temporary_id": "e1",
    "type": "send-email",
-   "template_id": "THeprK",
+   "template_id": "Sc4LsT",
    "from_email": "info@evolutiongolf.co.uk",
    "from_label": "⛳ Evolution Golf",
    "subject_line": "Your trolley's saved, {{ person.first_name|default:'there' }}",
@@ -294,7 +294,7 @@
         "property": "properties['MemberTier']",
         "filter": {
          "type": "existence",
-         "operator": "exists"
+         "operator": "is-set"
         }
        }
       ]
@@ -307,10 +307,10 @@
   {
    "temporary_id": "e2m",
    "type": "send-email",
-   "template_id": "WS7nDW",
+   "template_id": "W3wixR",
    "from_email": "info@evolutiongolf.co.uk",
    "from_label": "⛳ Evolution Golf",
-   "subject_line": "Your member price is already on this",
+   "subject_line": "Your member discount can go on this",
    "smart_sending_enabled": true,
    "links": {
     "next": "wait_d2_m"
@@ -319,7 +319,7 @@
   {
    "temporary_id": "e2",
    "type": "send-email",
-   "template_id": "WqkQJ7",
+   "template_id": "VC22MY",
    "from_email": "info@evolutiongolf.co.uk",
    "from_label": "⛳ Evolution Golf",
    "subject_line": "How to be sure it's the right trolley",
@@ -367,7 +367,7 @@
   {
    "temporary_id": "e3_m",
    "type": "send-email",
-   "template_id": "Sf6hhp",
+   "template_id": "VjRZzQ",
    "from_email": "info@evolutiongolf.co.uk",
    "from_label": "Alex at Evolution Golf",
    "subject_line": "Want a second opinion on that trolley?",
@@ -397,7 +397,7 @@
   {
    "temporary_id": "e3",
    "type": "send-email",
-   "template_id": "Sf6hhp",
+   "template_id": "VjRZzQ",
    "from_email": "info@evolutiongolf.co.uk",
    "from_label": "Alex at Evolution Golf",
    "subject_line": "Want a second opinion on that trolley?",

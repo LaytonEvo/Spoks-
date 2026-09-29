@@ -71,3 +71,7 @@ pack, and a recommendation on building the other flows this way. Then stop.
   Trustpilot 4.8 / 611 (re-check quarterly); battery range advice OK; info@ read daily; batteries/chargers not in trolley flow
   (removed from `klaviyo/flows/f3-trolleys-test.json`). Still open: trade-in quote URL + accepted brands; which free-delivery threshold for other flows.
   To verify at build: Klaviyo accepts `|urlencode` and `product.vendor` on the Checkout Started line items (render API).
+
+## 29 Sep 2026 (latest): F3 Trolleys draft flow built
+- Flow UXsJ3d (draft) + master templates Sc4LsT / VC22MY / W3wixR / VjRZzQ. Full details and the UI to-do list: `docs/03-build-log.md`.
+- Flow definition: `klaviyo/flows/f3-trolleys.json` (MemberTier split uses `existence` / `is-set`).
