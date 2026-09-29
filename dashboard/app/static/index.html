@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evolution Golf Flows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#" id="home-link"><span class="mark">EG</span><span>Evolution Golf <b>Flows</b></span></a>
+  <div class="top-controls">
+    <div class="seg" id="period" role="group" aria-label="Period">
+      <button type="button" data-tf="last_30_days">30 days</button>
+      <button type="button" data-tf="last_90_days">90 days</button>
+      <button type="button" data-tf="last_365_days">12 months</button>
+    </div>
+    <span class="refreshed" id="refreshed"></span>
+    <button type="button" class="btn-ghost" id="refresh">Refresh from Klaviyo</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <label class="search"><span class="sr">Find a flow</span><input id="search" type="search" placeholder="Find a flow"></label>
+    <nav id="flow-list" aria-label="Flows"></nav>
+  </aside>
+  <main id="main" tabindex="-1"></main>
+</div>
+<div class="modal" id="preview" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="pv-title">
+    <div class="modal-head">
+      <div><p class="eyebrow" id="pv-eyebrow"></p><h2 id="pv-title"></h2><p class="muted" id="pv-sub"></p></div>
+      <div class="modal-actions">
+        <div class="seg" id="pv-width"><button type="button" data-w="600" aria-pressed="true">Desktop</button><button type="button" data-w="375">Phone</button></div>
+        <button type="button" class="btn-ghost" id="pv-close">Close</button>
+      </div>
+    </div>
+    <p class="sample-note">Rendered with an example basket and the name “Sam”, not a real customer.</p>
+    <div class="frame-wrap"><iframe id="pv-frame" title="Email preview" sandbox=""></iframe></div>
+  </div>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

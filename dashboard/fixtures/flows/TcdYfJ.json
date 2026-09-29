@@ -1,0 +1,68 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "TcdYfJ",
+  "attributes": {
+   "name": "FLOW: Welcome — Club Access Member",
+   "status": "live",
+   "trigger_type": "Added to List",
+   "updated": "2026-06-12T10:13:18+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "segment",
+      "id": "WQDfwQ"
+     }
+    ],
+    "profile_filter": null,
+    "actions": [
+     {
+      "id": "108396213",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Your Evolution Golf Club Access Membership Is Live",
+        "preview_text": "Your Club Access benefits are now unlocked",
+        "template_id": "YzhUpD",
+        "smart_sending_enabled": false,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Welcome — Club Access Member",
+        "id": "UttzpC"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "108396213"
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/TcdYfJ/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/TcdYfJ/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/TcdYfJ/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/TcdYfJ/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/TcdYfJ/"
+  }
+ }
+}

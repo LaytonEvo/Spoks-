@@ -1,0 +1,68 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "VEWJnS",
+  "attributes": {
+   "name": "FLOW: Welcome — Evolution Pro Annual",
+   "status": "live",
+   "trigger_type": "Added to List",
+   "updated": "2026-06-12T09:24:13+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "segment",
+      "id": "QQTnct"
+     }
+    ],
+    "profile_filter": null,
+    "actions": [
+     {
+      "id": "109000367",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Your Evolution Golf Annual Pro Membership Is Live",
+        "preview_text": "Your full Pro benefits are now unlocked for the year ahead",
+        "template_id": "VZnvvS",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Welcome — Evolution Pro Annual Member",
+        "id": "SVA2Uy"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "109000367"
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/VEWJnS/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/VEWJnS/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/VEWJnS/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/VEWJnS/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/VEWJnS/"
+  }
+ }
+}

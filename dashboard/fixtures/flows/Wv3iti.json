@@ -1,0 +1,1340 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "Wv3iti",
+  "attributes": {
+   "name": "NEW: Browse Abandonment (category-routed)",
+   "status": "live",
+   "trigger_type": "Metric",
+   "updated": "2026-07-03T07:16:18+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "metric",
+      "id": "WDFj3H",
+      "trigger_filter": null
+     }
+    ],
+    "profile_filter": {
+     "condition_groups": [
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "WDFj3H",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "greater-than-or-equal",
+          "value": 2
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "in-the-last",
+          "unit": "hour",
+          "quantity": 24
+         },
+         "metric_filters": null
+        }
+       ]
+      },
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "UiZD2S",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "flow-start"
+         },
+         "metric_filters": null
+        }
+       ]
+      },
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "T9sNn9",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "flow-start"
+         },
+         "metric_filters": null
+        }
+       ]
+      },
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "Y2WUPe",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "in-the-last",
+          "unit": "day",
+          "quantity": 30
+         },
+         "metric_filters": null
+        }
+       ]
+      }
+     ]
+    },
+    "actions": [
+     {
+      "id": "107176225",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": true
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": "107176244"
+      }
+     },
+     {
+      "id": "107176244",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Electric Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "GPS Electric Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Remote Electric Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Motocaddy Electric Golf Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Manual Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Push Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "New In Golf Trolleys"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "WDFj3H",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107176384",
+       "next_if_false": "107176798"
+      }
+     },
+     {
+      "id": "107176384",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107636055"
+      }
+     },
+     {
+      "id": "107176798",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Drivers"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Irons"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Wedges"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Putters"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Hybrids"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Fairway Woods"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Clubs"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "All Approved Used Golf Clubs"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Approved Used Golf Clubs"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "WDFj3H",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107176912",
+       "next_if_false": "107177088"
+      }
+     },
+     {
+      "id": "107636055",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "live",
+       "main_action": {
+        "id": "107176414",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Still eyeing up that trolley?",
+          "preview_text": "Take another look when you're ready",
+          "template_id": "XpW544",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 1 — Trolleys (placeholder)",
+          "id": "Wtv4ja"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": {
+        "id": "01KSMYAGTFN5NP5NCE8XRRWNE1",
+        "name": null,
+        "variations": [
+         {
+          "id": "107636056",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "Still eyeing up that trolley?",
+            "preview_text": "Take another look when you're ready",
+            "template_id": "SjaFH9",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": null,
+            "name": "Email 1 — Trolleys (placeholder) Test #1 May 27, 2026 Variation A",
+            "id": "Wx3vkJ"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         },
+         {
+          "id": "107636063",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "How to pick the right electric trolley",
+            "preview_text": "Battery, weight, features — what actually matters",
+            "template_id": "TWVizc",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": null,
+            "name": "Email 1 — Trolleys (placeholder) Test #1 May 27, 2026 Variation B",
+            "id": "SLVdCY"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         }
+        ],
+        "allocations": {
+         "107636056": 0.47725,
+         "107636063": 0.52275
+        },
+        "started": "2026-07-03T07:16:16.714316+00:00",
+        "winner_metric": "unique-clicks",
+        "automatic_winner_selection_settings": {
+         "enabled": true,
+         "automatic_end_date": null,
+         "automatic_end_statistical_certainty": true
+        }
+       }
+      },
+      "links": {
+       "next": "107176446"
+      }
+     },
+     {
+      "id": "107176912",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107176934"
+      }
+     },
+     {
+      "id": "107177088",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Stand Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Cart Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Pencil Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Tour/Staff Bags"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "WDFj3H",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107177202",
+       "next_if_false": "107177325"
+      }
+     },
+     {
+      "id": "107176446",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107176545"
+      }
+     },
+     {
+      "id": "107176934",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Those clubs still on your mind?",
+        "preview_text": "No rush, they're right where you left them",
+        "template_id": "UqDATG",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 1 — Clubs (placeholder)",
+        "id": "XQqU3f"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107176939"
+      }
+     },
+     {
+      "id": "107177202",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177210"
+      }
+     },
+     {
+      "id": "107177325",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Womens Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Spiked Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Spikeless Golf Shoes"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "WDFj3H",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107177416",
+       "next_if_false": "107177545"
+      }
+     },
+     {
+      "id": "107176545",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "What we've actually been selling — trolleys",
+        "preview_text": "",
+        "template_id": "VXVWZa",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Trolleys (placeholder)",
+        "id": "Uh7par"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107176566"
+      }
+     },
+     {
+      "id": "107176939",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107176950"
+      }
+     },
+     {
+      "id": "107177210",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Still weighing up that bag?",
+        "preview_text": "Stand, cart or tour, it's all still here",
+        "template_id": "UVLSB4",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 1 — Bags (placeholder)",
+        "id": "S2jXDe"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177224"
+      }
+     },
+     {
+      "id": "107177416",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177450"
+      }
+     },
+     {
+      "id": "107177545",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Golf Clothing"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Womens Golf Clothing"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Polo Shirts"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Trousers"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Shorts"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Jackets"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mid Layers"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "WDFj3H",
+            "field": "Categories",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Base Layers"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "WDFj3H",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107177691",
+       "next_if_false": "107177818"
+      }
+     },
+     {
+      "id": "107176566",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107176593"
+      }
+     },
+     {
+      "id": "107176950",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "What we've actually been selling — clubs",
+        "preview_text": "",
+        "template_id": "RzAnTG",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Clubs (placeholder)",
+        "id": "VijHqe"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107176979"
+      }
+     },
+     {
+      "id": "107177224",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177254"
+      }
+     },
+     {
+      "id": "107177450",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Those shoes catch your eye?",
+        "preview_text": "Your size might not wait forever",
+        "template_id": "SJNdms",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 1 — Footwear (placeholder)",
+        "id": "V3JchH"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177458"
+      }
+     },
+     {
+      "id": "107177691",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177719"
+      }
+     },
+     {
+      "id": "107177818",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177828"
+      }
+     },
+     {
+      "id": "107176593",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107176979",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177030"
+      }
+     },
+     {
+      "id": "107177254",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Bags worth a second look",
+        "preview_text": "",
+        "template_id": "Uadjjt",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Bags (placeholder)",
+        "id": "RGqci2"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177269"
+      }
+     },
+     {
+      "id": "107177458",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177482"
+      }
+     },
+     {
+      "id": "107177719",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Still thinking about that piece?",
+        "preview_text": "Sorted by size and ready when you are",
+        "template_id": "RhRmaf",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 1 — Clothing (placeholder)",
+        "id": "TBmQgr"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177731"
+      }
+     },
+     {
+      "id": "107177828",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Saw something you liked?",
+        "preview_text": "It's still here when you're ready",
+        "template_id": "YrcnVH",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 1 — Fallback (placeholder)",
+        "id": "TR2mha"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177832"
+      }
+     },
+     {
+      "id": "107177030",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107177269",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177309"
+      }
+     },
+     {
+      "id": "107177482",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Spiked or spikeless?",
+        "preview_text": "What actually suits your game",
+        "template_id": "Ukc5Zy",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Footwear (placeholder)",
+        "id": "SqZKji"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177506"
+      }
+     },
+     {
+      "id": "107177731",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177749"
+      }
+     },
+     {
+      "id": "107177832",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177870"
+      }
+     },
+     {
+      "id": "107177309",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107177506",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177520"
+      }
+     },
+     {
+      "id": "107177749",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Layering for UK golf, briefly",
+        "preview_text": "Base, mid, shell — that's the whole trick",
+        "template_id": "V74D5f",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2— Clothing (placeholder)",
+        "id": "W83gMh"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177763"
+      }
+     },
+     {
+      "id": "107177870",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "What's been popular this week",
+        "preview_text": "",
+        "template_id": "TbYYXP",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Fallback (placeholder)",
+        "id": "R9EDXm"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107177890"
+      }
+     },
+     {
+      "id": "107177520",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107177763",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177772"
+      }
+     },
+     {
+      "id": "107177890",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107177893"
+      }
+     },
+     {
+      "id": "107177772",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107177893",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "107176225",
+    "reentry_criteria": {
+     "duration": 7,
+     "unit": "day"
+    }
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/Wv3iti/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/Wv3iti/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/Wv3iti/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/Wv3iti/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/Wv3iti/"
+  }
+ }
+}

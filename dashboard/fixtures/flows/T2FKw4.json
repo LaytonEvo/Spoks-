@@ -1,0 +1,69 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "T2FKw4",
+  "attributes": {
+   "name": "Order Confirmation - Standard",
+   "status": "live",
+   "trigger_type": "Metric",
+   "updated": "2026-05-15T11:43:50+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "metric",
+      "id": "T9sNn9",
+      "trigger_filter": null
+     }
+    ],
+    "profile_filter": null,
+    "actions": [
+     {
+      "id": "104359812",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Thank you for your order!",
+        "preview_text": "",
+        "template_id": "Uc6ApU",
+        "smart_sending_enabled": false,
+        "transactional": true,
+        "add_tracking_params": false,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Order Confirmation",
+        "id": "SpEGTr"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "104359812"
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/T2FKw4/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/T2FKw4/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/T2FKw4/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/T2FKw4/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/T2FKw4/"
+  }
+ }
+}

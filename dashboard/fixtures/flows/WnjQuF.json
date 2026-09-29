@@ -1,0 +1,134 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "WnjQuF",
+  "attributes": {
+   "name": "1.1 SM SMS Club Welcome",
+   "status": "live",
+   "trigger_type": "Added to List",
+   "updated": "2025-09-05T13:11:05+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "list",
+      "id": "XM59M4"
+     }
+    ],
+    "profile_filter": null,
+    "actions": [
+     {
+      "id": "88633238",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Thanks for signing up {{ person.first_name|title|default:'' }}!Get 5% off your order with code SMSCLUB5 at checkout. Offer expires in 7 days. https://evolutiongolf.co.uk/discount/SMSCLUB5",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": false,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS #1",
+        "id": "Vy3h2K",
+        "message_hierarchy": [
+         {
+          "message": "Thanks for signing up {{ person.first_name|title|default:'' }}!Get 5% off your order with code SMSCLUB5 at checkout. Offer expires in 7 days. https://evolutiongolf.co.uk/discount/SMSCLUB5",
+          "message_format": "RCS"
+         },
+         {
+          "message": "Thanks for signing up {{ person.first_name|title|default:'' }}!Get 5% off your order with code SMSCLUB5 at checkout. Offer expires in 7 days. https://evolutiongolf.co.uk/discount/SMSCLUB5",
+          "message_format": "SMS",
+          "extra": {}
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "88633430"
+      }
+     },
+     {
+      "id": "88633430",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 6,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "88633443"
+      }
+     },
+     {
+      "id": "88633443",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Your discount is about to expire {{ person.first_name|title|default:'' }}!Use code SMSCLUB5 at checkout and snag 5% off today. https://evolutiongolf.co.uk/discount/SMSCLUB5",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": false,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "Copy of SMS #1",
+        "id": "YucZhu",
+        "message_hierarchy": [
+         {
+          "message": "Your discount is about to expire {{ person.first_name|title|default:'' }}!Use code SMSCLUB5 at checkout and snag 5% off today. https://evolutiongolf.co.uk/discount/SMSCLUB5",
+          "message_format": "RCS"
+         },
+         {
+          "message": "Your discount is about to expire {{ person.first_name|title|default:'' }}!Use code SMSCLUB5 at checkout and snag 5% off today. https://evolutiongolf.co.uk/discount/SMSCLUB5",
+          "message_format": "SMS",
+          "extra": {}
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "88633238"
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/WnjQuF/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/WnjQuF/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/WnjQuF/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/WnjQuF/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/WnjQuF/"
+  }
+ }
+}

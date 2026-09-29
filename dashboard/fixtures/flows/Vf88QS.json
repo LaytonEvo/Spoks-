@@ -1,0 +1,119 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "Vf88QS",
+  "attributes": {
+   "name": "FLOW: SHOES UPSELL",
+   "status": "manual",
+   "trigger_type": "Metric",
+   "updated": "2026-01-14T12:07:04+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "metric",
+      "id": "T9sNn9",
+      "trigger_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "metric-property",
+           "metric_id": "T9sNn9",
+           "field": "Collections",
+           "filter": {
+            "type": "list",
+            "operator": "contains",
+            "value": "Golf Shoes"
+           }
+          },
+          {
+           "type": "metric-property",
+           "metric_id": "T9sNn9",
+           "field": "Collections",
+           "filter": {
+            "type": "list",
+            "operator": "contains",
+            "value": "Mens Golf Shoes"
+           }
+          },
+          {
+           "type": "metric-property",
+           "metric_id": "T9sNn9",
+           "field": "Collections",
+           "filter": {
+            "type": "list",
+            "operator": "contains",
+            "value": "shoes"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ],
+    "profile_filter": null,
+    "actions": [
+     {
+      "id": "92648269",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 5,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "92071581"
+      }
+     },
+     {
+      "id": "92071581",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Complete the Look 🧢",
+        "preview_text": "Your new shoes deserve the right fit",
+        "template_id": "V327VL",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email #1",
+        "id": "TdYYnV"
+       },
+       "status": "manual"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "92648269"
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/Vf88QS/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/Vf88QS/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/Vf88QS/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/Vf88QS/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/Vf88QS/"
+  }
+ }
+}

@@ -1,0 +1,285 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "VW5V2i",
+  "attributes": {
+   "name": "NEW: Second-Order Conversion",
+   "status": "live",
+   "trigger_type": "Metric",
+   "updated": "2026-07-06T09:31:33+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "metric",
+      "id": "T9sNn9",
+      "trigger_filter": null
+     }
+    ],
+    "profile_filter": {
+     "condition_groups": [
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "T9sNn9",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 1
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "alltime"
+         },
+         "metric_filters": null
+        }
+       ]
+      },
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "Y2WUPe",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "in-the-last",
+          "unit": "day",
+          "quantity": 30
+         },
+         "metric_filters": null
+        }
+       ]
+      }
+     ]
+    },
+    "actions": [
+     {
+      "id": "107258485",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "create",
+         "property_type": "boolean",
+         "property_key": "properties['in_secondorder_flow']",
+         "property_value": true
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": "107258560"
+      }
+     },
+     {
+      "id": "107258560",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 45,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107258568"
+      }
+     },
+     {
+      "id": "107258568",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "How's your last purchase working out?",
+        "preview_text": "",
+        "template_id": "TM6sQc",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 1 — Soft return (placeholder)",
+        "id": "XiZLJp"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107258584"
+      }
+     },
+     {
+      "id": "107258584",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107258601"
+      }
+     },
+     {
+      "id": "107258601",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "A small thank-you, 5% off",
+        "preview_text": "For your second order, whenever you're ready.",
+        "template_id": "TZcHGM",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — 5% nudge (placeholder)",
+        "id": "RgG5rN"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107258622"
+      }
+     },
+     {
+      "id": "107258622",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107258625"
+      }
+     },
+     {
+      "id": "107258625",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Bumped to 10%",
+        "preview_text": "The 5% just got better.",
+        "template_id": "Yrr4eq",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email #3",
+        "id": "TPnw7b"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107258638"
+      }
+     },
+     {
+      "id": "107258638",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107726775"
+      }
+     },
+     {
+      "id": "107726775",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Last one from me — 10% off",
+        "preview_text": "",
+        "template_id": "Uf6YDV",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email #4",
+        "id": "UupvDK"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107258649"
+      }
+     },
+     {
+      "id": "107258649",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_secondorder_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "107258485",
+    "reentry_criteria": {
+     "duration": 1,
+     "unit": "alltime"
+    }
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/VW5V2i/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/VW5V2i/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/VW5V2i/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/VW5V2i/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/VW5V2i/"
+  }
+ }
+}

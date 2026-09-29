@@ -1,0 +1,149 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "TXGJgW",
+  "attributes": {
+   "name": "FLOW: Welcome - Evolution Free",
+   "status": "live",
+   "trigger_type": "Added to List",
+   "updated": "2026-06-26T14:44:08+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "segment",
+      "id": "W3N8WF"
+     }
+    ],
+    "profile_filter": null,
+    "actions": [
+     {
+      "id": "108638495",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Your Evolution Golf Members Portal Is Now Live",
+        "preview_text": "You're in — your free membership and portal access starts here",
+        "template_id": "XuTJMc",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email #1",
+        "id": "W8Np8U"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "108640555"
+      }
+     },
+     {
+      "id": "108640555",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "10:00:00"
+      },
+      "links": {
+       "next": "108640565"
+      }
+     },
+     {
+      "id": "108640565",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "You're getting 5%. Club members get double.",
+        "preview_text": "",
+        "template_id": "TvvrYA",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email #2",
+        "id": "UHpM5R"
+       },
+       "status": "draft"
+      },
+      "links": {
+       "next": "108662746"
+      }
+     },
+     {
+      "id": "108662746",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "108662771"
+      }
+     },
+     {
+      "id": "108662771",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Bigger discounts, monthly rewards, more giveaways",
+        "preview_text": "",
+        "template_id": "SBYRb2",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email #3",
+        "id": "UFnfNV"
+       },
+       "status": "draft"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "108638495"
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/TXGJgW/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/TXGJgW/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/TXGJgW/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/TXGJgW/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/TXGJgW/"
+  }
+ }
+}

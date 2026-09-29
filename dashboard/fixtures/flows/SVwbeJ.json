@@ -1,0 +1,1083 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "SVwbeJ",
+  "attributes": {
+   "name": "1. SM: Welcome Sequence",
+   "status": "live",
+   "trigger_type": "Added to List",
+   "updated": "2026-09-24T08:20:40+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "list",
+      "id": "Tzck9t"
+     }
+    ],
+    "profile_filter": {
+     "condition_groups": [
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "T9sNn9",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "flow-start"
+         },
+         "metric_filters": null
+        }
+       ]
+      }
+     ]
+    },
+    "actions": [
+     {
+      "id": "82742350",
+      "type": "conditional-split",
+      "data": {
+       "profile_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "profile-metric",
+            "metric_id": "T9sNn9",
+            "measurement": "count",
+            "measurement_filter": {
+             "type": "numeric",
+             "operator": "equals",
+             "value": 0
+            },
+            "timeframe_filter": {
+             "type": "date",
+             "operator": "alltime"
+            },
+            "metric_filters": null
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "links": {
+       "next_if_true": "82742351",
+       "next_if_false": null
+      }
+     },
+     {
+      "id": "82742351",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Welcome to Evolution Golf!\nUse code EVO5 for 5% off your first order https://evolutiongolf.co.uk/discount/EVO5",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": {
+         "condition_groups": [
+          {
+           "conditions": [
+            {
+             "type": "profile-metric",
+             "metric_id": "SWbhwQ",
+             "measurement": "count",
+             "measurement_filter": {
+              "type": "numeric",
+              "operator": "greater-than",
+              "value": 0
+             },
+             "timeframe_filter": {
+              "type": "date",
+              "operator": "alltime"
+             },
+             "metric_filters": null
+            }
+           ]
+          }
+         ]
+        },
+        "name": "SMS #1",
+        "id": "WwmWfG",
+        "message_hierarchy": [
+         {
+          "message": "Welcome to Evolution Golf!\nUse code EVO5 for 5% off your first order https://evolutiongolf.co.uk/discount/EVO5",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Welcome to Evolution Golf!\nUse code EVO5 for 5% off your first order https://evolutiongolf.co.uk/discount/EVO5",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "82742352"
+      }
+     },
+     {
+      "id": "82742352",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Here’s your 5% OFF⛳️",
+        "preview_text": "Proper service, Quality gear",
+        "template_id": "VBjCqp",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "WELCOME 1 - INTRO",
+        "id": "YiMPLb"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "82742353"
+      }
+     },
+     {
+      "id": "82742353",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "create",
+         "property_type": "string",
+         "property_key": "properties['InWelcomeSequence']",
+         "property_value": "True"
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": "82742358"
+      }
+     },
+     {
+      "id": "82742358",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "11:30:00"
+      },
+      "links": {
+       "next": "100393782"
+      }
+     },
+     {
+      "id": "100393782",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "live",
+       "main_action": {
+        "id": "82742357",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Take the effort out of your round",
+          "preview_text": "🎁 Try it with 10% off discount code",
+          "template_id": "UJiiHB",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": {
+           "condition_groups": [
+            {
+             "conditions": [
+              {
+               "type": "profile-metric",
+               "metric_id": "ULCbbQ",
+               "measurement": "count",
+               "measurement_filter": {
+                "type": "numeric",
+                "operator": "greater-than",
+                "value": 0
+               },
+               "timeframe_filter": {
+                "type": "date",
+                "operator": "flow-start"
+               },
+               "metric_filters": null
+              },
+              {
+               "type": "profile-metric",
+               "metric_id": "T9sNn9",
+               "measurement": "count",
+               "measurement_filter": {
+                "type": "numeric",
+                "operator": "equals",
+                "value": 0
+               },
+               "timeframe_filter": {
+                "type": "date",
+                "operator": "flow-start"
+               },
+               "metric_filters": null
+              }
+             ]
+            }
+           ]
+          },
+          "name": "WELCOME 2 - ONE Best Seller",
+          "id": "Siv8C7"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": {
+        "id": "01KJ9XWQ4TRT2P97XZNPY3QQG7",
+        "name": null,
+        "variations": [
+         {
+          "id": "100393784",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "Take the effort out of your round",
+            "preview_text": "🎁 Try it with 10% off discount code",
+            "template_id": "RvSNCg",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": {
+             "condition_groups": [
+              {
+               "conditions": [
+                {
+                 "type": "profile-metric",
+                 "metric_id": "ULCbbQ",
+                 "measurement": "count",
+                 "measurement_filter": {
+                  "type": "numeric",
+                  "operator": "greater-than",
+                  "value": 0
+                 },
+                 "timeframe_filter": {
+                  "type": "date",
+                  "operator": "flow-start"
+                 },
+                 "metric_filters": null
+                },
+                {
+                 "type": "profile-metric",
+                 "metric_id": "T9sNn9",
+                 "measurement": "count",
+                 "measurement_filter": {
+                  "type": "numeric",
+                  "operator": "equals",
+                  "value": 0
+                 },
+                 "timeframe_filter": {
+                  "type": "date",
+                  "operator": "flow-start"
+                 },
+                 "metric_filters": null
+                }
+               ]
+              }
+             ]
+            },
+            "name": "WELCOME 2 - ONE Best Seller Test #1 February 25, 2026 Variation A",
+            "id": "XwbvLk"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         },
+         {
+          "id": "100393785",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "Our #1 Seller. For Good Reason.",
+            "preview_text": "🎁 Try it with 10% off discount code",
+            "template_id": "UtHx2B",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": {
+             "condition_groups": [
+              {
+               "conditions": [
+                {
+                 "type": "profile-metric",
+                 "metric_id": "ULCbbQ",
+                 "measurement": "count",
+                 "measurement_filter": {
+                  "type": "numeric",
+                  "operator": "greater-than",
+                  "value": 0
+                 },
+                 "timeframe_filter": {
+                  "type": "date",
+                  "operator": "flow-start"
+                 },
+                 "metric_filters": null
+                },
+                {
+                 "type": "profile-metric",
+                 "metric_id": "T9sNn9",
+                 "measurement": "count",
+                 "measurement_filter": {
+                  "type": "numeric",
+                  "operator": "equals",
+                  "value": 0
+                 },
+                 "timeframe_filter": {
+                  "type": "date",
+                  "operator": "flow-start"
+                 },
+                 "metric_filters": null
+                }
+               ]
+              }
+             ]
+            },
+            "name": "WELCOME 2 - ONE Best Seller Test #1 February 25, 2026 Variation B",
+            "id": "SFhDw8"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         }
+        ],
+        "allocations": {
+         "100393784": 0.59875,
+         "100393785": 0.40125
+        },
+        "started": "2026-02-25T08:22:31.271494+00:00",
+        "winner_metric": "unique-opens",
+        "automatic_winner_selection_settings": {
+         "enabled": true,
+         "automatic_end_date": null,
+         "automatic_end_statistical_certainty": true
+        }
+       }
+      },
+      "links": {
+       "next": "87010606"
+      }
+     },
+     {
+      "id": "87010606",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "11:30:00"
+      },
+      "links": {
+       "next": "100397209"
+      }
+     },
+     {
+      "id": "100397209",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "live",
+       "main_action": {
+        "id": "82742359",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "💬 What pros know that most don’t",
+          "preview_text": "How they stay sharp through 18 holes",
+          "template_id": "T8sbY6",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "WELCOME 3 - VALUE: Energy Preservation",
+          "id": "U6V28A"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": {
+        "id": "01KJA0PS6S6YX1RRPM44CZAEJ8",
+        "name": null,
+        "variations": [
+         {
+          "id": "100397211",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "💬 What pros know that most don’t",
+            "preview_text": "How they stay sharp through 18 holes",
+            "template_id": "Yi84SL",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": null,
+            "name": "WELCOME 3 - VALUE: Energy Preservation Test #1 February 25, 2026 Variation A",
+            "id": "WvGbnh"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         },
+         {
+          "id": "100397212",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "Let the Trolley Do the Work",
+            "preview_text": "How they stay sharp through 18 holes",
+            "template_id": "XF72g9",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": null,
+            "name": "WELCOME 3 - VALUE: Energy Preservation Test #1 February 25, 2026 Variation B",
+            "id": "VSF8KE"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         }
+        ],
+        "allocations": {
+         "100397211": 0.44175,
+         "100397212": 0.55825
+        },
+        "started": "2026-02-25T09:08:03.870897+00:00",
+        "winner_metric": "unique-opens",
+        "automatic_winner_selection_settings": {
+         "enabled": true,
+         "automatic_end_date": null,
+         "automatic_end_statistical_certainty": true
+        }
+       }
+      },
+      "links": {
+       "next": "82742360"
+      }
+     },
+     {
+      "id": "82742360",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 2,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "14:30:00"
+      },
+      "links": {
+       "next": "100397548"
+      }
+     },
+     {
+      "id": "100397548",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "live",
+       "main_action": {
+        "id": "82742361",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Still thinking it over?",
+          "preview_text": "⚠️ Your discount ends tomorrow",
+          "template_id": "TmCcVV",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": {
+           "condition_groups": [
+            {
+             "conditions": [
+              {
+               "type": "profile-metric",
+               "metric_id": "T9sNn9",
+               "measurement": "count",
+               "measurement_filter": {
+                "type": "numeric",
+                "operator": "equals",
+                "value": 0
+               },
+               "timeframe_filter": {
+                "type": "date",
+                "operator": "flow-start"
+               },
+               "metric_filters": null
+              }
+             ]
+            }
+           ]
+          },
+          "name": "WELCOME 4 - POSTER: Reminder to Redeem Voucher",
+          "id": "XFLM9y"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": {
+        "id": "01KJA10A3TQ8H8RZJ778Z3RC8Y",
+        "name": null,
+        "variations": [
+         {
+          "id": "100397549",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "Still thinking it over?",
+            "preview_text": "⚠️ Your discount ends tomorrow",
+            "template_id": "QXgL9w",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": {
+             "condition_groups": [
+              {
+               "conditions": [
+                {
+                 "type": "profile-metric",
+                 "metric_id": "T9sNn9",
+                 "measurement": "count",
+                 "measurement_filter": {
+                  "type": "numeric",
+                  "operator": "equals",
+                  "value": 0
+                 },
+                 "timeframe_filter": {
+                  "type": "date",
+                  "operator": "flow-start"
+                 },
+                 "metric_filters": null
+                }
+               ]
+              }
+             ]
+            },
+            "name": "WELCOME 4 - POSTER: Reminder to Redeem Voucher Test #1 February 25, 2026 Variation A",
+            "id": "WXzthA"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         },
+         {
+          "id": "100397552",
+          "type": "send-email",
+          "data": {
+           "message": {
+            "from_email": "info@evolutiongolf.co.uk",
+            "from_label": "⛳ Evolution Golf",
+            "reply_to_email": null,
+            "cc_email": null,
+            "bcc_email": null,
+            "subject_line": "Your discount expires tomorrow",
+            "preview_text": "Don't let it slip away.",
+            "template_id": "Ti6rVe",
+            "smart_sending_enabled": true,
+            "transactional": false,
+            "add_tracking_params": true,
+            "custom_tracking_params": null,
+            "additional_filters": {
+             "condition_groups": [
+              {
+               "conditions": [
+                {
+                 "type": "profile-metric",
+                 "metric_id": "T9sNn9",
+                 "measurement": "count",
+                 "measurement_filter": {
+                  "type": "numeric",
+                  "operator": "equals",
+                  "value": 0
+                 },
+                 "timeframe_filter": {
+                  "type": "date",
+                  "operator": "flow-start"
+                 },
+                 "metric_filters": null
+                }
+               ]
+              }
+             ]
+            },
+            "name": "WELCOME 4 - POSTER: Reminder to Redeem Voucher Test #1 February 25, 2026 Variation B",
+            "id": "RvEyqK"
+           },
+           "status": "live"
+          },
+          "links": {
+           "next": null
+          }
+         }
+        ],
+        "allocations": {
+         "100397549": 0.4165,
+         "100397552": 0.5835
+        },
+        "started": "2026-02-25T09:13:56.087118+00:00",
+        "winner_metric": "unique-opens",
+        "automatic_winner_selection_settings": {
+         "enabled": true,
+         "automatic_end_date": null,
+         "automatic_end_statistical_certainty": true
+        }
+       }
+      },
+      "links": {
+       "next": "82742362"
+      }
+     },
+     {
+      "id": "82742362",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "17:30:00"
+      },
+      "links": {
+       "next": "99545753"
+      }
+     },
+     {
+      "id": "99545753",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Your new golf shop 🏌️",
+        "preview_text": "Every category. One destination. ",
+        "template_id": "TkBqeG",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": {
+         "condition_groups": [
+          {
+           "conditions": [
+            {
+             "type": "profile-metric",
+             "metric_id": "T9sNn9",
+             "measurement": "count",
+             "measurement_filter": {
+              "type": "numeric",
+              "operator": "equals",
+              "value": 0
+             },
+             "timeframe_filter": {
+              "type": "date",
+              "operator": "flow-start"
+             },
+             "metric_filters": null
+            }
+           ]
+          }
+         ]
+        },
+        "name": "Welcome Email Additional",
+        "id": "RqkL9A"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "99935009"
+      }
+     },
+     {
+      "id": "99935009",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 2,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "17:30:00"
+      },
+      "links": {
+       "next": "82742363"
+      }
+     },
+     {
+      "id": "82742363",
+      "type": "conditional-split",
+      "data": {
+       "profile_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "profile-metric",
+            "metric_id": "ULCbbQ",
+            "measurement": "count",
+            "measurement_filter": {
+             "type": "numeric",
+             "operator": "greater-than",
+             "value": 0
+            },
+            "timeframe_filter": {
+             "type": "date",
+             "operator": "flow-start"
+            },
+            "metric_filters": null
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "links": {
+       "next_if_true": "82742366",
+       "next_if_false": "82742364"
+      }
+     },
+     {
+      "id": "82742366",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "Alex from ⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "A Message from Alex",
+        "preview_text": "",
+        "template_id": "VB6ShU",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "WELCOME 5 - (PT) LAST REMINDER",
+        "id": "R4t3nR"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "87849972"
+      }
+     },
+     {
+      "id": "82742364",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Hey {{ person.first_name|default:'' }}Hey {{ first_name }}, check spam/junk for emails from Evolution Golf. Reply STOP to unsubscribe.",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": {
+         "condition_groups": [
+          {
+           "conditions": [
+            {
+             "type": "profile-metric",
+             "metric_id": "SWbhwQ",
+             "measurement": "count",
+             "measurement_filter": {
+              "type": "numeric",
+              "operator": "greater-than",
+              "value": 0
+             },
+             "timeframe_filter": {
+              "type": "date",
+              "operator": "alltime"
+             },
+             "metric_filters": null
+            }
+           ]
+          }
+         ]
+        },
+        "name": "SMS #2 - Unengaged Reminder",
+        "id": "VgjR2s",
+        "message_hierarchy": [
+         {
+          "message": "Hey {{ person.first_name|default:'' }}Hey {{ first_name }}, check spam/junk for emails from Evolution Golf. Reply STOP to unsubscribe.",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Hey {{ person.first_name|default:'' }}Hey {{ first_name }}, check spam/junk for emails from Evolution Golf. Reply STOP to unsubscribe.",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "82742365"
+      }
+     },
+     {
+      "id": "87849972",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "{{ first_name }}, your EVO5 code expires soon.\nUse it now for 5% off:https://evolutiongolf.co.uk/discount/EVO5",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": {
+         "condition_groups": [
+          {
+           "conditions": [
+            {
+             "type": "profile-metric",
+             "metric_id": "SWbhwQ",
+             "measurement": "count",
+             "measurement_filter": {
+              "type": "numeric",
+              "operator": "greater-than",
+              "value": 0
+             },
+             "timeframe_filter": {
+              "type": "date",
+              "operator": "alltime"
+             },
+             "metric_filters": null
+            }
+           ]
+          },
+          {
+           "conditions": [
+            {
+             "type": "profile-metric",
+             "metric_id": "T9sNn9",
+             "measurement": "count",
+             "measurement_filter": {
+              "type": "numeric",
+              "operator": "equals",
+              "value": 0
+             },
+             "timeframe_filter": {
+              "type": "date",
+              "operator": "flow-start"
+             },
+             "metric_filters": null
+            }
+           ]
+          }
+         ]
+        },
+        "name": "SMS: WELCOME 3 - Discount Expiring",
+        "id": "R3NFt5",
+        "message_hierarchy": [
+         {
+          "message": "{{ first_name }}, your EVO5 code expires soon.\nUse it now for 5% off:https://evolutiongolf.co.uk/discount/EVO5",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "{{ first_name }}, your EVO5 code expires soon.\nUse it now for 5% off:https://evolutiongolf.co.uk/discount/EVO5",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "82744090"
+      }
+     },
+     {
+      "id": "82742365",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "18:30:00"
+      },
+      "links": {
+       "next": "82742366"
+      }
+     },
+     {
+      "id": "82744090",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 2,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "82742372"
+      }
+     },
+     {
+      "id": "82742372",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['InWelcomeSequence']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "82742350"
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/SVwbeJ/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/SVwbeJ/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/SVwbeJ/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/SVwbeJ/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/SVwbeJ/"
+  }
+ }
+}

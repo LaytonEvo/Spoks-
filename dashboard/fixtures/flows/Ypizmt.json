@@ -1,0 +1,2102 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "Ypizmt",
+  "attributes": {
+   "name": "NEW: Abandoned Checkout (category-routed)",
+   "status": "live",
+   "trigger_type": "Metric",
+   "updated": "2026-07-06T09:30:15+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "metric",
+      "id": "SwrKKw",
+      "trigger_filter": null
+     }
+    ],
+    "profile_filter": {
+     "condition_groups": [
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "T9sNn9",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "flow-start"
+         },
+         "metric_filters": null
+        }
+       ]
+      },
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "Y2WUPe",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "in-the-last",
+          "unit": "day",
+          "quantity": 30
+         },
+         "metric_filters": null
+        }
+       ]
+      }
+     ]
+    },
+    "actions": [
+     {
+      "id": "107057747",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": true
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": "107058264"
+      }
+     },
+     {
+      "id": "107058264",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Electric Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "GPS Electric Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Remote Electric Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Motocaddy Electric Golf Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Push/Pull Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "New In Golf Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Push & Electric Golf Trolleys"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Push Golf Trolleys"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "SwrKKw",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107059825",
+       "next_if_false": "107060795"
+      }
+     },
+     {
+      "id": "107059825",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 15,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107059898"
+      }
+     },
+     {
+      "id": "107060795",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Drivers"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Wedges"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Putters"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Hybrids & Utility Irons"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Fairway Woods"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Clubs"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "All Approved Used Golf Clubs"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "All Approved Used Golf Clubs"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "SwrKKw",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107061305",
+       "next_if_false": "107061692"
+      }
+     },
+     {
+      "id": "107059898",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Hi {{ person.first_name|title|default:'' }}! Your trolley's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 1 — Trolleys (placeholder)",
+        "id": "XyrvHC",
+        "message_hierarchy": [
+         {
+          "message": "Hi {{ person.first_name|title|default:'' }}! Your trolley's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Hi {{ person.first_name|title|default:'' }}! Your trolley's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107059937"
+      }
+     },
+     {
+      "id": "107061305",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 15,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107061360"
+      }
+     },
+     {
+      "id": "107061692",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Stand Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Cart Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Carry Bags"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Tour/Staff Bags"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "SwrKKw",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107061772",
+       "next_if_false": "107062087"
+      }
+     },
+     {
+      "id": "107059937",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107059962"
+      }
+     },
+     {
+      "id": "107061360",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Your club's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 1 — Clubs (placeholder)",
+        "id": "ULzxZn",
+        "message_hierarchy": [
+         {
+          "message": "Your club's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Your club's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107061417"
+      }
+     },
+     {
+      "id": "107061772",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 15,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107061792"
+      }
+     },
+     {
+      "id": "107062087",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Women's Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Spikeless Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Spiked Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Waterproof Golf Shoes"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Junior Golf Shoes"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "SwrKKw",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107062243",
+       "next_if_false": "107156497"
+      }
+     },
+     {
+      "id": "107059962",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "We've held your basket",
+        "preview_text": "",
+        "template_id": "XhSB6r",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 1 — Trolleys (placeholder)",
+        "id": "RJzPm4"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107060024"
+      }
+     },
+     {
+      "id": "107061417",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107593924"
+      }
+     },
+     {
+      "id": "107061792",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Your bag's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 1 — Bags (placeholder)",
+        "id": "T2DqDM",
+        "message_hierarchy": [
+         {
+          "message": "Your bag's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Your bag's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107061824"
+      }
+     },
+     {
+      "id": "107062243",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 15,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107064727"
+      }
+     },
+     {
+      "id": "107156497",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Golf Clothing"
+            }
+           },
+           {
+            "type": "metric-property",
+            "metric_id": "SwrKKw",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Women's Golf Clothing"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "SwrKKw",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "107156802",
+       "next_if_false": "107157159"
+      }
+     },
+     {
+      "id": "107060024",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107060111"
+      }
+     },
+     {
+      "id": "107593924",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "completed",
+       "main_action": {
+        "id": "107061458",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Your club basket, still here",
+          "preview_text": "",
+          "template_id": "VASxei",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 1 — Clubs (placeholder)",
+          "id": "SsWnin"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": null
+      },
+      "links": {
+       "next": "107061476"
+      }
+     },
+     {
+      "id": "107061824",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107598467"
+      }
+     },
+     {
+      "id": "107064727",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Your footwear's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 1 — Footwear (placeholder)",
+        "id": "RUVzRY",
+        "message_hierarchy": [
+         {
+          "message": "Your footwear's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Your footwear's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107064738"
+      }
+     },
+     {
+      "id": "107156802",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 15,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107156824"
+      }
+     },
+     {
+      "id": "107157159",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 15,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107157182"
+      }
+     },
+     {
+      "id": "107060111",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "5% off your trolley, 3 days only",
+        "preview_text": "",
+        "template_id": "Y7WUkQ",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Trolleys (placeholder)",
+        "id": "UTsNzf"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107060160"
+      }
+     },
+     {
+      "id": "107061476",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107061516"
+      }
+     },
+     {
+      "id": "107598467",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "completed",
+       "main_action": {
+        "id": "107061875",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Your bag — basket held",
+          "preview_text": "",
+          "template_id": "WXKs7c",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 1 — Bags (placeholder)",
+          "id": "TJSXEa"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": null
+      },
+      "links": {
+       "next": "107061928"
+      }
+     },
+     {
+      "id": "107064738",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107599419"
+      }
+     },
+     {
+      "id": "107156824",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Your kit's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 1 — Clothing (placeholder)",
+        "id": "XvyDGE",
+        "message_hierarchy": [
+         {
+          "message": "Your kit's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Your kit's still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107156843"
+      }
+     },
+     {
+      "id": "107157182",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Your items are still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 1 — Fallback (placeholder)",
+        "id": "RYyYA4",
+        "message_hierarchy": [
+         {
+          "message": "Your items are still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Your items are still in your basket. Finish up here: {{ event.extra.checkout_url }}\n",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107157204"
+      }
+     },
+     {
+      "id": "107060160",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "18:00:00"
+      },
+      "links": {
+       "next": "107592781"
+      }
+     },
+     {
+      "id": "107061516",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "5% off your clubs, 3 days only",
+        "preview_text": "",
+        "template_id": "U6yBdD",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Clubs (placeholder)",
+        "id": "VkK6pF"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107061529"
+      }
+     },
+     {
+      "id": "107061928",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107061947"
+      }
+     },
+     {
+      "id": "107599419",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "completed",
+       "main_action": {
+        "id": "107064766",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Your shoe basket — still here",
+          "preview_text": "",
+          "template_id": "XxjJt9",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 1 — Footwear (placeholder)",
+          "id": "TbyV9A"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": null
+      },
+      "links": {
+       "next": "107064775"
+      }
+     },
+     {
+      "id": "107156843",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107600289"
+      }
+     },
+     {
+      "id": "107157204",
+      "type": "time-delay",
+      "data": {
+       "unit": "minutes",
+       "value": 30,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107601623"
+      }
+     },
+     {
+      "id": "107592781",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "completed",
+       "main_action": {
+        "id": "107060266",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Last note on your trolley",
+          "preview_text": "",
+          "template_id": "YjaJJV",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 3 — Trolleys (placeholder)",
+          "id": "WfiEeB"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": null
+      },
+      "links": {
+       "next": "107060300"
+      }
+     },
+     {
+      "id": "107061529",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "18:00:00"
+      },
+      "links": {
+       "next": "107061565"
+      }
+     },
+     {
+      "id": "107061947",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "5% off — code inside",
+        "preview_text": "",
+        "template_id": "RnRDKn",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Bags (placeholder)",
+        "id": "VB7Bse"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107061984"
+      }
+     },
+     {
+      "id": "107064775",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107064864"
+      }
+     },
+     {
+      "id": "107600289",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "completed",
+       "main_action": {
+        "id": "107156856",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Your basket is still here",
+          "preview_text": "",
+          "template_id": "UtrZBf",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 1 — Clothing (placeholder)",
+          "id": "UXtt5D"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": null
+      },
+      "links": {
+       "next": "107156872"
+      }
+     },
+     {
+      "id": "107601623",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "completed",
+       "main_action": {
+        "id": "107157216",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "Your basket is still here",
+          "preview_text": "",
+          "template_id": "Yrev4V",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 1 — Fallback (placeholder)",
+          "id": "V3Cdn9"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": null
+      },
+      "links": {
+       "next": "107157225"
+      }
+     },
+     {
+      "id": "107060300",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107060317"
+      }
+     },
+     {
+      "id": "107061565",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Last note on the clubs",
+        "preview_text": "",
+        "template_id": "YwErHh",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 3 — Clubs (placeholder)",
+        "id": "Rzd4zL"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107061581"
+      }
+     },
+     {
+      "id": "107061984",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "18:00:00"
+      },
+      "links": {
+       "next": "107062006"
+      }
+     },
+     {
+      "id": "107064864",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "5% off the shoes if you finish this week",
+        "preview_text": "",
+        "template_id": "Rw7qf8",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Footwear (placeholder)",
+        "id": "Sv78gh"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107064901"
+      }
+     },
+     {
+      "id": "107156872",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107156881"
+      }
+     },
+     {
+      "id": "107157225",
+      "type": "time-delay",
+      "data": {
+       "unit": "hours",
+       "value": 5,
+       "secondary_value": 0,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107157243"
+      }
+     },
+     {
+      "id": "107060317",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 2 — Trolleys (placeholder)",
+        "id": "T4bqQs",
+        "message_hierarchy": [
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107060348"
+      }
+     },
+     {
+      "id": "107061581",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107061592"
+      }
+     },
+     {
+      "id": "107062006",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Last note on your bag",
+        "preview_text": "",
+        "template_id": "V9Vbwp",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 3 — Bags (placeholder)",
+        "id": "XEBL5B"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107062015"
+      }
+     },
+     {
+      "id": "107064901",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "18:00:00"
+      },
+      "links": {
+       "next": "107064925"
+      }
+     },
+     {
+      "id": "107156881",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "5% off — your basket plus the code",
+        "preview_text": "",
+        "template_id": "VHKdNK",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 2 — Clothing (placeholder)",
+        "id": "VB5KJC"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107156892"
+      }
+     },
+     {
+      "id": "107157243",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "5% off if you finish your order this week",
+        "preview_text": "",
+        "template_id": "WaNfBJ",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "5% off if you finish today",
+        "id": "YrctxN"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107157264"
+      }
+     },
+     {
+      "id": "107060348",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107061592",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 2 — Clubs (placeholder)",
+        "id": "S8c6Tm",
+        "message_hierarchy": [
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107061608"
+      }
+     },
+     {
+      "id": "107062015",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107062027"
+      }
+     },
+     {
+      "id": "107064925",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Last note on the shoes",
+        "preview_text": "",
+        "template_id": "VmNcmx",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 3 — Footwear (placeholder)",
+        "id": "V925jq"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107064957"
+      }
+     },
+     {
+      "id": "107156892",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "18:00:00"
+      },
+      "links": {
+       "next": "107156912"
+      }
+     },
+     {
+      "id": "107157264",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile",
+       "delay_until_time": "18:00:00"
+      },
+      "links": {
+       "next": "107602668"
+      }
+     },
+     {
+      "id": "107061608",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107062027",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 2 — Bags (placeholder)",
+        "id": "TftrAH",
+        "message_hierarchy": [
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107062040"
+      }
+     },
+     {
+      "id": "107064957",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107609821"
+      }
+     },
+     {
+      "id": "107156912",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Last note on your basket",
+        "preview_text": "",
+        "template_id": "XGY87D",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Email 3 — Clothing (placeholder)",
+        "id": "RNWtSm"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107156934"
+      }
+     },
+     {
+      "id": "107602668",
+      "type": "ab-test",
+      "data": {
+       "status": "live",
+       "experiment_status": "completed",
+       "main_action": {
+        "id": "107157278",
+        "type": "send-email",
+        "data": {
+         "message": {
+          "from_email": "info@evolutiongolf.co.uk",
+          "from_label": "⛳ Evolution Golf",
+          "reply_to_email": null,
+          "cc_email": null,
+          "bcc_email": null,
+          "subject_line": "One more note",
+          "preview_text": "",
+          "template_id": "Tddmeg",
+          "smart_sending_enabled": true,
+          "transactional": false,
+          "add_tracking_params": true,
+          "custom_tracking_params": null,
+          "additional_filters": null,
+          "name": "Email 3 — Fallback (placeholder)",
+          "id": "UVzcUA"
+         },
+         "status": "live"
+        },
+        "links": {
+         "next": null
+        }
+       },
+       "current_experiment": null
+      },
+      "links": {
+       "next": "107157299"
+      }
+     },
+     {
+      "id": "107062040",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107609821",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "Text message #12",
+        "id": "RVMbuL",
+        "message_hierarchy": [
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107064985"
+      }
+     },
+     {
+      "id": "107156934",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107156943"
+      }
+     },
+     {
+      "id": "107157299",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 1,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "107157323"
+      }
+     },
+     {
+      "id": "107064985",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107156943",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 2 — Clothing (placeholder)",
+        "id": "VUb323",
+        "message_hierarchy": [
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107156958"
+      }
+     },
+     {
+      "id": "107157323",
+      "type": "send-sms",
+      "data": {
+       "message": {
+        "body": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+        "image_id": null,
+        "dynamic_image": null,
+        "shorten_links": true,
+        "include_contact_card": false,
+        "add_org_prefix": true,
+        "add_info_link": true,
+        "add_opt_out_language": true,
+        "smart_sending_enabled": true,
+        "sms_quiet_hours_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "template_id": null,
+        "additional_filters": null,
+        "name": "SMS 2 — Fallback (placeholder)",
+        "id": "RYjJyB",
+        "message_hierarchy": [
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "RCS",
+          "extra": {}
+         },
+         {
+          "message": "Last call: 10% off with {% coupon_code 'BASKET10' %}. Ends tonight: {{ event.extra.checkout_url }}",
+          "message_format": "SMS",
+          "extra": {
+           "should_use_same_content": false
+          }
+         }
+        ]
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "107157332"
+      }
+     },
+     {
+      "id": "107156958",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "107157332",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_abandon_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "107057747",
+    "reentry_criteria": {
+     "duration": 21,
+     "unit": "day"
+    }
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/Ypizmt/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/Ypizmt/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/Ypizmt/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/Ypizmt/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/Ypizmt/"
+  }
+ }
+}

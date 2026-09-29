@@ -75,3 +75,10 @@ pack, and a recommendation on building the other flows this way. Then stop.
 ## 29 Sep 2026 (latest): F3 Trolleys draft flow built
 - Flow UXsJ3d (draft) + master templates Sc4LsT / VC22MY / W3wixR / VjRZzQ. Full details and the UI to-do list: `docs/03-build-log.md`.
 - Flow definition: `klaviyo/flows/f3-trolleys.json` (MemberTier split uses `existence` / `is-set`).
+
+## 29 Sep 2026: read-only flow dashboard (Phase 1)
+- App in `dashboard/` (FastAPI + vanilla JS). Reads Klaviyo flows, per-message performance (30d/90d/12m), renders emails
+  with an example basket, runs rule-based checks, Claude reviews (`claude-opus-5-5`, structured output), team notes. Never writes to Klaviyo.
+- Runs on saved test data (`dashboard/fixtures/`, 18 flows + 90-day report) until `KLAVIYO_API_KEY` is set. See `dashboard/README.md`.
+- Not yet deployed. Needs: Klaviyo read-only private key, dashboard password, Anthropic API key (reviews), Railway service with a /data volume.
+- Unverified until first live run: Klaviyo `revision` (default 2025-10-15) accepting `additional-fields[flow]=definition`; review call (no API key here to test).

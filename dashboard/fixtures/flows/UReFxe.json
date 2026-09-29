@@ -1,0 +1,1450 @@
+{
+ "data": {
+  "type": "flow",
+  "id": "UReFxe",
+  "attributes": {
+   "name": "NEW: Post-Fulfillment",
+   "status": "live",
+   "trigger_type": "Metric",
+   "updated": "2026-09-01T09:03:58+00:00",
+   "definition": {
+    "triggers": [
+     {
+      "type": "metric",
+      "id": "T9sNn9",
+      "trigger_filter": null
+     }
+    ],
+    "profile_filter": {
+     "condition_groups": [
+      {
+       "conditions": [
+        {
+         "type": "profile-metric",
+         "metric_id": "Y2WUPe",
+         "measurement": "count",
+         "measurement_filter": {
+          "type": "numeric",
+          "operator": "equals",
+          "value": 0
+         },
+         "timeframe_filter": {
+          "type": "date",
+          "operator": "in-the-last",
+          "unit": "day",
+          "quantity": 30
+         },
+         "metric_filters": null
+        }
+       ]
+      }
+     ]
+    },
+    "actions": [
+     {
+      "id": "116120916",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": true
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": "116120917"
+      }
+     },
+     {
+      "id": "116120917",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 3,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121713"
+      }
+     },
+     {
+      "id": "116121713",
+      "type": "multi-branch-split",
+      "data": {
+       "branches": [
+        {
+         "branch_id": "1d5db6",
+         "branch_filter": {
+          "condition_groups": [
+           {
+            "conditions": [
+             {
+              "type": "profile-metric",
+              "metric_id": "WJizp7",
+              "measurement": "count",
+              "measurement_filter": {
+               "type": "numeric",
+               "operator": "greater-than",
+               "value": 0
+              },
+              "timeframe_filter": {
+               "type": "date",
+               "operator": "flow-start"
+              },
+              "metric_filters": null
+             }
+            ]
+           }
+          ]
+         },
+         "links": {
+          "next": "116120918"
+         },
+         "order": 0,
+         "name": "Path #1"
+        },
+        {
+         "branch_id": "b98c63",
+         "branch_filter": null,
+         "links": null,
+         "is_else": true
+        }
+       ],
+       "name": "Split #1"
+      }
+     },
+     {
+      "id": "116120918",
+      "type": "conditional-split",
+      "data": {
+       "profile_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "profile-metric",
+            "metric_id": "T9sNn9",
+            "measurement": "count",
+            "measurement_filter": {
+             "type": "numeric",
+             "operator": "equals",
+             "value": 1
+            },
+            "timeframe_filter": {
+             "type": "date",
+             "operator": "alltime"
+            },
+            "metric_filters": null
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "links": {
+       "next_if_true": "116120919",
+       "next_if_false": "116120920"
+      }
+     },
+     {
+      "id": "116120919",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "T9sNn9",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Push & Electric Golf Trolleys"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "T9sNn9",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "116120930",
+       "next_if_false": "116120942"
+      }
+     },
+     {
+      "id": "116120920",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Order's in — welcome to Evo Golf",
+        "preview_text": "What to expect from here.",
+        "template_id": "VpCtNt",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 1 — Existing customer thank you (placeholder)",
+        "id": "RNLGMv"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120923"
+      }
+     },
+     {
+      "id": "116120930",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Your trolley's on its way!",
+        "preview_text": "",
+        "template_id": "TzbA9t",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 1 — Trolleys ownership welcome (placeholder)",
+        "id": "RLKGCY"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120931"
+      }
+     },
+     {
+      "id": "116120942",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "T9sNn9",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Golf Clubs"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "T9sNn9",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "116120943",
+       "next_if_false": "116120955"
+      }
+     },
+     {
+      "id": "116120923",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 13,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120924"
+      }
+     },
+     {
+      "id": "116120931",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 6,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120932"
+      }
+     },
+     {
+      "id": "116120943",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Good choice on the clubs",
+        "preview_text": "",
+        "template_id": "XMDDPq",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 1 — Clubs ownership welcome (placeholder)",
+        "id": "VZdLiV"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120945"
+      }
+     },
+     {
+      "id": "116120955",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "T9sNn9",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Golf Bags"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "T9sNn9",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "116120956",
+       "next_if_false": "116120995"
+      }
+     },
+     {
+      "id": "116120924",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Quick favour, please",
+        "preview_text": "",
+        "template_id": "UwHE9E",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 14 — Existing customer review request (placeholder)",
+        "id": "SJhLDb"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120926"
+      }
+     },
+     {
+      "id": "116120932",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Your trolley plus the small stuff",
+        "preview_text": "The bits trolley owners rate most.",
+        "template_id": "TRFBnw",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 7 — Trolleys soft 2nd-order nudge (placeholder)",
+        "id": "S5fHS3"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120935"
+      }
+     },
+     {
+      "id": "116120945",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 6,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120946"
+      }
+     },
+     {
+      "id": "116120956",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Good choice on the bag",
+        "preview_text": "What to expect, and one tip for the setup.",
+        "template_id": "Wb5x45",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 1 — Bags ownership welcome (placeholder)",
+        "id": "SAdL37"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120958"
+      }
+     },
+     {
+      "id": "116120995",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "T9sNn9",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Golf Shoes"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "T9sNn9",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "116120997",
+       "next_if_false": "116121016"
+      }
+     },
+     {
+      "id": "116120926",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 16,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120927"
+      }
+     },
+     {
+      "id": "116120935",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120936"
+      }
+     },
+     {
+      "id": "116120946",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Around the new club",
+        "preview_text": "The usual second buys, in one place.",
+        "template_id": "V8iWE8",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 7 — Clubs soft 2nd-order nudge (placeholde",
+        "id": "RxtbDa"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120949"
+      }
+     },
+     {
+      "id": "116120958",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 6,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120959"
+      }
+     },
+     {
+      "id": "116120997",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Good choice on the shoes",
+        "preview_text": "What to expect, and one tip before the first round.",
+        "template_id": "UyvqgJ",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 1 — Footwear ownership welcome (placeholder)",
+        "id": "SL5wLf"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121001"
+      }
+     },
+     {
+      "id": "116121016",
+      "type": "trigger-split",
+      "data": {
+       "trigger_filter": {
+        "condition_groups": [
+         {
+          "conditions": [
+           {
+            "type": "metric-property",
+            "metric_id": "T9sNn9",
+            "field": "Collections",
+            "filter": {
+             "type": "list",
+             "operator": "contains",
+             "value": "Mens Golf Clothing"
+            }
+           }
+          ]
+         }
+        ]
+       },
+       "trigger_id": "T9sNn9",
+       "trigger_type": "metric",
+       "trigger_subtype": null
+      },
+      "links": {
+       "next_if_true": "116121017",
+       "next_if_false": "116121031"
+      }
+     },
+     {
+      "id": "116120927",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "A bit of what we're working on",
+        "preview_text": "Behind the scenes at Evo Golf.",
+        "template_id": "UTQVJ7",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 30 — Existing customer brand story (placeholder)",
+        "id": "RiZaH9"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120929"
+      }
+     },
+     {
+      "id": "116120936",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Quick favour on the trolley",
+        "preview_text": "",
+        "template_id": "UabCBz",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 14 — Trolleys review request (placeholder)",
+        "id": "Yn4sfa"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120937"
+      }
+     },
+     {
+      "id": "116120949",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120950"
+      }
+     },
+     {
+      "id": "116120959",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Filling the new bag",
+        "preview_text": "The bits that usually go in first.",
+        "template_id": "YkCG8Z",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 7 — Bags soft 2nd-order nudge (placeholder)",
+        "id": "WycNCw"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120968"
+      }
+     },
+     {
+      "id": "116121001",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 6,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121002"
+      }
+     },
+     {
+      "id": "116121017",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Building out the kit",
+        "preview_text": "What to expect, and a care tip that matters.",
+        "template_id": "WwM4wm",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 1 — Clothing ownership welcome (placeholder)",
+        "id": "X9N78Y"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121018"
+      }
+     },
+     {
+      "id": "116121031",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Order's in — welcome to Evo Golf",
+        "preview_text": "",
+        "template_id": "VxdYmD",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 1 — Fallback ownership welcome",
+        "id": "RWndkF"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121043"
+      }
+     },
+     {
+      "id": "116120929",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "116120937",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120938"
+      }
+     },
+     {
+      "id": "116120950",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Quick favour on the new club",
+        "preview_text": "",
+        "template_id": "YtgWCU",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 14 — Clubs review request (placeholder)",
+        "id": "USrbBW"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120951"
+      }
+     },
+     {
+      "id": "116120968",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120969"
+      }
+     },
+     {
+      "id": "116121002",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Shoes plus the small stuff",
+        "preview_text": "",
+        "template_id": "XgsmCT",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 7 — Footwear soft 2nd-order nudge (placeholder)",
+        "id": "Vu2u8q"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121005"
+      }
+     },
+     {
+      "id": "116121018",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 6,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121019"
+      }
+     },
+     {
+      "id": "116121043",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 6,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121044"
+      }
+     },
+     {
+      "id": "116120938",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Three weeks in with the trolley",
+        "preview_text": "Last one from this series, kept short.",
+        "template_id": "SJT2Fx",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 21 — Trolleys brand story (placeholder)",
+        "id": "VajWND"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120941"
+      }
+     },
+     {
+      "id": "116120951",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120952"
+      }
+     },
+     {
+      "id": "116120969",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Quick favour on the bag",
+        "preview_text": "",
+        "template_id": "WdFMeW",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 14 — Bags review request (placeholder)",
+        "id": "SCQ2dY"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120982"
+      }
+     },
+     {
+      "id": "116121005",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121006"
+      }
+     },
+     {
+      "id": "116121019",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "How's the new kit fitting in?",
+        "preview_text": "The layers that complete it.",
+        "template_id": "Wcg38M",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 7 — Clothing soft 2nd-order nudge (placeholder)",
+        "id": "SBqg7P"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121020"
+      }
+     },
+     {
+      "id": "116121044",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "One week in",
+        "preview_text": "",
+        "template_id": "WsK4dj",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 7 — Fallback soft 2nd-order nudge (placeholder)",
+        "id": "UEjaGQ"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121046"
+      }
+     },
+     {
+      "id": "116120941",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "116120952",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Three weeks in with the club",
+        "preview_text": "",
+        "template_id": "VMWftC",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 21 — Clubs brand story (placeholder)",
+        "id": "TZwmX9"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120954"
+      }
+     },
+     {
+      "id": "116120982",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116120983"
+      }
+     },
+     {
+      "id": "116121006",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Quick favour on the shoes",
+        "preview_text": "",
+        "template_id": "VR9KGR",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 14 — Footwear review request (placeholder)",
+        "id": "U4HScn"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121011"
+      }
+     },
+     {
+      "id": "116121020",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121021"
+      }
+     },
+     {
+      "id": "116121046",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121047"
+      }
+     },
+     {
+      "id": "116120954",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "116120983",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Three weeks in with the bag",
+        "preview_text": "",
+        "template_id": "RKVczb",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 21 — Bags brand story (placeholder)",
+        "id": "XLdTHf"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116120994"
+      }
+     },
+     {
+      "id": "116121011",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121012"
+      }
+     },
+     {
+      "id": "116121021",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Quick favour",
+        "preview_text": "",
+        "template_id": "TwVjXv",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 14 — Clothing review request (placeholder)",
+        "id": "XJN9B6"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121025"
+      }
+     },
+     {
+      "id": "116121047",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Quick favour",
+        "preview_text": "",
+        "template_id": "Y5Ur32",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 14 — Fallback review request (placeholder)",
+        "id": "Whuxwx"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121049"
+      }
+     },
+     {
+      "id": "116120994",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "116121012",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Three weeks in with the shoes",
+        "preview_text": "",
+        "template_id": "TbP4xz",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 21 — Footwear brand story (placeholder)",
+        "id": "Rppb36"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121015"
+      }
+     },
+     {
+      "id": "116121025",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121026"
+      }
+     },
+     {
+      "id": "116121049",
+      "type": "time-delay",
+      "data": {
+       "unit": "days",
+       "value": 7,
+       "secondary_value": null,
+       "timezone": "profile"
+      },
+      "links": {
+       "next": "116121050"
+      }
+     },
+     {
+      "id": "116121015",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "116121026",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "Three weeks in with your golf clothing",
+        "preview_text": "",
+        "template_id": "RuBFqQ",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 21 — Clothing brand story (placeholder)",
+        "id": "XuUnyU"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121030"
+      }
+     },
+     {
+      "id": "116121050",
+      "type": "send-email",
+      "data": {
+       "message": {
+        "from_email": "info@evolutiongolf.co.uk",
+        "from_label": "⛳ Evolution Golf",
+        "reply_to_email": null,
+        "cc_email": null,
+        "bcc_email": null,
+        "subject_line": "A short note, three weeks in",
+        "preview_text": "",
+        "template_id": "XcZBnd",
+        "smart_sending_enabled": true,
+        "transactional": false,
+        "add_tracking_params": true,
+        "custom_tracking_params": null,
+        "additional_filters": null,
+        "name": "Day 21 — Fallback brand story (placeholder)",
+        "id": "RPHWQL"
+       },
+       "status": "live"
+      },
+      "links": {
+       "next": "116121051"
+      }
+     },
+     {
+      "id": "116121030",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     },
+     {
+      "id": "116121051",
+      "type": "update-profile",
+      "data": {
+       "profile_operations": [
+        {
+         "operator": "update",
+         "property_type": "boolean",
+         "property_key": "properties['in_postpurchase_flow']",
+         "property_value": false
+        }
+       ],
+       "status": "live"
+      },
+      "links": {
+       "next": null
+      }
+     }
+    ],
+    "entry_action_id": "116120916",
+    "reentry_criteria": {
+     "duration": 30,
+     "unit": "day"
+    }
+   }
+  },
+  "relationships": {
+   "flow-actions": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/UReFxe/relationships/flow-actions/",
+     "related": "https://a.klaviyo.com/api/flows/UReFxe/flow-actions/"
+    }
+   },
+   "tags": {
+    "links": {
+     "self": "https://a.klaviyo.com/api/flows/UReFxe/relationships/tags/",
+     "related": "https://a.klaviyo.com/api/flows/UReFxe/tags/"
+    }
+   }
+  },
+  "links": {
+   "self": "https://a.klaviyo.com/api/flows/UReFxe/"
+  }
+ }
+}
