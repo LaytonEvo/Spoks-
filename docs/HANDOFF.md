@@ -47,3 +47,13 @@ pack, and a recommendation on building the other flows this way. Then stop.
 - **Blocked:** Windsor rejected `execute_action`: write actions are disabled for the Windsor user.
   Layton to enable under Windsor Settings > API Access ("Enable write actions for Claude, ChatGPT & API"), then re-run with that JSON unchanged.
 - Unverified filter shapes (first attempt will tell): `$value` `greater-than-or-equal` in trigger filter; `MemberTier` `existence/exists` split.
+
+## 29 Sep 2026 (later): paused building, working on design + content first (Layton's call)
+
+- Decisions: promote the £36/yr Evolution Golf Membership in abandonment emails; evolve the current email look
+  (don't redesign); imagery = Shopify product photos + existing Klaviyo images + Layton's lifestyle photos;
+  review via preview page + copy deck.
+- Copy deck (Claude Doc): https://claude.ai/code/artifact/d7f53e2a-2546-4994-8ae6-bf64cfc72477 (F3 Trolleys E1/E2/E2m/SMS/E3, facts table, open questions).
+- Hero product for mock-ups: Motocaddy 2026 M1 DHC Standard Lithium, £799 (gid://shopify/Product/8502252830978).
+- Blocked for design previews: sandbox can't fetch d3k81ch9hvuctc.cloudfront.net (Klaviyo images), cdn.shopify.com, evolutiongolf.co.uk.
+- Next: master email design (evolved from live template XhSB6r) + preview page, after copy sign-off.
