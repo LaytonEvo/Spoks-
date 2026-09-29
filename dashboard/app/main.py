@@ -62,6 +62,11 @@ async def lifespan(_app):
 app = FastAPI(title="Evolution Golf Flow Dashboard", docs_url=None, redoc_url=None, lifespan=lifespan)
 
 
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+
 @app.get("/", response_class=HTMLResponse)
 def index(user=Depends(auth)):
     return FileResponse(STATIC / "index.html")
