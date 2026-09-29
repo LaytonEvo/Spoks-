@@ -38,3 +38,7 @@ Spoks store id: `2745819a-e9db-41a1-8f76-442730a6a213` (workspace "Evolution Gol
 - New Spoks flows are named `EG · F<n> <Flow> · <Path>`; tags prefixed `eg_`.
 - FALLBACK steps: `… – FALLBACK (disabled: Layton to choose)`.
 - Brand: #006747 green, #003D27 dark green, #F1DA01 yellow (max one element per email), #FAF7F1 cream; Fraunces/Inter (fallback Georgia/Arial).
+- **Email design system: option B "On the course"** (chosen 29 Sep 2026; builder `klaviyo/design/build_f3_b.py`, rules `klaviyo/design/README.md`).
+- **White backgrounds rule:** the email canvas (outer background and card) is always white (#FFFFFF), never cream. Any image with a white
+  or transparent background (product shots, packshots, cut-outs) is flattened onto pure white (#FFFFFF), never cream or grey. Cream (#FAF7F1)
+  is only allowed as a fill for a small contained panel (USP strip, trade-in panel, member note), never behind an image.

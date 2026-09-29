@@ -28,7 +28,7 @@ SLOTS = {
                none="Hero dropped. The headline leads and the product card becomes the main image."),
     "H2": dict(emails="E2, E2m", where="Hero, under the header", what="A folded trolley going into a car boot, next to a golf bag. Backs up the \"Boot\" check.",
                size="1200 × 720 px (5:3), JPG, under 250 KB",
-               now="Shopify product shot of the M1 DHC folded, on cream: shows one model to everyone", now_status="Stop-gap",
+               now="Shopify product shot of the M1 DHC folded, on white: shows one model to everyone", now_status="Stop-gap",
                none="Hero dropped. The eyebrow and headline lead."),
     "M1": dict(emails="E2", where="Top of the membership panel", what="Evolution Golf membership card still-life (card, glove, ball, scorecard).",
                size="1200 × 800 px (3:2), JPG", now="Klaviyo \"member access\" image (1536 px). It shows The Open's logo on the card: check you have the rights, or crop it out",
@@ -90,7 +90,8 @@ class Ctx:
         return (f'<img class="full" src="{self.img[key]}" width="{w}" alt="" style="width:{w}px;max-width:100%;height:auto;{style}">{tag}')
 
 
-def shell(ctx, body, preheader, bg=CREAM, header=True):
+def shell(ctx, body, preheader, bg=WHITE, header=True):
+    # Rule: the email canvas is always white, so white-background product shots sit seamlessly.
     fonts = ('<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600'
              '&family=Inter:wght@400;600&display=swap" rel="stylesheet">') if ctx.web_fonts else ""
     head = (f'<tr><td bgcolor="{DG}" style="background:{DG};padding:18px 32px;">'
