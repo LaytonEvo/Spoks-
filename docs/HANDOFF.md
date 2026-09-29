@@ -26,3 +26,15 @@ Build **EG · F3 Checkout abandonment · Trolleys (TEST)** in Klaviyo as a Draft
 ## Report back to Layton
 Flow link, what Windsor could and couldn't set (splits, time-of-day, filters, templates, smart sending, SMS), every deviation from the
 pack, and a recommendation on building the other flows this way. Then stop.
+
+## Windsor `create_flow` — confirmed schema (29 Sep, via list_actions)
+- Windsor accounts connected: **Shopify only — Klaviyo not yet connected** (Layton to add it in Windsor).
+- Trigger: `metric` (metric_id + optional `trigger_filter`) or `list` (list_id). No segment trigger.
+- Flow-level `profile_filter` (optional).
+- Steps: `time-delay` (unit minutes/hours/days/weeks — **no time-of-day "send at 09:30"**), `send-email` (**template_id of an existing
+  Klaviyo template**, `from_email`, `from_label`, `subject_line`, `smart_sending_enabled`), `send-sms` (inline body),
+  `conditional-split` (`profile_filter`, next_if_true / next_if_false). **No trigger split, no update-profile-property step, no A/B.**
+- Created in Draft. `update_flow_status` exists (draft/manual/live) — **never call it.**
+- So: templates via the Klaviyo MCP (`create_email_template`), then Windsor `create_flow` referencing them. Per-email sender
+  ("Alex at Evolution Golf") IS possible. Category routing must use the metric `trigger_filter` (one flow per path) because splits are
+  profile-only.
