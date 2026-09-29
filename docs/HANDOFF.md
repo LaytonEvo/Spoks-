@@ -82,3 +82,7 @@ pack, and a recommendation on building the other flows this way. Then stop.
 - Runs on saved test data (`dashboard/fixtures/`, 18 flows + 90-day report) until `KLAVIYO_API_KEY` is set. See `dashboard/README.md`.
 - Not yet deployed. Needs: Klaviyo read-only private key, dashboard password, Anthropic API key (reviews), Railway service with a /data volume.
 - Unverified until first live run: Klaviyo `revision` (default 2025-10-15) accepting `additional-fields[flow]=definition`; review call (no API key here to test).
+- **Deployed on Railway** (29 Sep): project `evolution-golf-flow-dashboard` (8526c94b-…), service `flow-dashboard` (7266a04c-…),
+  root `/dashboard`, volume `dashboard-data` at `/data`, deploys from branch `claude/new-session-kmtqg8`.
+  URL: https://flow-dashboard-production-7b2a.up.railway.app (login user `evolution`; password is the `DASHBOARD_PASSWORD` Railway variable).
+  Runs on saved test data until `KLAVIYO_API_KEY` (and optionally `ANTHROPIC_API_KEY`) are added in Railway → service → Variables.
