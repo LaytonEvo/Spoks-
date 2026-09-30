@@ -269,7 +269,19 @@ def key_check(force=False):
         _key_check.update(out)
         return out
     out.update(read_account=f"{rname or '?'} ({rid})", write_account=f"{wname or '?'} ({wid})", ok=rid == wid)
-    if not out["ok"]:
+    if out["ok"]:
+        # Same account; can the write key actually see a flow email's template?
+        snap = snapshot.load() or {"flows": []}
+        tid = next((m.get("template_id") for f in snap["flows"] if f["status"] == "live"
+                    for m in snapshot._iter_messages(f["steps"]) if m.get("template_id")), None)
+        if tid:
+            try:
+                WriteClient().template_full(tid)
+            except Exception as e:
+                out["ok"] = False
+                out["message"] = ("The write key is in the right account but can't see the templates inside your flows "
+                                  f"(Klaviyo: {str(e)[:120]}). Give it Flows: Read access as well as Templates: Full and Accounts: Read.")
+    elif not out["ok"]:
         out["message"] = (f"The write key belongs to a different Klaviyo account ({wname or '?'}, {wid}) than the one "
                           f"the dashboard reads ({rname or '?'}, {rid}). Create the write key in the {rname or 'same'} account.")
     _key_check.clear()
