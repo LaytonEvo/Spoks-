@@ -21,3 +21,8 @@
 
 ### Clean-up for Layton (I don't delete)
 - Old test templates from the first attempt: THeprK, WqkQJ7, WS7nDW, Sf6hhp.
+
+## 30 Sep 2026: tag check for the fixes feature
+- Created test template `S7gn6z` "EG · TEST tag check (delete me)" (not used by any flow) to confirm tags render:
+  `{% unsubscribe_link %}` and `{% manage_preferences_link %}` work as link addresses; `{% unsubscribe_url %}` does not.
+  **Layton: please delete S7gn6z** along with the older test templates.

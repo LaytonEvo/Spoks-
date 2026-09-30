@@ -334,3 +334,64 @@ document.addEventListener("click", async (e) => {
     catch (err) { alertInline(btn, err.message); }
   }
 });
+
+// ---------- fixes: recommend → approve → apply ----------
+let fixState = { data: null, open: {} };
+async function renderFixes() {
+  fixState.data = await api("/api/fixes");
+  const d = fixState.data, all = d.fixes;
+  const group = (st) => all.filter((f) => st.includes(f.status));
+  const review = group(["proposed", "failed"]), todo = group(["manual"]), done = group(["applied", "done"]), closed = group(["dismissed", "reverted"]);
+  const scanning = d.scan.running;
+  const card = (f) => {
+    const loc = `<a href="#flow/${esc(f.flow_id)}">${esc(f.flow)}</a>${f.message ? ` · ${esc(f.message)}` : ""} ${pill(f.flow_status || "")}`;
+    const hist = (f.history || []).map((h) => `<li>${esc(h.at.slice(0, 16).replace("T", " "))} · ${esc(h.by)} · ${esc(h.action)}${h.detail ? ` – ${esc(h.detail)}` : ""}</li>`).join("");
+    const previews = f.kind !== "manual" ? `<details class="fix-prev" ${fixState.open[f.id] ? "open" : ""} data-fix-open="${esc(f.id)}"><summary>Show before and after</summary>
+        <div class="fix-frames"><figure><figcaption>Before</figcaption><iframe sandbox="" loading="lazy" src="/fixes/${esc(f.id)}/preview?which=before"></iframe></figure>
+        <figure><figcaption>After</figcaption><iframe sandbox="" loading="lazy" src="/fixes/${esc(f.id)}/preview?which=after"></iframe></figure></div></details>` : "";
+    let actions = "";
+    if (f.status === "proposed" || f.status === "failed") {
+      const edit = f.kind === "deadline" ? `<label class="fix-edit">Change “${esc(f.find.replace(/<[^>]+>/g, ""))}” to <input type="text" data-replace="${esc(f.id)}" value="${esc(f.replace)}" placeholder="(remove the sentence)"></label>` : "";
+      const canApply = f.kind === "manual" || d.writes_enabled;
+      actions = `${edit}<div class="fix-actions"><button type="button" class="btn" data-fix="approve" data-id="${esc(f.id)}" ${canApply ? "" : "disabled"}>${f.kind === "manual" ? "Approve: add to Klaviyo to-do" : "Approve and apply in Klaviyo"}</button>
+        <button type="button" class="btn-line" data-fix="dismiss" data-id="${esc(f.id)}">Dismiss</button></div>`;
+    } else if (f.status === "manual") {
+      actions = `<div class="fix-actions"><a class="btn-line" href="https://www.klaviyo.com/flow/${esc(f.flow_id)}/edit" target="_blank" rel="noopener">Open flow in Klaviyo ↗</a><button type="button" class="btn" data-fix="done" data-id="${esc(f.id)}">Mark done</button></div>`;
+    } else if (f.status === "applied") {
+      actions = `<div class="fix-actions"><button type="button" class="btn-line" data-fix="undo" data-id="${esc(f.id)}">Undo</button></div>`;
+    }
+    return `<article class="panel fix ${esc(f.status)}"><div class="fix-head"><span class="fix-kind ${esc(f.kind)}">${f.kind === "unsubscribe" ? "Compliance" : f.kind === "deadline" ? "DMCC check" : "In Klaviyo editor"}</span>
+        <h3>${esc(f.title)}</h3><span class="stat ${f.status === "applied" || f.status === "done" ? "live" : f.status === "failed" ? "todo" : f.status === "manual" ? "draft" : "skip"}">${esc({ proposed: "Waiting for approval", failed: "Needs attention", manual: "To do in Klaviyo", applied: "Applied", done: "Done", dismissed: "Dismissed", reverted: "Undone" }[f.status])}</span></div>
+      <p class="fix-loc">${loc}</p><p>${esc(f.why)}</p>${f.change ? `<p class="muted">Change: ${esc(f.change)}</p>` : ""}
+      ${previews}${actions}${hist ? `<ul class="fix-hist">${hist}</ul>` : ""}</article>`;
+  };
+  const section = (title, list, empty) => `<h2 class="fix-h">${title} <span class="muted">(${list.length})</span></h2>${list.length ? list.map(card).join("") : `<p class="muted">${empty}</p>`}`;
+  $("#main").innerHTML = `<p class="eyebrow">Fixes</p><h1>Recommend, approve, apply</h1>
+    <p class="muted" style="max-width:85ch">The app checks every email in your flows and proposes fixes. Nothing changes in Klaviyo until you approve it. Each applied fix is checked in Klaviyo straight after and can be undone. The app never switches flows on or off, changes timings or sends anything.</p>
+    ${d.writes_enabled ? "" : `<div class="flag medium">Applying is switched off until a Klaviyo key with Templates write access is added as <code>KLAVIYO_WRITE_KEY</code> in Railway. You can still review the proposals.</div>`}
+    <div class="fix-bar"><button type="button" class="btn" id="fix-scan" ${scanning ? "disabled" : ""}>${scanning ? `Scanning: ${esc(d.scan.step)}` : "Scan emails for fixes"}</button>
+      ${d.scan.error ? `<span class="flag high">${esc(d.scan.error)}</span>` : d.scan.finished_at ? `<span class="muted">Last scan ${esc(d.scan.finished_at.slice(0, 16).replace("T", " "))} UTC</span>` : ""}</div>
+    ${section("Waiting for approval", review, all.length ? "Nothing waiting." : "Run a scan to get the first proposals.")}
+    ${section("To do in the Klaviyo editor", todo, "Nothing to do by hand.")}
+    ${section("Implemented", done, "Nothing applied yet.")}
+    ${closed.length ? `<details class="fix-closed"><summary>Dismissed or undone (${closed.length})</summary>${closed.map(card).join("")}</details>` : ""}`;
+  if (scanning) setTimeout(() => { if (state.page === "fixes") renderFixes(); }, 3000);
+}
+document.addEventListener("toggle", (e) => { const t = e.target.closest && e.target.closest("[data-fix-open]"); if (t) fixState.open[t.dataset.fixOpen] = t.open; }, true);
+document.addEventListener("click", async (e) => {
+  if (e.target.id === "fix-scan") { e.target.disabled = true; await api("/api/fixes/scan", { method: "POST" }); setTimeout(renderFixes, 800); return; }
+  const b = e.target.closest("[data-fix]");
+  if (!b) return;
+  const id = b.dataset.id, action = b.dataset.fix, body = {};
+  if (action === "approve") {
+    const inp = document.querySelector(`[data-replace="${CSS.escape(id)}"]`);
+    if (inp) body.replace = inp.value;
+    const f = fixState.data.fixes.find((x) => x.id === id);
+    if (f.kind !== "manual" && !confirm(`Apply this change to the live email in Klaviyo?\n\n${f.flow} · ${f.message}\n${f.change}`)) return;
+  }
+  if (action === "undo" && !confirm("Put this email back exactly as it was before the fix?")) return;
+  b.disabled = true; b.textContent = action === "approve" ? "Applying…" : "Working…";
+  try { await api(`/api/fixes/${encodeURIComponent(id)}/${action}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); }
+  catch (err) { alertInline(b, err.message); return; }
+  renderFixes();
+});

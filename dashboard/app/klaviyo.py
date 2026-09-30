@@ -114,6 +114,17 @@ class LiveSource:
         at = d["data"]["attributes"]
         return at.get("date_times") or [], at.get("results") or []
 
+    def template_full(self, template_id):
+        """A template's html plus, for drag-and-drop templates, its block structure."""
+        d = self._request("GET", f"/templates/{template_id}", params={
+            "additional-fields[template]": "definition",
+            "fields[template]": "name,editor_type,html,definition,updated"})
+        at = d["data"]["attributes"]
+        if at.get("editor_type") == "SYSTEM_DRAGGABLE" and not at.get("definition"):
+            raise KlaviyoError("Klaviyo didn't return this drag-and-drop template's block structure; "
+                               "set KLAVIYO_REVISION to a newer API date.")
+        return {k: at.get(k) for k in ("name", "editor_type", "html", "definition", "updated")}
+
     def render(self, template_id, context):
         body = {"data": {"type": "template", "id": template_id, "attributes": {"context": context}}}
         d = self._request("POST", "/template-render", content=json.dumps(body))
@@ -122,6 +133,32 @@ class LiveSource:
     def template_html(self, template_id):
         d = self._request("GET", f"/templates/{template_id}", params={"fields[template]": "html"})
         return d["data"]["attributes"].get("html") or ""
+
+
+class WriteClient(LiveSource):
+    """The only code that changes Klaviyo. It can read, update and create email templates, nothing else:
+    no flow status changes, no sends, no profiles. Uses its own key (KLAVIYO_WRITE_KEY)."""
+
+    def __init__(self):
+        if not config.KLAVIYO_WRITE_KEY:
+            raise KlaviyoError("KLAVIYO_WRITE_KEY is not set.")
+        super().__init__()
+        self.client.headers["Authorization"] = f"Klaviyo-API-Key {config.KLAVIYO_WRITE_KEY}"
+
+    def update_template(self, template_id, html=None, definition=None):
+        attrs = {}
+        if definition is not None:
+            attrs["definition"] = definition
+        elif html is not None:
+            attrs["html"] = html
+        body = {"data": {"type": "template", "id": template_id, "attributes": attrs}}
+        return self._request("PATCH", f"/templates/{template_id}", content=json.dumps(body))
+
+    def create_template(self, name, html):
+        body = {"data": {"type": "template", "attributes": {"name": name, "editor_type": "CODE", "html": html}}}
+        return self._request("POST", "/templates", content=json.dumps(body))["data"]["id"]
+
+    # Deliberately absent: flow status, flow edits, campaigns, sends, profiles.
 
 
 class FixtureSource:

@@ -12,19 +12,26 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, digest, review, snapshot
+from . import config, digest, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
 NOTES = config.DATA_DIR / "notes"
 ID_RE = re.compile(r"^[A-Za-z0-9]{4,12}$")
+FIX_RE = re.compile(r"^[A-Za-z0-9-]{4,80}$")
 
 
 def auth(credentials: HTTPBasicCredentials | None = Depends(security)):
-    if not config.DASHBOARD_PASSWORD:
+    users = dict(config.DASHBOARD_USERS)
+    if config.DASHBOARD_PASSWORD:
+        users.setdefault(config.DASHBOARD_USER, config.DASHBOARD_PASSWORD)
+    if not users:
         return "local"
-    ok = credentials and secrets.compare_digest(credentials.username, config.DASHBOARD_USER) \
-        and secrets.compare_digest(credentials.password, config.DASHBOARD_PASSWORD)
+    ok = False
+    if credentials:
+        for name, pw in users.items():
+            if secrets.compare_digest(credentials.username, name) and secrets.compare_digest(credentials.password, pw):
+                ok = True
     if not ok:
         raise HTTPException(401, "Login required", headers={"WWW-Authenticate": 'Basic realm="Evolution Golf"'})
     return credentials.username
@@ -92,7 +99,8 @@ def api_status(user=Depends(auth)):
     snap = snapshot.load()
     return {**snapshot.status, "source": "fixtures" if config.USE_FIXTURES else "klaviyo",
             "generated_at": snap["generated_at"] if snap else None,
-            "reviews_enabled": bool(config.ANTHROPIC_API_KEY), "slack_enabled": bool(config.SLACK_WEBHOOK_URL)}
+            "reviews_enabled": bool(config.ANTHROPIC_API_KEY), "slack_enabled": bool(config.SLACK_WEBHOOK_URL),
+            "writes_enabled": bool(config.KLAVIYO_WRITE_KEY), "user": user}
 
 
 @app.get("/api/snapshot")
@@ -192,3 +200,59 @@ def api_summary_send(user=Depends(auth)):
     except Exception as e:
         raise HTTPException(400, str(e)[:300])
     return {"ok": True}
+
+
+# ---------- fixes: recommend, approve, apply ----------
+def _fix_id(fid):
+    if not FIX_RE.match(fid):
+        raise HTTPException(404)
+    return fid
+
+
+@app.get("/api/fixes")
+def api_fixes(user=Depends(auth)):
+    return {"fixes": [fixes.public(f) for f in fixes.load_all()], "scan": fixes.scan_status,
+            "writes_enabled": bool(config.KLAVIYO_WRITE_KEY)}
+
+
+@app.post("/api/fixes/scan")
+def api_fixes_scan(user=Depends(auth)):
+    fixes.start_scan()
+    return fixes.scan_status
+
+
+@app.post("/api/fixes/{fid}/{action}")
+async def api_fix_action(fid: str, action: str, request: Request, user=Depends(auth)):
+    fid = _fix_id(fid)
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+    try:
+        if action == "approve":
+            f = fixes.apply(fid, user, body.get("replace"))
+        elif action == "undo":
+            f = fixes.revert(fid, user)
+        elif action == "dismiss":
+            f = fixes.dismiss(fid, user, str(body.get("note", "")))
+        elif action == "done":
+            f = fixes.done(fid, user)
+        else:
+            raise HTTPException(404)
+    except HTTPException:
+        raise
+    except KeyError:
+        raise HTTPException(404, "No such fix")
+    except Exception as e:
+        raise HTTPException(400, str(e)[:400])
+    return fixes.public(f)
+
+
+@app.get("/fixes/{fid}/preview", response_class=HTMLResponse)
+def fix_preview(fid: str, which: str = "after", user=Depends(auth)):
+    f = fixes.get(_fix_id(fid))
+    if not f:
+        raise HTTPException(404)
+    html = f.get("after_preview" if which == "after" else "before_preview") or "<p>No preview.</p>"
+    return HTMLResponse(snapshot.fill_tags(html), headers={"Content-Security-Policy": "script-src 'none'"})

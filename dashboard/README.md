@@ -16,6 +16,10 @@ Data is cached in a snapshot and refreshed daily or with the "Refresh from Klavi
 ## Pages
 - **Overview**: sortable table with a verdict per flow, colour cues against your own median flow, and a revenue trend.
 - **Flow**: week-by-week sends, revenue and revenue per send; the journey with a preview pane; Claude's review; notes.
+- **Fixes to approve**: scans every email in the flows and proposes fixes (broken unsubscribe link, deadline claims).
+  Approve → the app edits that one template in Klaviyo, reads it back to check, logs who approved it, and offers Undo.
+  Subject lines and SMS text can't be changed through the API, so those become to-dos for the Klaviyo editor.
+  The app never switches flows on or off, changes timings, or sends anything.
 - **Programme**: the Build Pack flows (F1–F13) in build order, with status worked out from Klaviyo (`EG · F<n>` names),
   what each replaces, to-dos and open questions. Edit `app/programme.json` to update it.
 - **Compare**: new flow or path against the one it replaces. After launch, the weeks since launch are set against the
@@ -33,6 +37,8 @@ Data is cached in a snapshot and refreshed daily or with the "Refresh from Klavi
 | `DATA_DIR` | on Railway | `/data` (a mounted volume, so snapshots, reviews and notes survive redeploys) |
 | `KLAVIYO_REVISION` | optional | Defaults to `2025-10-15`; change if Klaviyo rejects the revision |
 | `USE_FIXTURES` | optional | `1` to run on the saved test data in `fixtures/` |
+| `KLAVIYO_WRITE_KEY` | to apply fixes | A second Klaviyo private key with **Templates: read + write** only. Unset = read-only app |
+| `DASHBOARD_USERS` | recommended | Named logins so approvals show who made them: `layton:pass1,karin:pass2` |
 | `SLACK_WEBHOOK_URL` | optional | Slack incoming-webhook address for the Monday summary. Unset = nothing is ever posted |
 | `PUBLIC_URL` | optional | Dashboard address for links in the summary (defaults to Railway's public domain) |
 

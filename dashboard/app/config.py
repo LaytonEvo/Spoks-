@@ -6,6 +6,9 @@ BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 # Klaviyo private API key with READ-ONLY scopes (flows, templates, metrics, lists, segments, reporting).
 KLAVIYO_API_KEY = os.getenv("KLAVIYO_API_KEY", "")
+# Separate Klaviyo key used ONLY to apply fixes Layton approves in the app (Templates: read + write).
+# Leave unset and the app stays read-only.
+KLAVIYO_WRITE_KEY = os.getenv("KLAVIYO_WRITE_KEY", "")
 # Klaviyo API revision. Flow definitions need a recent revision; change here if Klaviyo rejects it.
 KLAVIYO_REVISION = os.getenv("KLAVIYO_REVISION", "2025-10-15")
 # "Placed Order" metric used for conversions and revenue.
@@ -18,6 +21,8 @@ REVIEW_MODEL = os.getenv("REVIEW_MODEL", "claude-opus-5-5")
 # Login for the dashboard. If unset, the app runs without a login (local development only).
 DASHBOARD_USER = os.getenv("DASHBOARD_USER", "evolution")
 DASHBOARD_PASSWORD = os.getenv("DASHBOARD_PASSWORD", "")
+# Named logins, so approvals record who made them: "layton:password1,karin:password2".
+DASHBOARD_USERS = dict(pair.split(":", 1) for pair in os.getenv("DASHBOARD_USERS", "").split(",") if ":" in pair)
 
 # Where snapshots, renders, reviews and notes are stored. Use a Railway volume in production.
 DATA_DIR = pathlib.Path(os.getenv("DATA_DIR", BASE_DIR / "data"))

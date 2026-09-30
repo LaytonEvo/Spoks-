@@ -23,6 +23,12 @@ Spoks store id: `2745819a-e9db-41a1-8f76-442730a6a213` (workspace "Evolution Gol
   no `send_campaign`, no `cancel_campaign_send`). New flows are created as Draft and stay Draft; Layton activates in the Klaviyo UI.
 - **Never edit or archive existing Klaviyo flows**; build new ones prefixed `EG · `. Klaviyo's create-flow can't edit structure later —
   if a draft is wrong, create a new draft (suffix v2) and tell Layton which old draft to delete.
+- **Approved app write access (Layton, 30 Sep 2026)** — the dashboard may, only after Layton (or a named user) approves the
+  specific change in the app: (1) create new draft flows and templates; (2) edit the text of existing live email templates,
+  limited to replacing the hard-coded unsubscribe link with `{% unsubscribe_link %}` / adding `{% manage_preferences_link %}`,
+  and rewording or removing deadline claims. Every applied change is verified, logged with who approved it, and undoable.
+  Switching flows on/off stays in the Klaviyo flow editor (the app has no code path for it). Writes use a separate
+  `KLAVIYO_WRITE_KEY`; without it the app is read-only. Two-path simplification of the rebuild: not yet decided.
 - Never touch contact records. Never resolve a `[CONFIRM]` by guessing. If the MCP can't do something, record it in the gap register — no pretend workarounds.
 
 ## Phases (stop at every ⏸)
