@@ -6,7 +6,7 @@ const pct = (v) => (v == null ? "–" : (v * 100).toFixed(1) + "%");
 const gbp = (v, dp = 0) => (v == null ? "–" : "£" + v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }));
 const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", last_365_days: "last 12 months" };
 
-const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "", pvId: null, pvWidth: "600" };
+const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "all" };
 const WIDE = window.matchMedia("(min-width: 1200px)");
 try { state.tf = localStorage.getItem("eg-tf") || state.tf; } catch (e) { /* storage unavailable */ }
 
@@ -66,6 +66,70 @@ function renderSidebar() {
   nav.innerHTML = html;
 }
 
+// ---------- judging performance against the account's own flows ----------
+const MIN_SENDS = 50;
+const COLS = [
+  { key: "name", label: "Flow", val: (f) => f.name.toLowerCase() },
+  { key: "verdict", label: "Verdict", val: (f, r) => r.get(f.id).verdict.rank },
+  { key: "recipients", label: "Sends", val: (f) => totals(f).recipients ?? 0 },
+  { key: "open_rate", label: "Open rate", val: (f) => totals(f).open_rate },
+  { key: "click_rate", label: "Click rate", val: (f) => totals(f).click_rate },
+  { key: "conversions", label: "Orders", val: (f) => totals(f).conversions },
+  { key: "revenue", label: "Revenue", val: (f) => totals(f).revenue },
+  { key: "rps", label: "Per send", val: (f) => (totals(f).recipients ? totals(f).revenue_per_recipient : null) },
+  { key: "unsubscribe_rate", label: "Unsub rate", val: (f) => totals(f).unsubscribe_rate },
+];
+const isPostPurchase = (f) => /placed order|fulfilled|delivered|shipment/i.test(f.trigger || "");
+function median(xs) {
+  const v = xs.filter((x) => x != null).sort((a, b) => a - b);
+  if (!v.length) return null;
+  const m = Math.floor(v.length / 2);
+  return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+}
+function rateFlows(flows) {
+  const eligible = flows.filter((f) => (totals(f).recipients || 0) >= MIN_SENDS);
+  const med = {
+    open_rate: median(eligible.map((f) => totals(f).open_rate)),
+    click_rate: median(eligible.map((f) => totals(f).click_rate)),
+    rps: median(eligible.filter((f) => !isPostPurchase(f)).map((f) => totals(f).revenue_per_recipient)),
+  };
+  const rel = (v, m) => (v == null || !m ? null : v / m);
+  const out = new Map();
+  for (const f of flows) {
+    const t = totals(f), sends = t.recipients || 0, low = sends > 0 && sends < MIN_SENDS;
+    const tone = {};
+    if (!low && sends) {
+      for (const k of ["open_rate", "click_rate"]) {
+        const r = rel(t[k], med[k]);
+        if (r != null) tone[k] = r >= 1.25 ? "good" : r <= 0.75 ? "poor" : "";
+      }
+      if (!isPostPurchase(f)) {
+        const r = rel(t.revenue_per_recipient, med.rps);
+        if (r != null) tone.rps = r >= 1.25 ? "good" : r <= 0.75 ? "poor" : "";
+      }
+    }
+    if (sends && (t.unsubscribe_rate || 0) > 0.01) tone.unsubscribe_rate = "poor";
+    else if (sends && (t.unsubscribe_rate || 0) > 0.005) tone.unsubscribe_rate = "warn";
+    const c = counts(f);
+    let verdict;
+    if (f.status !== "live" && !sends) verdict = { label: f.status === "draft" ? "Draft" : "Not live", tone: "off", rank: 6, why: "Not sending to anyone." };
+    else if (!sends) verdict = { label: "Not sending", tone: "poor", rank: 0, why: "Live but nobody received a message in this period. Check the trigger and filters." };
+    else if (low) verdict = { label: "Too few sends", tone: "off", rank: 5, why: `Under ${MIN_SENDS} sends, so the rates swing too much to judge.` };
+    else if ((t.unsubscribe_rate || 0) > 0.01) verdict = { label: "Losing subscribers", tone: "poor", rank: 1, why: "More than 1% of recipients unsubscribed." };
+    else {
+      const key = isPostPurchase(f) ? "click_rate" : "rps";
+      const r = rel(key === "rps" ? t.revenue_per_recipient : t.click_rate, med[key]);
+      const what = key === "rps" ? "revenue per send" : "click rate (post-purchase flow)";
+      if (r == null) verdict = { label: "No benchmark", tone: "off", rank: 5, why: "Not enough comparable flows." };
+      else if (r >= 1.25) verdict = { label: "Strong", tone: "good", rank: 4, why: `${what} is ${r.toFixed(1)}× your typical flow.` };
+      else if (r <= 0.75) verdict = { label: "Underperforming", tone: "warn", rank: 2, why: `${what} is ${r.toFixed(2)}× your typical flow.` };
+      else verdict = { label: "On par", tone: "", rank: 3, why: `${what} is close to your typical flow.` };
+    }
+    out.set(f.id, { tone, low, verdict, attention: verdict.rank <= 2 || c.high > 0 });
+  }
+  return out;
+}
+
 // ---------- overview ----------
 function renderOverview() {
   const live = state.snap.flows.filter((f) => f.status === "live");
@@ -76,12 +140,33 @@ function renderOverview() {
     for (const x of (f.flags[state.tf] || [])) if (x.level === "high") highs.push({ f, text: x.text });
     for (const m of messages(f.steps)) for (const x of ((m.flags || {})[state.tf] || [])) if (x.level === "high") highs.push({ f, m, text: x.text });
   }
-  const rows = state.snap.flows.map((f) => {
-    const t = totals(f);
+  const rated = rateFlows(state.snap.flows);
+  let list = state.snap.flows.filter((f) => state.show === "all" || (state.show === "live" ? f.status === "live" : rated.get(f.id).attention));
+  if (state.sort) {
+    const col = COLS.find((c) => c.key === state.sort.key);
+    const dir = state.sort.dir === "asc" ? 1 : -1;
+    list = list.slice().sort((a, b) => {
+      const va = col.val(a, rated), vb = col.val(b, rated);
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+      return (typeof va === "string" ? va.localeCompare(vb) : va - vb) * dir;
+    });
+  }
+  const rows = list.map((f) => {
+    const t = totals(f), r = rated.get(f.id);
+    const cell = (k, v) => `<td class="${r.tone[k] || ""}${r.low ? " low" : ""}">${v}</td>`;
     return `<tr data-id="${esc(f.id)}"><td><span class="fname">${esc(f.name)}</span> ${pill(f.status)}</td>
-      <td>${n(t.recipients)}</td><td>${pct(t.open_rate)}</td><td>${pct(t.click_rate)}</td><td>${n(t.conversions)}</td>
-      <td>${gbp(t.revenue)}</td><td>${t.recipients ? gbp(t.revenue_per_recipient, 2) : "–"}</td><td>${pct(t.unsubscribe_rate)}</td><td>${dots(counts(f))}</td></tr>`;
+      <td class="verdict-cell"><span class="verdict ${r.verdict.tone}" title="${esc(r.verdict.why)}">${esc(r.verdict.label)}</span></td>
+      ${cell("recipients", n(t.recipients))}${cell("open_rate", pct(t.open_rate))}${cell("click_rate", pct(t.click_rate))}${cell("conversions", n(t.conversions))}
+      ${cell("revenue", gbp(t.revenue))}${cell("rps", t.recipients ? gbp(t.revenue_per_recipient, 2) : "–")}${cell("unsubscribe_rate", pct(t.unsubscribe_rate))}<td>${dots(counts(f))}</td></tr>`;
   }).join("");
+  const head = COLS.map((c) => {
+    const on = state.sort && state.sort.key === c.key;
+    const aria = on ? (state.sort.dir === "asc" ? "ascending" : "descending") : "none";
+    return `<th aria-sort="${aria}"><button type="button" class="sort-btn" data-sort="${c.key}">${c.label}<span class="arrow" aria-hidden="true">${on ? (state.sort.dir === "asc" ? "▲" : "▼") : "↕"}</span></button></th>`;
+  }).join("");
+  const nAttention = state.snap.flows.filter((f) => rated.get(f.id).attention).length;
   $("#main").innerHTML = `
     <p class="eyebrow">All flows · ${esc(TF_LABEL[state.tf])}</p>
     <h1>How the flows are doing</h1>
@@ -95,10 +180,16 @@ function renderOverview() {
     ${highs.length ? `<div class="panel" style="margin-bottom:18px"><h2>Needs attention now</h2><p class="muted" style="margin:4px 0 8px">High-priority checks across live flows.</p>
       ${highs.slice(0, 12).map((h) => `<div class="flag high"><span><b>${esc(h.f.name)}</b>${h.m ? ` · ${esc(h.m.name)}` : ""}: ${esc(h.text)}</span></div>`).join("")}
       ${highs.length > 12 ? `<p class="muted">+ ${highs.length - 12} more in the individual flows.</p>` : ""}</div>` : ""}
+    <div class="table-bar">
+      <div class="seg seg-light" id="show" role="group" aria-label="Show">
+        ${[["all", "All flows"], ["live", "Live"], ["attention", `Needs work (${nAttention})`]].map(([k, l]) => `<button type="button" data-show="${k}" aria-pressed="${state.show === k}">${l}</button>`).join("")}
+      </div>
+      <p class="legend"><span class="sw good"></span>well above your typical flow <span class="sw poor"></span>well below, or unsubscribes over the limit <span class="sw lowv"></span>under ${MIN_SENDS} sends, too few to judge</p>
+    </div>
     <div class="panel table-wrap"><table class="flows">
-      <thead><tr><th>Flow</th><th>Sends</th><th>Open rate</th><th>Click rate</th><th>Orders</th><th>Revenue</th><th>Per send</th><th>Unsub rate</th><th>Checks</th></tr></thead>
-      <tbody>${rows}</tbody></table></div>
-    <p class="muted" style="margin-top:10px">Sends count every email and SMS delivered, not unique people. Revenue is what Klaviyo attributes to each message from Placed Order.</p>`;
+      <thead><tr>${head}<th>Checks</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="10" class="muted">No flows match.</td></tr>`}</tbody></table></div>
+    <p class="muted" style="margin-top:10px">“Typical flow” is the median of your own flows with ${MIN_SENDS}+ sends in this period, not an industry figure. Well above means at least 1.25× the median; well below means 0.75× or less. Post-purchase flows (triggered by an order or delivery) are judged on clicks, not revenue. Sends count every email and SMS delivered, not unique people. Revenue is what Klaviyo attributes to each message from Placed Order.</p>`;
 }
 
 // ---------- flow view ----------
@@ -321,6 +412,15 @@ document.addEventListener("click", async (e) => {
   if (pw) { state.pvWidth = pw.dataset.w; showInPane(state.pvId); return; }
   const card = e.target.closest(".msg[data-pick]");
   if (card && WIDE.matches && !e.target.closest("a, button, summary")) { showInPane(card.dataset.pick); return; }
+  const sb = e.target.closest("[data-sort]");
+  if (sb) {
+    const k = sb.dataset.sort, cur = state.sort;
+    const firstDir = k === "name" || k === "verdict" ? "asc" : "desc";
+    state.sort = !cur || cur.key !== k ? { key: k, dir: firstDir } : cur.dir === firstDir ? { key: k, dir: firstDir === "asc" ? "desc" : "asc" } : null;
+    renderOverview(); $(`[data-sort="${k}"]`).focus(); return;
+  }
+  const sh = e.target.closest("[data-show]");
+  if (sh) { state.show = sh.dataset.show; renderOverview(); return; }
   const tf = e.target.closest("#period button");
   if (tf && !tf.disabled) { state.tf = tf.dataset.tf; try { localStorage.setItem("eg-tf", state.tf); } catch (err) { /* ignore */ } render(); return; }
   const w = e.target.closest("#pv-width button");
