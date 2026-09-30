@@ -341,42 +341,43 @@ async function renderFixes() {
   fixState.data = await api("/api/fixes");
   const d = fixState.data, all = d.fixes;
   const group = (st) => all.filter((f) => st.includes(f.status));
-  const review = group(["proposed", "failed"]), todo = group(["manual"]), done = group(["applied", "done"]), closed = group(["dismissed", "reverted"]);
+  const review = group(["proposed"]), todo = group(["manual"]), done = group(["verified", "done"]), closed = group(["dismissed"]);
   const scanning = d.scan.running;
+  const kindLabel = { unsubscribe: "Compliance", deadline: "DMCC check", text: "DMCC check" };
   const card = (f) => {
-    const loc = `<a href="#flow/${esc(f.flow_id)}">${esc(f.flow)}</a>${f.message ? ` · ${esc(f.message)}` : ""} ${pill(f.flow_status || "")}`;
+    const items = f.items || [];
+    const open = items.filter((i) => !i.fixed), fixed = items.filter((i) => i.fixed);
     const hist = (f.history || []).map((h) => `<li>${esc(h.at.slice(0, 16).replace("T", " "))} · ${esc(h.by)} · ${esc(h.action)}${h.detail ? ` – ${esc(h.detail)}` : ""}</li>`).join("");
-    const previews = f.kind !== "manual" ? `<details class="fix-prev" ${fixState.open[f.id] ? "open" : ""} data-fix-open="${esc(f.id)}"><summary>Show before and after</summary>
-        <div class="fix-frames"><figure><figcaption>Before</figcaption><iframe sandbox="" loading="lazy" src="/fixes/${esc(f.id)}/preview?which=before"></iframe></figure>
-        <figure><figcaption>After</figcaption><iframe sandbox="" loading="lazy" src="/fixes/${esc(f.id)}/preview?which=after"></iframe></figure></div></details>` : "";
+    const row = (i) => `<li class="${i.fixed ? "fixed" : ""}"><span class="tick" aria-hidden="true">${i.fixed ? "✓" : "○"}</span>
+      <span><b>${esc(i.message || "")}</b>${i.kind === "text" ? "" : ""}${f.kind === "unsubscribe" ? "" : `<br><span class="muted">${esc(i.detail)}</span>`}
+      ${i.suggestion && !i.fixed ? `<br>→ <span class="sugg">${esc(i.suggestion)}</span>` : ""}${i.codes && i.codes.length && !i.fixed ? ` <span class="muted">(uses ${esc(i.codes.join(", "))})</span>` : ""}
+      ${i.fixed ? `<span class="muted"> – fixed</span>` : ""}</span></li>`;
+    const previews = f.before_preview ? `<details class="fix-prev" ${fixState.open[f.id] ? "open" : ""} data-fix-open="${esc(f.id)}"><summary>Show what the fix looks like (first email)</summary>
+        <div class="fix-frames"><figure><figcaption>Now</figcaption><iframe sandbox="" loading="lazy" src="/fixes/${esc(f.id)}/preview?which=before"></iframe></figure>
+        <figure><figcaption>After the fix</figcaption><iframe sandbox="" loading="lazy" src="/fixes/${esc(f.id)}/preview?which=after"></iframe></figure></div></details>` : "";
     let actions = "";
-    if (f.status === "proposed" || f.status === "failed") {
-      const edit = f.kind === "deadline" ? `<label class="fix-edit">Change “${esc(f.find.replace(/<[^>]+>/g, ""))}” to <input type="text" data-replace="${esc(f.id)}" value="${esc(f.replace)}" placeholder="(remove the sentence)"></label>` : "";
-      const canApply = f.kind === "manual" || d.writes_enabled;
-      actions = `${edit}<div class="fix-actions"><button type="button" class="btn" data-fix="approve" data-id="${esc(f.id)}" ${canApply ? "" : "disabled"}>${f.kind === "manual" ? "Approve: add to Klaviyo to-do" : "Approve and apply in Klaviyo"}</button>
+    if (f.status === "proposed") actions = `<div class="fix-actions"><button type="button" class="btn" data-fix="approve" data-id="${esc(f.id)}">Approve: add to the Klaviyo to-do list</button>
         <button type="button" class="btn-line" data-fix="dismiss" data-id="${esc(f.id)}">Dismiss</button></div>`;
-    } else if (f.status === "manual") {
-      actions = `<div class="fix-actions"><a class="btn-line" href="https://www.klaviyo.com/flow/${esc(f.flow_id)}/edit" target="_blank" rel="noopener">Open flow in Klaviyo ↗</a><button type="button" class="btn" data-fix="done" data-id="${esc(f.id)}">Mark done</button></div>`;
-    } else if (f.status === "applied") {
-      actions = `<div class="fix-actions"><button type="button" class="btn-line" data-fix="undo" data-id="${esc(f.id)}">Undo</button></div>`;
-    }
-    return `<article class="panel fix ${esc(f.status)}"><div class="fix-head"><span class="fix-kind ${esc(f.kind)}">${f.kind === "unsubscribe" ? "Compliance" : f.kind === "deadline" ? "DMCC check" : "In Klaviyo editor"}</span>
-        <h3>${esc(f.title)}</h3><span class="stat ${f.status === "applied" || f.status === "done" ? "live" : f.status === "failed" ? "todo" : f.status === "manual" ? "draft" : "skip"}">${esc({ proposed: "Waiting for approval", failed: "Needs attention", manual: "To do in Klaviyo", applied: "Applied", done: "Done", dismissed: "Dismissed", reverted: "Undone" }[f.status])}</span></div>
-      <p class="fix-loc">${loc}</p><p>${esc(f.why)}</p>${f.change ? `<p class="muted">Change: ${esc(f.change)}</p>` : ""}
+    else if (f.status === "manual") actions = `<div class="fix-actions"><a class="btn" href="${esc(f.klaviyo_url)}" target="_blank" rel="noopener">Open the flow in Klaviyo ↗</a>
+        <span class="muted">When the changes are saved, press “Scan emails” at the top: each item is checked and ticked off.</span></div>`;
+    const badge = { proposed: ["skip", "Waiting for approval"], manual: ["draft", `To do · ${open.length} of ${items.length} left`], verified: ["live", "Verified fixed in Klaviyo"], done: ["live", "Done"], dismissed: ["skip", "Dismissed"] }[f.status] || ["skip", f.status];
+    return `<article class="panel fix ${esc(f.status)}"><div class="fix-head"><span class="fix-kind ${esc(f.kind)}">${esc(kindLabel[f.kind] || f.kind)}</span>
+        <h3>${esc(f.title)} · <a href="#flow/${esc(f.flow_id)}">${esc(f.flow)}</a></h3><span class="stat ${badge[0]}">${esc(badge[1])}</span></div>
+      <p>${esc(f.why)}</p>
+      <details class="fix-items" ${f.status === "manual" ? "open" : ""}><summary>${open.length} email${open.length === 1 ? "" : "s"} to fix${fixed.length ? `, ${fixed.length} fixed` : ""}</summary><ul class="fix-list">${open.map(row).join("")}${fixed.map(row).join("")}</ul></details>
+      ${f.status !== "verified" && f.status !== "dismissed" ? `<details class="fix-steps"><summary>How to fix it in Klaviyo</summary><ol>${(f.steps || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ol></details>` : ""}
       ${previews}${actions}${hist ? `<ul class="fix-hist">${hist}</ul>` : ""}</article>`;
   };
   const section = (title, list, empty) => `<h2 class="fix-h">${title} <span class="muted">(${list.length})</span></h2>${list.length ? list.map(card).join("") : `<p class="muted">${empty}</p>`}`;
-  $("#main").innerHTML = `<p class="eyebrow">Fixes</p><h1>Recommend, approve, apply</h1>
-    <p class="muted" style="max-width:85ch">The app checks every email in your flows and proposes fixes. Nothing changes in Klaviyo until you approve it. Each applied fix is checked in Klaviyo straight after and can be undone. The app never switches flows on or off, changes timings or sends anything.</p>
-    ${d.writes_enabled ? `<p class="muted">Write key checked: same Klaviyo account as the dashboard (${esc(d.key_check.write_account || "")}).</p>`
-      : d.key_check && d.key_check.message ? `<div class="flag high">${esc(d.key_check.message)} <button type="button" class="btn-line" id="fix-keys">Check again</button></div>`
-      : `<div class="flag medium">Applying is switched off until a Klaviyo key with Templates write access is added as <code>KLAVIYO_WRITE_KEY</code> in Railway. You can still review the proposals.</div>`}
-    <div class="fix-bar"><button type="button" class="btn" id="fix-scan" ${scanning ? "disabled" : ""}>${scanning ? `Scanning: ${esc(d.scan.step)}` : "Scan emails for fixes"}</button>
-      ${d.scan.error ? `<span class="flag high">${esc(d.scan.error)}</span>` : d.scan.finished_at ? `<span class="muted">Last scan ${esc(d.scan.finished_at.slice(0, 16).replace("T", " "))} UTC</span>` : ""}</div>
+  const openCount = [...review, ...todo].reduce((a, f) => a + (f.open || 0), 0);
+  $("#main").innerHTML = `<p class="eyebrow">Fixes</p><h1>Recommend, approve, track</h1>
+    <p class="muted" style="max-width:88ch">The app reads every email in your flows and groups what needs fixing by flow. Klaviyo doesn't let apps edit emails that are inside flows (only its own editor can), so approving a card puts it on the Klaviyo to-do list with exact steps. After the changes are made, <b>Scan emails</b> checks each one and ticks it off, so “done” means verified in Klaviyo, not just clicked.</p>
+    <div class="fix-bar"><button type="button" class="btn" id="fix-scan" ${scanning ? "disabled" : ""}>${scanning ? `Scanning: ${esc(d.scan.step)}` : "Scan emails"}</button>
+      ${d.scan.error ? `<span class="flag high">${esc(d.scan.error)}</span>` : d.scan.finished_at ? `<span class="muted">Last scan ${esc(d.scan.finished_at.slice(0, 16).replace("T", " "))} UTC · ${openCount} email${openCount === 1 ? "" : "s"} still to fix</span>` : ""}</div>
     ${section("Waiting for approval", review, all.length ? "Nothing waiting." : "Run a scan to get the first proposals.")}
-    ${section("To do in the Klaviyo editor", todo, "Nothing to do by hand.")}
-    ${section("Implemented", done, "Nothing applied yet.")}
-    ${closed.length ? `<details class="fix-closed"><summary>Dismissed or undone (${closed.length})</summary>${closed.map(card).join("")}</details>` : ""}`;
+    ${section("To do in the Klaviyo editor", todo, "Nothing on the to-do list.")}
+    ${section("Verified fixed", done, "Nothing verified yet.")}
+    ${closed.length ? `<details class="fix-closed"><summary>Dismissed (${closed.length})</summary>${closed.map(card).join("")}</details>` : ""}`;
   if (scanning) setTimeout(() => { if (state.page === "fixes") renderFixes(); }, 3000);
 }
 document.addEventListener("toggle", (e) => { const t = e.target.closest && e.target.closest("[data-fix-open]"); if (t) fixState.open[t.dataset.fixOpen] = t.open; }, true);
@@ -390,7 +391,7 @@ document.addEventListener("click", async (e) => {
     const inp = document.querySelector(`[data-replace="${CSS.escape(id)}"]`);
     if (inp) body.replace = inp.value;
     const f = fixState.data.fixes.find((x) => x.id === id);
-    if (f.kind !== "manual" && !confirm(`Apply this change to the live email in Klaviyo?\n\n${f.flow} · ${f.message}\n${f.change}`)) return;
+    if (f && !f.items && f.kind !== "manual" && !confirm(`Apply this change to the live email in Klaviyo?\n\n${f.flow} · ${f.message}\n${f.change}`)) return;
   }
   if (action === "undo" && !confirm("Put this email back exactly as it was before the fix?")) return;
   b.disabled = true; b.textContent = action === "approve" ? "Applying…" : "Working…";

@@ -316,3 +316,14 @@ table.mini th:first-child, table.mini td:first-child { text-align: left; }
 .btn-line { background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; font-weight: 600; text-decoration: none; }
 .fix-hist { margin: 12px 0 0; padding-left: 18px; font-size: 12px; color: var(--muted); }
 .fix-closed summary { cursor: pointer; margin: 20px 0 10px; color: var(--muted); }
+
+.fix-items summary, .fix-steps summary { cursor: pointer; font-weight: 600; margin: 8px 0 4px; }
+.fix-list { list-style: none; padding: 0; margin: 4px 0 0; display: grid; gap: 6px; max-height: 420px; overflow: auto; }
+.fix-list li { display: flex; gap: 8px; font-size: 13px; }
+.fix-list li.fixed { opacity: .6; }
+.fix-list .tick { color: var(--good); font-weight: 700; width: 14px; flex: 0 0 14px; }
+.fix-list .sugg { color: var(--good); }
+.fix-steps ol { margin: 4px 0 0; padding-left: 20px; font-size: 13px; }
+.fix-steps li { margin: 3px 0; }
+.fix.verified { border-left: 4px solid var(--good); }
+.fix.manual { border-left: 4px solid var(--info); }

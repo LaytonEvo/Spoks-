@@ -111,8 +111,9 @@ def load_all():
     if not STORE.exists():
         return []
     items = [json.loads(p.read_text()) for p in STORE.glob("*.json")]
-    order = {"proposed": 0, "manual": 1, "applied": 2, "done": 3, "failed": 0, "reverted": 4, "dismissed": 5}
-    return sorted(items, key=lambda x: (order.get(x["status"], 9), x.get("priority", 5), x["created_at"]))
+    order = {"proposed": 0, "manual": 1, "applied": 2, "done": 3, "verified": 3, "failed": 0, "reverted": 4, "dismissed": 5}
+    kind_order = {"unsubscribe": 0, "deadline": 1, "text": 2}
+    return sorted(items, key=lambda x: (order.get(x["status"], 9), kind_order.get(x["kind"], 5), -(x.get("open") or 0)))
 
 
 def get(fid):
@@ -150,8 +151,49 @@ def _upsert(fix):
     _save(fix)
 
 
+KLAVIYO_FLOW = "https://www.klaviyo.com/flow/{}/edit"
+STEPS = {
+    "unsubscribe": [
+        "Open the flow in Klaviyo and click into each email listed below.",
+        "In the footer, select the words “Unsubscribe.” and edit the link.",
+        "Replace the long manage.kmail-lists.com address with exactly: {% unsubscribe_link %}",
+        "Type “ Manage preferences.” after it, select it, and set its link to exactly: {% manage_preferences_link %}",
+        "Save the email. Preview it in Klaviyo: both links should still be white on the green footer.",
+        "Quicker for the future: save the fixed footer as a universal content block and use it in every email.",
+    ],
+    "deadline": [
+        "Only change these if the code does NOT really expire as the email says (check the coupon's settings in Klaviyo).",
+        "Open each email listed below and replace the sentence with the suggested wording (or your own).",
+        "Save the email.",
+    ],
+    "text": [
+        "Only change these if the deadline isn't real (check the coupon's settings in Klaviyo).",
+        "Open the message listed below in the flow and edit the subject line, preview text or SMS text shown.",
+        "Save the message.",
+    ],
+}
+TITLES = {"unsubscribe": "Fix the broken unsubscribe link", "deadline": "Check deadline claims in the email text",
+          "text": "Check deadline claims in subject lines, preview text and SMS"}
+WHY = {
+    "unsubscribe": "The footer links to one specific person's unsubscribe page, so anyone else who clicks it isn't unsubscribed. "
+                   "That's a compliance risk and pushes people to the spam button instead.",
+    "deadline": "Under the DMCC Act a deadline must be real. These sentences promise an expiry; if the code doesn't really expire that way, "
+                "they need rewording.",
+    "text": "Under the DMCC Act a deadline must be real. These lines promise an expiry or last chance; reword any that aren't true.",
+}
+
+
+def _group_id(kind, flow_id):
+    return f"{kind}-{flow_id}"
+
+
 def scan():
-    """Look through every email template used by current flows and propose fixes. Read-only."""
+    """Read every email in the current flows (read-only) and group what needs fixing by flow.
+
+    Klaviyo doesn't let apps edit emails inside flows (checked 30 Sep 2026: even a no-op change is refused),
+    so every card is a to-do for the Klaviyo editor. Rescanning checks each item and marks it fixed when the
+    problem has gone.
+    """
     if not _lock.acquire(blocking=False):
         return
     scan_status.update(running=True, error=None, step="Reading templates")
@@ -160,70 +202,94 @@ def scan():
         if config.USE_FIXTURES:
             raise RuntimeError("Scanning needs the live Klaviyo connection (it reads each template).")
         src = LiveSource()
-        seen, unread = set(), []
+        seen, unread, found = {}, [], {}
         msgs = []
         for f in snap["flows"]:
             for m in snapshot._iter_messages(f["steps"]):
                 msgs.append((f, m))
                 for v in (m.get("ab_test") or {}).get("variations", []):
                     msgs.append((f, dict(v, name=f"{m['name']} (variation)")))
+
+        def add(kind, f, item, preview=None):
+            g = found.setdefault(_group_id(kind, f["id"]), {"kind": kind, "flow": f, "items": [], "preview": None})
+            g["items"].append(item)
+            if preview and not g["preview"]:
+                g["preview"] = preview
+
         emails = [(f, m) for f, m in msgs if m["kind"] == "email" and m.get("template_id")]
         for i, (f, m) in enumerate(emails, 1):
             tid = m["template_id"]
-            if tid in seen:
+            scan_status["step"] = f"Checking email {i} of {len(emails)}"
+            if tid not in seen:
+                try:
+                    seen[tid] = src.template_full(tid)
+                except KlaviyoError as e:
+                    log.warning("Scan could not read template %s: %s", tid, str(e)[:200])
+                    unread.append(str(e))
+                    seen[tid] = None
+            tpl = seen[tid]
+            if not tpl:
                 continue
-            seen.add(tid)
-            scan_status["step"] = f"Checking template {i} of {len(emails)}"
-            try:
-                tpl = src.template_full(tid)
-            except KlaviyoError as e:
-                log.warning("Scan could not read template %s: %s", tid, str(e)[:200])
-                unread.append(str(e))
-                continue
-            where = {"flow_id": f["id"], "flow": f["name"], "flow_status": f["status"], "message": m.get("name"),
-                     "message_id": m.get("message_id"), "template_id": tid, "editor": tpl.get("editor_type")}
             source = tpl.get("definition") or tpl.get("html") or ""
             strings = _strings(source) if isinstance(source, dict) else [source]
-            base = {"template_fingerprint": _fingerprint(tpl), "before": tpl, "created_at": _now(), "status": "proposed",
-                    "before_preview": tpl.get("html") or ""}
-            if any(UNSUB_A.search(s) for s in strings):
-                fix = dict(base, id=f"unsub-{tid}", kind="unsubscribe", priority=1, **where,
-                           title="Replace the broken unsubscribe link",
-                           why="The footer links to one specific person's unsubscribe page, so anyone else who clicks it is not unsubscribed. "
-                               "This swaps it for Klaviyo's unsubscribe tag and adds a manage-preferences link, keeping the same styling.",
-                           change="Footer: unsubscribe link → Klaviyo tag; add “Manage preferences”.")
-                fix["after_preview"] = unsub_transform(fix["before_preview"])
-                _upsert(fix)
+            base = {"message": m.get("name"), "message_id": m.get("message_id"), "template_id": tid}
+            if any(UNSUB_A.search(x) for x in strings):
+                html = tpl.get("html") or ""
+                add("unsubscribe", f, dict(base, key=f"u-{tid}", detail="Footer unsubscribe link"),
+                    preview={"before": html, "after": unsub_transform(html)})
+            codes = sorted(set(STATIC_CODE.findall(" ".join(strings))))
             for sent in _deadline_sentences(strings):
                 text = _visible_text(sent)
-                codes = sorted(set(STATIC_CODE.findall(" ".join(strings))))
-                sid = hashlib.sha1(sent.encode()).hexdigest()[:8]
-                fix = dict(base, id=f"deadline-{tid}-{sid}", kind="deadline", priority=2, **where,
-                           title="Check a deadline claim",
-                           why=(f"This email says “{text.rstrip(chr(46))}”. " + (f"It uses {', '.join(codes)}. " if codes else "") +
-                                "Under the DMCC Act a deadline must be real. If the code doesn't actually expire like this, approve the rewording "
-                                "(you can edit it first). If it does expire, dismiss this card."),
-                           find=sent, replace=_suggest(sent), change="Reword one sentence.")
-                fix["after_preview"] = sentence_transform(sent, fix["replace"])(fix["before_preview"])
-                _upsert(fix)
-        # Subject lines, preview text and SMS can't be edited through the API: manual cards.
+                add("deadline", f, dict(base, key=f"d-{tid}-{hashlib.sha1(sent.encode()).hexdigest()[:8]}",
+                                        detail=text, suggestion=_visible_text(_suggest(sent)) or "(remove the sentence)",
+                                        codes=codes))
         for f, m in msgs:
             for field, label in (("subject", "Subject line"), ("preview_text", "Preview text"), ("body", "SMS text")):
                 val = m.get(field) or ""
                 if val and DEADLINE.search(val):
-                    fid = f"manual-{m.get('message_id')}-{field}"
-                    fix = {"id": fid, "kind": "manual", "priority": 3, "status": "proposed", "created_at": _now(),
-                           "flow_id": f["id"], "flow": f["name"], "flow_status": f["status"], "message": m.get("name"),
-                           "message_id": m.get("message_id"), "title": f"Check the deadline in the {label.lower()}",
-                           "why": f"{label}: “{val[:300]}”. Klaviyo's API can't change this, so it needs doing in the flow editor. "
-                                  "Approve to add it to the Klaviyo to-do list, or dismiss if the deadline is real.",
-                           "change": f"In Klaviyo: open this message and reword the {label.lower()}."}
-                    _upsert(fix)
+                    add("text", f, {"message": m.get("name"), "message_id": m.get("message_id"),
+                                    "key": f"t-{m.get('message_id')}-{field}", "detail": f"{label}: “{val[:300]}”"})
+
+        # Merge into stored cards: new items added, items no longer found marked fixed.
+        existing = {x["id"]: x for x in load_all() if "items" in x}
+        for old in load_all():
+            if "items" not in old and old["status"] in ("proposed", "failed", "manual"):
+                _path(old["id"]).unlink(missing_ok=True)  # cards from the first version of this page
+        now = _now()
+        for gid in set(existing) | set(found):
+            card = existing.get(gid)
+            g = found.get(gid)
+            if card is None:
+                f = g["flow"]
+                card = {"id": gid, "kind": g["kind"], "status": "proposed", "created_at": now, "flow_id": f["id"],
+                        "flow": f["name"], "flow_status": f["status"], "title": TITLES[g["kind"]], "why": WHY[g["kind"]],
+                        "steps": STEPS[g["kind"]], "klaviyo_url": KLAVIYO_FLOW.format(f["id"]), "items": []}
+            live = {it["key"]: it for it in (g["items"] if g else [])}
+            by_key = {it["key"]: it for it in card["items"]}
+            for k, it in live.items():
+                if k in by_key:
+                    by_key[k].update(it, fixed=False)
+                else:
+                    card["items"].append(dict(it, fixed=False, first_seen=now))
+            for k, it in by_key.items():
+                if k not in live and not it.get("fixed") and not any(u for u in unread):
+                    it.update(fixed=True, fixed_seen=now)
+            if g and g["preview"]:
+                card["before_preview"], card["after_preview"] = g["preview"]["before"], g["preview"]["after"]
+            open_items = [it for it in card["items"] if not it.get("fixed")]
+            card["open"], card["total"] = len(open_items), len(card["items"])
+            if not open_items and card["status"] in ("proposed", "manual"):
+                card["status"] = "verified"
+                _hist(card, "scan", "verified", "Rescan found every item fixed in Klaviyo.")
+            elif open_items and card["status"] == "verified":
+                card["status"] = "manual"
+                _hist(card, "scan", "reopened", "Rescan found the problem again.")
+            _save(card)
         if unread:
             scan_status["error"] = (f"Couldn't read {len(unread)} of {len(seen)} templates, so this scan is incomplete. "
                                     f"First error: {unread[0][:200]}")
         scan_status.update(step="Done", finished_at=_now())
-        log.info("Fix scan done: %d templates, %d unreadable, template API revision %s", len(seen), len(unread), LiveSource._template_revision)
+        log.info("Fix scan done: %d templates, %d unreadable, %d cards", len(seen), len(unread), len(found))
     except Exception as e:
         scan_status.update(error=str(e)[:300], step="Failed")
         log.exception("Fix scan failed")
@@ -293,7 +359,7 @@ def apply(fid, who, replace=None):
     fix = get(fid)
     if not fix:
         raise KeyError(fid)
-    if fix["kind"] == "manual":
+    if fix["kind"] in ("manual", "unsubscribe", "deadline", "text") and "items" in fix or fix["kind"] == "manual":
         fix["status"] = "manual"
         _hist(fix, who, "approved", "Added to the Klaviyo to-do list")
         _save(fix)

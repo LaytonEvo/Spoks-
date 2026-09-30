@@ -26,3 +26,6 @@
 - Created test template `S7gn6z` "EG · TEST tag check (delete me)" (not used by any flow) to confirm tags render:
   `{% unsubscribe_link %}` and `{% manage_preferences_link %}` work as link addresses; `{% unsubscribe_url %}` does not.
   **Layton: please delete S7gn6z** along with the older test templates.
+- 30 Sep: Klaviyo PATCH /templates on a flow-message template returns 404 "does not exist" (tested with a no-op name change on
+  our own draft F3 template RUYKhu; also XhSB6r from the live checkout flow via the app). Reads work. Nothing was changed.
+  The Fixes page now groups findings per flow as Klaviyo-editor to-dos and verifies them on rescan.
