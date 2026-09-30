@@ -6,7 +6,8 @@ const pct = (v) => (v == null ? "–" : (v * 100).toFixed(1) + "%");
 const gbp = (v, dp = 0) => (v == null ? "–" : "£" + v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }));
 const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", last_365_days: "last 12 months" };
 
-const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "all" };
+const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "all", page: null, cmp: null };
+const PAGES = { programme: "Programme", compare: "Compare", tests: "A/B tests", summary: "Monday summary" };
 const WIDE = window.matchMedia("(min-width: 1200px)");
 try { state.tf = localStorage.getItem("eg-tf") || state.tf; } catch (e) { /* storage unavailable */ }
 
@@ -51,7 +52,8 @@ function renderSidebar() {
   const nav = $("#flow-list");
   const q = state.search.toLowerCase();
   const groups = [["live", "Live"], ["manual", "Manual"], ["draft", "New drafts"]];
-  let html = `<button type="button" class="flow-link" data-id="" ${!state.flowId ? 'aria-current="true"' : ""}><span class="fname">All flows overview</span></button>`;
+  let html = `<button type="button" class="flow-link" data-id="" ${!state.flowId && !state.page ? 'aria-current="true"' : ""}><span class="fname">All flows overview</span></button>`;
+  for (const [k, l] of Object.entries(PAGES)) html += `<a class="flow-link page-link" href="#${k}" ${state.page === k ? 'aria-current="true"' : ""}><span class="fname">${l}</span></a>`;
   for (const [status, label] of groups) {
     const flows = state.snap.flows.filter((f) => f.status === status && f.name.toLowerCase().includes(q));
     if (!flows.length) continue;
@@ -77,6 +79,7 @@ const COLS = [
   { key: "conversions", label: "Orders", val: (f) => totals(f).conversions },
   { key: "revenue", label: "Revenue", val: (f) => totals(f).revenue },
   { key: "rps", label: "Per send", val: (f) => (totals(f).recipients ? totals(f).revenue_per_recipient : null) },
+  { key: "trend", label: "Revenue trend", val: (f) => { const t = trendFor(flowWeekly(f), "conversion_value"); return t && t.pct != null ? t.pct : null; } },
   { key: "unsubscribe_rate", label: "Unsub rate", val: (f) => totals(f).unsubscribe_rate },
 ];
 const isPostPurchase = (f) => /placed order|fulfilled|delivered|shipment/i.test(f.trigger || "");
@@ -130,6 +133,13 @@ function rateFlows(flows) {
   return out;
 }
 
+function trendCell(f) {
+  const w = flowWeekly(f);
+  if (!w || !w.conversion_value.some((v) => v)) return `<td class="trend-cell"><span class="muted">–</span></td>`;
+  const N = TF_WEEKS[state.tf] || 13;
+  return `<td class="trend-cell">${spark(w.conversion_value.slice(-2 * N), { label: `Revenue per week, last ${2 * N} weeks` })} ${chip(trendFor(w, "conversion_value"))}</td>`;
+}
+
 // ---------- overview ----------
 function renderOverview() {
   const live = state.snap.flows.filter((f) => f.status === "live");
@@ -159,7 +169,7 @@ function renderOverview() {
     return `<tr data-id="${esc(f.id)}"><td><span class="fname">${esc(f.name)}</span> ${pill(f.status)}</td>
       <td class="verdict-cell"><span class="verdict ${r.verdict.tone}" title="${esc(r.verdict.why)}">${esc(r.verdict.label)}</span></td>
       ${cell("recipients", n(t.recipients))}${cell("open_rate", pct(t.open_rate))}${cell("click_rate", pct(t.click_rate))}${cell("conversions", n(t.conversions))}
-      ${cell("revenue", gbp(t.revenue))}${cell("rps", t.recipients ? gbp(t.revenue_per_recipient, 2) : "–")}${cell("unsubscribe_rate", pct(t.unsubscribe_rate))}<td>${dots(counts(f))}</td></tr>`;
+      ${cell("revenue", gbp(t.revenue))}${cell("rps", t.recipients ? gbp(t.revenue_per_recipient, 2) : "–")}${trendCell(f)}${cell("unsubscribe_rate", pct(t.unsubscribe_rate))}<td>${dots(counts(f))}</td></tr>`;
   }).join("");
   const head = COLS.map((c) => {
     const on = state.sort && state.sort.key === c.key;
@@ -188,8 +198,8 @@ function renderOverview() {
     </div>
     <div class="panel table-wrap"><table class="flows">
       <thead><tr>${head}<th>Checks</th></tr></thead>
-      <tbody>${rows || `<tr><td colspan="10" class="muted">No flows match.</td></tr>`}</tbody></table></div>
-    <p class="muted" style="margin-top:10px">“Typical flow” is the median of your own flows with ${MIN_SENDS}+ sends in this period, not an industry figure. Well above means at least 1.25× the median; well below means 0.75× or less. Post-purchase flows (triggered by an order or delivery) are judged on clicks, not revenue. Sends count every email and SMS delivered, not unique people. Revenue is what Klaviyo attributes to each message from Placed Order.</p>`;
+      <tbody>${rows || `<tr><td colspan="11" class="muted">No flows match.</td></tr>`}</tbody></table></div>
+    <p class="muted" style="margin-top:10px">“Typical flow” is the median of your own flows with ${MIN_SENDS}+ sends in this period, not an industry figure. Well above means at least 1.25× the median; well below means 0.75× or less. Post-purchase flows (triggered by an order or delivery) are judged on clicks, not revenue. Revenue trend compares the last ${TF_WEEKS[state.tf] || 13} full weeks with the ${TF_WEEKS[state.tf] || 13} before. Sends count every email and SMS delivered, not unique people. Revenue is what Klaviyo attributes to each message from Placed Order.</p>`;
 }
 
 // ---------- flow view ----------
@@ -221,7 +231,7 @@ function msgCard(m) {
   return `<article class="msg${m.message_id === state.pvId && WIDE.matches ? " selected" : ""}"${pick}>
     <div class="msg-top"><span class="chan ${m.kind}">${m.kind.toUpperCase()}</span><span class="msg-name">${esc(m.name)}</span>
       ${m.status && m.status !== "live" ? pill(m.status) : ""}${m.from_label && m.kind === "email" ? `<span class="msg-from">from ${esc(m.from_label)}</span>` : ""}</div>
-    ${body}${metricRow(m)}${abTable(m)}${flagList(flags, true)}
+    ${body}${metricRow(m)}${messageTrend(m)}${abTable(m)}${flagList(flags, true)}
     ${m.kind === "email" ? `<div class="msg-actions"><button type="button" class="link-btn" data-preview="${esc(m.message_id)}">Preview email →</button></div>` : ""}
   </article>`;
 }
@@ -289,6 +299,7 @@ function renderFlow() {
       <div class="kpi"><div class="label">Revenue</div><div class="value">${gbp(t.revenue)}</div></div>
       <div class="kpi"><div class="label">Revenue per send</div><div class="value">${t.recipients ? gbp(t.revenue_per_recipient, 2) : "–"}</div></div>
     </div>
+    ${flowTrendPanel(f)}
     ${(f.flags[state.tf] || []).length ? `<div class="panel"><h3>Flow checks</h3>${flagList(f.flags[state.tf])}</div>` : ""}
     <div class="tabs" role="tablist">
       ${[["journey", "Journey"], ["review", "Review"], ["notes", "Notes"]].map(([k, l]) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${l}</button>`).join("")}
@@ -380,9 +391,15 @@ function render() {
   document.querySelectorAll("#period button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tf === state.tf)));
   document.querySelectorAll("#period button").forEach((b) => { b.disabled = !state.snap.timeframes.includes(b.dataset.tf); b.title = b.disabled ? "Not in this snapshot yet" : ""; });
   renderSidebar();
-  if (state.flowId) renderFlow(); else renderOverview();
+  if (state.page === "programme") renderProgramme();
+  else if (state.page === "compare") renderCompare();
+  else if (state.page === "tests") renderTests();
+  else if (state.page === "summary") renderSummary();
+  else if (state.flowId) renderFlow(); else renderOverview();
 }
 function route() {
+  const pg = /^#(\w+)$/.exec(location.hash);
+  state.page = pg && PAGES[pg[1]] ? pg[1] : null;
   const m = /^#flow\/(\w+)(?:\/(\w+))?/.exec(location.hash);
   state.flowId = m ? m[1] : null;
   state.tab = (m && m[2]) || "journey";
@@ -402,7 +419,7 @@ async function pollStatus() {
 }
 
 document.addEventListener("click", async (e) => {
-  const link = e.target.closest(".flow-link, table.flows tr[data-id]");
+  const link = e.target.closest(".flow-link:not(.page-link), table.flows tr[data-id]");
   if (link) { location.hash = link.dataset.id ? `#flow/${link.dataset.id}` : ""; if (!link.dataset.id) route(); return; }
   const tab = e.target.closest("[data-tab]");
   if (tab) { location.hash = `#flow/${state.flowId}/${tab.dataset.tab}`; return; }

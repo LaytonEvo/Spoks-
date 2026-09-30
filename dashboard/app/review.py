@@ -72,6 +72,24 @@ def _compact(steps, tf):
     return out
 
 
+def _weekly_totals(flow):
+    """Flow-level sends and revenue per week for the last 13 weeks (latest week may be part-week)."""
+    sends = rev = None
+    stack = list(flow["steps"])
+    while stack:
+        st = stack.pop()
+        if st["kind"] == "split":
+            for br in st["branches"]:
+                stack.extend(br["steps"])
+        w = st.get("weekly") or {}
+        if w.get("recipients"):
+            sends = w["recipients"] if sends is None else [a + b for a, b in zip(sends, w["recipients"])]
+            rev = w["conversion_value"] if rev is None else [a + b for a, b in zip(rev, w["conversion_value"])]
+    if sends is None:
+        return None
+    return {"sends": sends[-13:], "revenue": [round(x, 2) for x in rev[-13:]]}
+
+
 def generate(flow, tf):
     if not config.ANTHROPIC_API_KEY:
         raise RuntimeError("Set ANTHROPIC_API_KEY to generate reviews.")
@@ -79,6 +97,7 @@ def generate(flow, tf):
         "flow": flow["name"], "status": flow["status"], "trigger": flow["trigger"], "flow_filter": flow["flow_filter"],
         "re_entry": flow.get("reentry"), "period": tf.replace("_", " "), "totals": flow["totals"].get(tf),
         "flow_checks": [f["text"] for f in flow["flags"].get(tf, [])], "journey": _compact(flow["steps"], tf),
+        "weekly_last_13_weeks_latest_may_be_part_week": _weekly_totals(flow),
     }
     client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
     response = client.beta.messages.parse(

@@ -24,9 +24,14 @@ DATA_DIR = pathlib.Path(os.getenv("DATA_DIR", BASE_DIR / "data"))
 
 # Use saved test data instead of calling Klaviyo (development, or before a key is set).
 USE_FIXTURES = os.getenv("USE_FIXTURES", "").lower() in ("1", "true", "yes") or not KLAVIYO_API_KEY
-FIXTURE_DIR = BASE_DIR / "fixtures"
+FIXTURE_DIR = pathlib.Path(os.getenv("FIXTURE_DIR", BASE_DIR / "fixtures"))
 
 # Drafts are shown only when their name starts with one of these prefixes (new EG builds).
 DRAFT_PREFIXES = tuple(p for p in os.getenv("DRAFT_PREFIXES", "EG ·").split(",") if p)
 
 TIMEFRAMES = ["last_30_days", "last_90_days", "last_365_days"]
+
+# Monday summary: posted to this Slack incoming-webhook URL when set. Leave unset and nothing is ever sent.
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
+# Public address of the dashboard, for links in the summary (Railway sets RAILWAY_PUBLIC_DOMAIN).
+PUBLIC_URL = os.getenv("PUBLIC_URL") or (f"https://{os.getenv('RAILWAY_PUBLIC_DOMAIN')}" if os.getenv("RAILWAY_PUBLIC_DOMAIN") else "")

@@ -7,7 +7,7 @@ import re
 import threading
 
 from . import config
-from .klaviyo import KNOWN_METRICS, get_source
+from .klaviyo import KNOWN_METRICS, SERIES_STATS, get_source
 
 SNAPSHOT = config.DATA_DIR / "snapshot.json"
 RENDERS = config.DATA_DIR / "renders"
@@ -368,6 +368,21 @@ def build():
                 continue
             if rows is not None:
                 reports[tf] = {r["groupings"]["flow_message_id"]: r["statistics"] for r in rows}
+        weeks, weekly = [], {}
+        status["step"] = "Reading week-by-week performance"
+        try:
+            weeks, rows = src.flow_series()
+            for r in rows:
+                mid = r["groupings"].get("flow_message_id")
+                st = r.get("statistics") or {}
+                if not mid or not any(st.get("recipients") or []):
+                    continue
+                cur = weekly.setdefault(mid, {})
+                for k in SERIES_STATS:  # a message can come back once per channel; add them
+                    vals = [round(v or 0, 2) for v in (st.get(k) or [0] * len(weeks))]
+                    cur[k] = [a + b for a, b in zip(cur[k], vals)] if k in cur else vals
+        except Exception as e:  # trends are extra; the rest of the dashboard still works without them
+            log.warning("Week-by-week report failed: %s", str(e)[:300])
         flows = []
         listed = [f for f in src.flows() if _include(f)]
         for i, f in enumerate(listed, 1):
@@ -384,8 +399,12 @@ def build():
             msgs = list(_iter_messages(steps))
             for m in msgs:
                 m["metrics"] = {tf: rep.get(m["message_id"]) for tf, rep in reports.items() if rep.get(m["message_id"])}
+                if weekly.get(m["message_id"]):
+                    m["weekly"] = weekly[m["message_id"]]
                 for v in (m.get("ab_test") or {}).get("variations", []):
                     v["metrics"] = {tf: rep.get(v["message_id"]) for tf, rep in reports.items() if rep.get(v["message_id"])}
+                    if weekly.get(v["message_id"]):
+                        v["weekly"] = weekly[v["message_id"]]
                 if m["kind"] == "email" and m.get("template_id"):
                     status["step"] = f"Rendering “{m['name']}”"
                     html = ""
@@ -416,7 +435,7 @@ def build():
         flows.sort(key=lambda x: (order.get(x["status"], 3), -((x["totals"].get("last_90_days") or {}).get("revenue") or 0)))
         snap = {"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
                 "source": "fixtures" if config.USE_FIXTURES else "klaviyo",
-                "timeframes": list(reports), "flows": flows}
+                "timeframes": list(reports), "weeks": [w[:10] for w in weeks], "flows": flows}
         config.DATA_DIR.mkdir(parents=True, exist_ok=True)
         tmp = SNAPSHOT.with_suffix(".tmp")
         tmp.write_text(json.dumps(snap, ensure_ascii=False))

@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, review, snapshot
+from . import config, digest, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -52,6 +52,15 @@ def _auto_refresh():
         stale = age and age > dt.timedelta(hours=24) and not config.USE_FIXTURES
         if snap is None or snap.get("source") != source or stale:
             snapshot.build()
+        try:
+            if digest.due():
+                snap = snapshot.load()
+                fresh = snap and dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(snap["generated_at"]) < dt.timedelta(hours=6)
+                if not fresh and not config.USE_FIXTURES:
+                    snapshot.build()
+                digest.send(config.PUBLIC_URL)
+        except Exception as e:  # never let the summary stop the refresh loop
+            snapshot.log.warning("Monday summary not sent: %s", str(e)[:300])
         time.sleep(3600)
 
 
@@ -82,7 +91,7 @@ def api_status(user=Depends(auth)):
     snap = snapshot.load()
     return {**snapshot.status, "source": "fixtures" if config.USE_FIXTURES else "klaviyo",
             "generated_at": snap["generated_at"] if snap else None,
-            "reviews_enabled": bool(config.ANTHROPIC_API_KEY)}
+            "reviews_enabled": bool(config.ANTHROPIC_API_KEY), "slack_enabled": bool(config.SLACK_WEBHOOK_URL)}
 
 
 @app.get("/api/snapshot")
@@ -157,3 +166,28 @@ async def add_note(flow_id: str, request: Request, user=Depends(auth)):
     notes.append({"author": author, "text": text, "at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")})
     p.write_text(json.dumps(notes, ensure_ascii=False, indent=1))
     return notes
+
+
+@app.get("/api/programme")
+def api_programme(user=Depends(auth)):
+    return JSONResponse(json.loads((config.BASE_DIR / "app" / "programme.json").read_text()))
+
+
+@app.get("/api/summary")
+def api_summary(user=Depends(auth)):
+    s = digest.build()
+    if not s:
+        return {}
+    s.pop("_flag_keys", None)
+    s["slack_enabled"] = bool(config.SLACK_WEBHOOK_URL)
+    s["last_sent"] = digest._load_state().get("sent_at")
+    return s
+
+
+@app.post("/api/summary/send")
+def api_summary_send(user=Depends(auth)):
+    try:
+        digest.send(config.PUBLIC_URL)
+    except Exception as e:
+        raise HTTPException(400, str(e)[:300])
+    return {"ok": True}

@@ -21,6 +21,11 @@ KNOWN_METRICS = {
 }
 
 
+# Counts (not rates) so weeks and messages can be added together.
+SERIES_STATS = ("recipients", "delivered", "opens_unique", "clicks_unique", "conversions",
+                "conversion_value", "unsubscribe_uniques")
+
+
 class KlaviyoError(RuntimeError):
     pass
 
@@ -93,6 +98,18 @@ class LiveSource:
         d = self._request("POST", "/flow-values-reports", content=json.dumps(body))
         return d["data"]["attributes"]["results"]
 
+    def flow_series(self, timeframe_key="last_365_days", interval="weekly"):
+        """Week-by-week counts per message. Returns (date_times, results)."""
+        body = {"data": {"type": "flow-series-report", "attributes": {
+            "statistics": list(SERIES_STATS),
+            "timeframe": {"key": timeframe_key}, "interval": interval,
+            "conversion_metric_id": config.CONVERSION_METRIC_ID,
+            "group_by": ["flow_id", "flow_message_id", "send_channel"],
+        }}}
+        d = self._request("POST", "/flow-series-reports", content=json.dumps(body))
+        at = d["data"]["attributes"]
+        return at.get("date_times") or [], at.get("results") or []
+
     def render(self, template_id, context):
         body = {"data": {"type": "template", "id": template_id, "attributes": {"context": context}}}
         d = self._request("POST", "/template-render", content=json.dumps(body))
@@ -133,6 +150,13 @@ class FixtureSource:
 
     def template_html(self, template_id):
         return self.render(template_id, None)
+
+    def flow_series(self, timeframe_key="last_365_days", interval="weekly"):
+        p = self.dir / "flow_series_weekly.json"
+        if not p.exists():
+            return [], []
+        at = json.loads(p.read_text())["data"]["attributes"]
+        return at.get("date_times") or [], at.get("results") or []
 
 
 def get_source():
