@@ -6,7 +6,8 @@ const pct = (v) => (v == null ? "–" : (v * 100).toFixed(1) + "%");
 const gbp = (v, dp = 0) => (v == null ? "–" : "£" + v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }));
 const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", last_365_days: "last 12 months" };
 
-const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "" };
+const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "", pvId: null, pvWidth: "600" };
+const WIDE = window.matchMedia("(min-width: 1200px)");
 try { state.tf = localStorage.getItem("eg-tf") || state.tf; } catch (e) { /* storage unavailable */ }
 
 async function api(path, opts) {
@@ -125,7 +126,8 @@ function msgCard(m) {
   const body = m.kind === "sms"
     ? `<div class="sms-body">${esc(m.body)}</div>`
     : `<p class="msg-subject">${esc(m.subject || "(no subject)")}</p>${m.preview_text ? `<p class="msg-preview">${esc(m.preview_text)}</p>` : ""}`;
-  return `<article class="msg">
+  const pick = m.kind === "email" ? ` data-pick="${esc(m.message_id)}"` : "";
+  return `<article class="msg${m.message_id === state.pvId && WIDE.matches ? " selected" : ""}"${pick}>
     <div class="msg-top"><span class="chan ${m.kind}">${m.kind.toUpperCase()}</span><span class="msg-name">${esc(m.name)}</span>
       ${m.status && m.status !== "live" ? pill(m.status) : ""}${m.from_label && m.kind === "email" ? `<span class="msg-from">from ${esc(m.from_label)}</span>` : ""}</div>
     ${body}${metricRow(m)}${abTable(m)}${flagList(flags, true)}
@@ -207,7 +209,16 @@ function renderFlow() {
 async function renderTab(f) {
   const el = $("#tab-body");
   if (state.tab === "journey") {
-    el.innerHTML = `<div class="journey">${renderSteps(f.steps)}</div>`;
+    const emails = [...messages(f.steps)].filter((m) => m.kind === "email");
+    if (!emails.some((m) => m.message_id === state.pvId)) state.pvId = emails[0] ? emails[0].message_id : null;
+    el.innerHTML = `<div class="journey-wrap"><div class="journey">${renderSteps(f.steps)}</div>
+      <aside class="pane" aria-label="Email preview">${state.pvId ? `
+        <div class="pane-head"><div><p class="eyebrow" id="pane-name"></p><h3 id="pane-subject"></h3></div>
+          <div class="seg seg-light" id="pane-width"><button type="button" data-w="600">Desktop</button><button type="button" data-w="375">Phone</button></div></div>
+        <p class="sample-note" id="pane-note"></p>
+        <div class="frame-wrap"><iframe id="pane-frame" title="Email preview" sandbox=""></iframe></div>` : `<p class="muted" style="padding:16px">No emails in this flow.</p>`}
+      </aside></div>`;
+    if (state.pvId) showInPane(state.pvId);
     return;
   }
   if (state.tab === "review") {
@@ -236,16 +247,37 @@ async function renderTab(f) {
 }
 
 // ---------- preview ----------
-function openPreview(messageId) {
+function findMessage(messageId) {
   const f = state.snap.flows.find((x) => x.id === state.flowId);
-  const m = f && [...messages(f.steps)].find((x) => x.message_id === messageId);
+  return [f, f && [...messages(f.steps)].find((x) => x.message_id === messageId)];
+}
+function previewNote(m) {
+  return m.render_mode === "unpersonalised"
+    ? "Klaviyo won’t fill in this template without a real customer, so it shows the default text instead. Product details stay blank, and every version of any conditional section appears."
+    : "Rendered with an example basket and the name “Sam”, not a real customer.";
+}
+function showInPane(messageId) {
+  const [, m] = findMessage(messageId);
+  if (!m || !$("#pane-frame")) return;
+  state.pvId = messageId;
+  document.querySelectorAll(".msg[data-pick]").forEach((c) => c.classList.toggle("selected", c.dataset.pick === messageId));
+  $("#pane-name").textContent = m.name;
+  $("#pane-subject").textContent = m.subject || "(no subject)";
+  $("#pane-note").textContent = previewNote(m);
+  document.querySelectorAll("#pane-width button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.w === state.pvWidth)));
+  const fr = $("#pane-frame");
+  fr.style.width = state.pvWidth + "px";
+  const src = `/render/${encodeURIComponent(messageId)}`;
+  if (fr.getAttribute("src") !== src) fr.src = src;
+}
+function openPreview(messageId) {
+  if (WIDE.matches && $("#pane-frame")) { showInPane(messageId); return; }
+  const [f, m] = findMessage(messageId);
   if (!m) return;
   $("#pv-eyebrow").textContent = f.name;
   $("#pv-title").textContent = m.subject || m.name;
   $("#pv-sub").textContent = [m.from_label && `From ${m.from_label}`, m.preview_text].filter(Boolean).join(" · ");
-  $("#pv-note").textContent = m.render_mode === "unpersonalised"
-    ? "Klaviyo won’t fill in this template without a real customer, so it shows the default text instead. Product details stay blank, and every version of any conditional section appears."
-    : "Rendered with an example basket and the name “Sam”, not a real customer.";
+  $("#pv-note").textContent = previewNote(m);
   $("#pv-frame").src = `/render/${encodeURIComponent(messageId)}`;
   $("#preview").hidden = false;
   $("#pv-close").focus();
@@ -285,6 +317,10 @@ document.addEventListener("click", async (e) => {
   if (tab) { location.hash = `#flow/${state.flowId}/${tab.dataset.tab}`; return; }
   const pv = e.target.closest("[data-preview]");
   if (pv) { openPreview(pv.dataset.preview); return; }
+  const pw = e.target.closest("#pane-width button");
+  if (pw) { state.pvWidth = pw.dataset.w; showInPane(state.pvId); return; }
+  const card = e.target.closest(".msg[data-pick]");
+  if (card && WIDE.matches && !e.target.closest("a, button, summary")) { showInPane(card.dataset.pick); return; }
   const tf = e.target.closest("#period button");
   if (tf && !tf.disabled) { state.tf = tf.dataset.tf; try { localStorage.setItem("eg-tf", state.tf); } catch (err) { /* ignore */ } render(); return; }
   const w = e.target.closest("#pv-width button");
@@ -320,3 +356,5 @@ window.addEventListener("hashchange", route);
   route();
   if (!state.snap.flows.length || state.status.running) pollStatus();
 })();
+
+WIDE.addEventListener("change", () => { if (state.snap && state.flowId && state.tab === "journey") renderFlow(); });
