@@ -50,7 +50,7 @@ def _auto_refresh():
             age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(snap["generated_at"])
         source = "fixtures" if config.USE_FIXTURES else "klaviyo"
         stale = age and age > dt.timedelta(hours=24) and not config.USE_FIXTURES
-        outdated = snap is not None and "weeks" not in snap  # built before week-by-week figures existed
+        outdated = snap is not None and snap.get("schema", 1) < snapshot.SCHEMA  # built by an older version
         if snap is None or snap.get("source") != source or stale or outdated:
             snapshot.build()
         try:

@@ -13,6 +13,7 @@ SNAPSHOT = config.DATA_DIR / "snapshot.json"
 RENDERS = config.DATA_DIR / "renders"
 _lock = threading.Lock()
 log = logging.getLogger("uvicorn.error")
+SCHEMA = 2  # bump when the snapshot gains fields, so running apps rebuild once
 status = {"running": False, "step": "", "error": None, "finished_at": None}
 
 # Sample data used to render templates. Clearly an example basket, never a real customer.
@@ -433,7 +434,7 @@ def build():
             flows.append(flow)
         order = {"live": 0, "manual": 1, "draft": 2}
         flows.sort(key=lambda x: (order.get(x["status"], 3), -((x["totals"].get("last_90_days") or {}).get("revenue") or 0)))
-        snap = {"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        snap = {"schema": SCHEMA, "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
                 "source": "fixtures" if config.USE_FIXTURES else "klaviyo",
                 "timeframes": list(reports), "weeks": [w[:10] for w in weeks], "flows": flows}
         config.DATA_DIR.mkdir(parents=True, exist_ok=True)

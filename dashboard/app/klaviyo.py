@@ -3,6 +3,7 @@
 Nothing in this module writes to Klaviyo. The only POST calls are the reporting and
 template-render endpoints, which read data and change nothing.
 """
+import datetime as dt
 import json
 import time
 
@@ -98,11 +99,14 @@ class LiveSource:
         d = self._request("POST", "/flow-values-reports", content=json.dumps(body))
         return d["data"]["attributes"]["results"]
 
-    def flow_series(self, timeframe_key="last_365_days", interval="weekly"):
-        """Week-by-week counts per message. Returns (date_times, results)."""
+    def flow_series(self, weeks=52, interval="weekly"):
+        """Week-by-week counts per message over the last `weeks` weeks (Klaviyo's weekly limit is 52).
+        Returns (date_times, results)."""
+        end = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+        start = end - dt.timedelta(weeks=weeks) + dt.timedelta(hours=1)
         body = {"data": {"type": "flow-series-report", "attributes": {
             "statistics": list(SERIES_STATS),
-            "timeframe": {"key": timeframe_key}, "interval": interval,
+            "timeframe": {"start": start.isoformat(), "end": end.isoformat()}, "interval": interval,
             "conversion_metric_id": config.CONVERSION_METRIC_ID,
             "group_by": ["flow_id", "flow_message_id", "send_channel"],
         }}}
@@ -151,7 +155,7 @@ class FixtureSource:
     def template_html(self, template_id):
         return self.render(template_id, None)
 
-    def flow_series(self, timeframe_key="last_365_days", interval="weekly"):
+    def flow_series(self, weeks=52, interval="weekly"):
         p = self.dir / "flow_series_weekly.json"
         if not p.exists():
             return [], []
