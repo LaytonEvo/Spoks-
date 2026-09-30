@@ -368,7 +368,9 @@ async function renderFixes() {
   const section = (title, list, empty) => `<h2 class="fix-h">${title} <span class="muted">(${list.length})</span></h2>${list.length ? list.map(card).join("") : `<p class="muted">${empty}</p>`}`;
   $("#main").innerHTML = `<p class="eyebrow">Fixes</p><h1>Recommend, approve, apply</h1>
     <p class="muted" style="max-width:85ch">The app checks every email in your flows and proposes fixes. Nothing changes in Klaviyo until you approve it. Each applied fix is checked in Klaviyo straight after and can be undone. The app never switches flows on or off, changes timings or sends anything.</p>
-    ${d.writes_enabled ? "" : `<div class="flag medium">Applying is switched off until a Klaviyo key with Templates write access is added as <code>KLAVIYO_WRITE_KEY</code> in Railway. You can still review the proposals.</div>`}
+    ${d.writes_enabled ? `<p class="muted">Write key checked: same Klaviyo account as the dashboard (${esc(d.key_check.write_account || "")}).</p>`
+      : d.key_check && d.key_check.message ? `<div class="flag high">${esc(d.key_check.message)} <button type="button" class="btn-line" id="fix-keys">Check again</button></div>`
+      : `<div class="flag medium">Applying is switched off until a Klaviyo key with Templates write access is added as <code>KLAVIYO_WRITE_KEY</code> in Railway. You can still review the proposals.</div>`}
     <div class="fix-bar"><button type="button" class="btn" id="fix-scan" ${scanning ? "disabled" : ""}>${scanning ? `Scanning: ${esc(d.scan.step)}` : "Scan emails for fixes"}</button>
       ${d.scan.error ? `<span class="flag high">${esc(d.scan.error)}</span>` : d.scan.finished_at ? `<span class="muted">Last scan ${esc(d.scan.finished_at.slice(0, 16).replace("T", " "))} UTC</span>` : ""}</div>
     ${section("Waiting for approval", review, all.length ? "Nothing waiting." : "Run a scan to get the first proposals.")}
@@ -379,6 +381,7 @@ async function renderFixes() {
 }
 document.addEventListener("toggle", (e) => { const t = e.target.closest && e.target.closest("[data-fix-open]"); if (t) fixState.open[t.dataset.fixOpen] = t.open; }, true);
 document.addEventListener("click", async (e) => {
+  if (e.target.id === "fix-keys") { e.target.disabled = true; await api("/api/fixes/check-keys", { method: "POST" }); renderFixes(); return; }
   if (e.target.id === "fix-scan") { e.target.disabled = true; await api("/api/fixes/scan", { method: "POST" }); setTimeout(renderFixes, 800); return; }
   const b = e.target.closest("[data-fix]");
   if (!b) return;

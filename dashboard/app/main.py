@@ -211,8 +211,14 @@ def _fix_id(fid):
 
 @app.get("/api/fixes")
 def api_fixes(user=Depends(auth)):
+    kc = fixes.key_check() if config.KLAVIYO_WRITE_KEY and not config.USE_FIXTURES else {}
     return {"fixes": [fixes.public(f) for f in fixes.load_all()], "scan": fixes.scan_status,
-            "writes_enabled": bool(config.KLAVIYO_WRITE_KEY)}
+            "writes_enabled": bool(config.KLAVIYO_WRITE_KEY) and kc.get("ok", False), "key_check": kc}
+
+
+@app.post("/api/fixes/check-keys")
+def api_fixes_check_keys(user=Depends(auth)):
+    return fixes.key_check(force=True)
 
 
 @app.post("/api/fixes/scan")

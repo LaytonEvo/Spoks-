@@ -136,6 +136,13 @@ class LiveSource:
                     raise
         raise last
 
+    def account(self):
+        """Which Klaviyo account this key belongs to: (id, organisation name)."""
+        d = self._request("GET", "/accounts", params={"fields[account]": "contact_information"})
+        acc = (d.get("data") or [{}])[0]
+        name = ((acc.get("attributes") or {}).get("contact_information") or {}).get("organization_name")
+        return acc.get("id"), name
+
     def template_full(self, template_id):
         """A template's html plus, for drag-and-drop templates, its block structure."""
         d = self._template_request("GET", f"/templates/{template_id}", params={

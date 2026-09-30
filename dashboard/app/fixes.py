@@ -246,6 +246,37 @@ def _transform_for(fix):
     raise ValueError("This kind of fix isn't applied automatically.")
 
 
+_key_check = {}
+
+
+def key_check(force=False):
+    """Make sure the write key is for the same Klaviyo account as the read key, before any write."""
+    if _key_check and not force:
+        return _key_check
+    out = {"ok": False, "message": ""}
+    try:
+        rid, rname = LiveSource().account()
+    except Exception as e:
+        out["message"] = f"Couldn't identify the read key's account: {str(e)[:200]}"
+        _key_check.update(out)
+        return out
+    try:
+        wid, wname = WriteClient().account()
+    except Exception as e:
+        msg = str(e)
+        hint = " Give the write key 'Accounts: read' as well as 'Templates: read + write'." if "403" in msg else ""
+        out["message"] = f"Couldn't identify the write key's account.{hint} ({msg[:200]})"
+        _key_check.update(out)
+        return out
+    out.update(read_account=f"{rname or '?'} ({rid})", write_account=f"{wname or '?'} ({wid})", ok=rid == wid)
+    if not out["ok"]:
+        out["message"] = (f"The write key belongs to a different Klaviyo account ({wname or '?'}, {wid}) than the one "
+                          f"the dashboard reads ({rname or '?'}, {rid}). Create the write key in the {rname or 'same'} account.")
+    _key_check.clear()
+    _key_check.update(out)
+    return out
+
+
 def apply(fid, who, replace=None):
     fix = get(fid)
     if not fix:
@@ -261,6 +292,11 @@ def apply(fid, who, replace=None):
         fix["replace"] = replace.strip()[:500]
     if not config.KLAVIYO_WRITE_KEY:
         raise RuntimeError("Add KLAVIYO_WRITE_KEY in Railway (a Klaviyo key with Templates write access) to apply fixes.")
+    kc = key_check()
+    if not kc["ok"]:
+        key_check(force=True)  # the key may have been fixed since; check again once
+        if not _key_check["ok"]:
+            raise RuntimeError(_key_check["message"])
     w = WriteClient()
     current = w.template_full(fix["template_id"])
     if _fingerprint(current) != fix["template_fingerprint"]:
