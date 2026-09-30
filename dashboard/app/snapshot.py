@@ -44,6 +44,30 @@ DISCOUNT_RE = re.compile(r"coupon_code|/discount/|\bcode\s+[A-Z0-9]{4,}\b|\b\d{1
 URGENCY_RE = re.compile(r"ends tonight|expires? (in|tomorrow|today|soon)|last chance|only \d+ (left|hours)|hurry", re.I)
 
 
+TAG_RE = re.compile(r"{%.*?%}", re.S)
+VAR_RE = re.compile(r"{{(.*?)}}", re.S)
+DEFAULT_RE = re.compile(r"""\|\s*default\s*:\s*(['"])(.*?)\1""")
+
+
+def _fill_var(match):
+    expr = match.group(1)
+    d = DEFAULT_RE.search(expr)
+    if d:
+        return d.group(2)
+    name = expr.split("|")[0].strip()
+    if "first_name" in name:
+        return "Sam"
+    return ""
+
+
+def fill_tags(html):
+    """Show a raw template without a profile: drop logic tags, use each variable's default text."""
+    html = re.sub(r"{%\s*unsubscribe\s*(['\"])(.*?)\1\s*%}", r'<a href="#">\2</a>', html)
+    html = re.sub(r"{%\s*manage_preferences\s*(['\"])(.*?)\1\s*%}", r'<a href="#">\2</a>', html)
+    html = re.sub(r"{%\s*web_view\s*(['\"])(.*?)\1\s*%}", r'<a href="#">\2</a>', html)
+    return VAR_RE.sub(_fill_var, TAG_RE.sub("", html))
+
+
 # ---------------- labels ----------------
 def _metric(mid, names):
     return names.get(mid) or KNOWN_METRICS.get(mid) or f"metric {mid}"
@@ -364,12 +388,21 @@ def build():
                     v["metrics"] = {tf: rep.get(v["message_id"]) for tf, rep in reports.items() if rep.get(v["message_id"])}
                 if m["kind"] == "email" and m.get("template_id"):
                     status["step"] = f"Rendering “{m['name']}”"
+                    html = ""
                     try:
                         html = src.render(m["template_id"], SAMPLE_CONTEXT)
                     except Exception as e:  # a broken template shouldn't stop the refresh
-                        html = ""
-                        m["render_error"] = str(e)[:300]
-                        log.warning("Render failed for %s: %s", m["message_id"], m["render_error"])
+                        if "profile is required" in str(e):
+                            # Klaviyo won't render some templates without a real profile; we never use one.
+                            try:
+                                html = fill_tags(src.template_html(m["template_id"]))
+                                m["render_mode"] = "unpersonalised"
+                            except Exception as e2:
+                                m["render_error"] = str(e2)[:300]
+                        else:
+                            m["render_error"] = str(e)[:300]
+                        if m.get("render_error"):
+                            log.warning("Render failed for %s: %s", m["message_id"], m["render_error"])
                     if html:
                         (RENDERS / f"{m['message_id']}.html").write_text(html)
                         m["rendered"] = True

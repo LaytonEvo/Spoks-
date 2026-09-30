@@ -243,6 +243,9 @@ function openPreview(messageId) {
   $("#pv-eyebrow").textContent = f.name;
   $("#pv-title").textContent = m.subject || m.name;
   $("#pv-sub").textContent = [m.from_label && `From ${m.from_label}`, m.preview_text].filter(Boolean).join(" · ");
+  $("#pv-note").textContent = m.render_mode === "unpersonalised"
+    ? "Klaviyo won’t fill in this template without a real customer, so it shows the default text instead. Product details stay blank, and every version of any conditional section appears."
+    : "Rendered with an example basket and the name “Sam”, not a real customer.";
   $("#pv-frame").src = `/render/${encodeURIComponent(messageId)}`;
   $("#preview").hidden = false;
   $("#pv-close").focus();

@@ -98,6 +98,10 @@ class LiveSource:
         d = self._request("POST", "/template-render", content=json.dumps(body))
         return d["data"]["attributes"].get("html") or ""
 
+    def template_html(self, template_id):
+        d = self._request("GET", f"/templates/{template_id}", params={"fields[template]": "html"})
+        return d["data"]["attributes"].get("html") or ""
+
 
 class FixtureSource:
     """Serves saved Klaviyo responses from dashboard/fixtures (same shapes as the live API)."""
@@ -126,6 +130,9 @@ class FixtureSource:
     def render(self, template_id, context):
         p = self.dir / "renders" / f"{template_id}.html"
         return p.read_text() if p.exists() else ""
+
+    def template_html(self, template_id):
+        return self.render(template_id, None)
 
 
 def get_source():
