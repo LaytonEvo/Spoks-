@@ -2,6 +2,7 @@
 import datetime as dt
 import html as htmllib
 import json
+import logging
 import re
 import threading
 
@@ -11,6 +12,7 @@ from .klaviyo import KNOWN_METRICS, get_source
 SNAPSHOT = config.DATA_DIR / "snapshot.json"
 RENDERS = config.DATA_DIR / "renders"
 _lock = threading.Lock()
+log = logging.getLogger("uvicorn.error")
 status = {"running": False, "step": "", "error": None, "finished_at": None}
 
 # Sample data used to render templates. Clearly an example basket, never a real customer.
@@ -327,6 +329,7 @@ def build():
     if not _lock.acquire(blocking=False):
         return
     status.update(running=True, error=None, step="Listing flows")
+    log.info("Refresh started (%s)", "fixtures" if config.USE_FIXTURES else "klaviyo")
     try:
         src = get_source()
         RENDERS.mkdir(parents=True, exist_ok=True)
@@ -334,7 +337,11 @@ def build():
         reports = {}
         for tf in config.TIMEFRAMES:
             status["step"] = f"Reading performance ({tf.replace('_', ' ')})"
-            rows = src.flow_report(tf)
+            try:
+                rows = src.flow_report(tf)
+            except Exception as e:  # one period failing (e.g. the daily report quota) shouldn't lose the rest
+                log.warning("Performance report for %s failed: %s", tf, str(e)[:300])
+                continue
             if rows is not None:
                 reports[tf] = {r["groupings"]["flow_message_id"]: r["statistics"] for r in rows}
         flows = []
@@ -362,6 +369,7 @@ def build():
                     except Exception as e:  # a broken template shouldn't stop the refresh
                         html = ""
                         m["render_error"] = str(e)[:300]
+                        log.warning("Render failed for %s: %s", m["message_id"], m["render_error"])
                     if html:
                         (RENDERS / f"{m['message_id']}.html").write_text(html)
                         m["rendered"] = True
@@ -381,8 +389,10 @@ def build():
         tmp.write_text(json.dumps(snap, ensure_ascii=False))
         tmp.replace(SNAPSHOT)
         status.update(step="Done", finished_at=snap["generated_at"])
+        log.info("Refresh done: %d flows, periods %s", len(flows), ", ".join(reports) or "none")
     except Exception as e:
         status.update(error=str(e), step="Failed")
+        log.exception("Refresh failed at step: %s", status.get("step"))
     finally:
         status["running"] = False
         _lock.release()

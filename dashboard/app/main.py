@@ -48,7 +48,9 @@ def _auto_refresh():
         age = None
         if snap:
             age = dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(snap["generated_at"])
-        if snap is None or (age and age > dt.timedelta(hours=24) and not config.USE_FIXTURES):
+        source = "fixtures" if config.USE_FIXTURES else "klaviyo"
+        stale = age and age > dt.timedelta(hours=24) and not config.USE_FIXTURES
+        if snap is None or snap.get("source") != source or stale:
             snapshot.build()
         time.sleep(3600)
 
