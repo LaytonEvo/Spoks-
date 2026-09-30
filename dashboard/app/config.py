@@ -11,6 +11,8 @@ KLAVIYO_API_KEY = os.getenv("KLAVIYO_API_KEY", "")
 KLAVIYO_WRITE_KEY = os.getenv("KLAVIYO_WRITE_KEY", "")
 # Klaviyo API revision. Flow definitions need a recent revision; change here if Klaviyo rejects it.
 KLAVIYO_REVISION = os.getenv("KLAVIYO_REVISION", "2025-10-15")
+# Optional override for template calls (drag-and-drop definitions need a recent revision; the app tries recent ones itself).
+KLAVIYO_TEMPLATE_REVISION = os.getenv("KLAVIYO_TEMPLATE_REVISION", "")
 # "Placed Order" metric used for conversions and revenue.
 CONVERSION_METRIC_ID = os.getenv("CONVERSION_METRIC_ID", "T9sNn9")
 

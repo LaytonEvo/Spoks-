@@ -160,7 +160,7 @@ def scan():
         if config.USE_FIXTURES:
             raise RuntimeError("Scanning needs the live Klaviyo connection (it reads each template).")
         src = LiveSource()
-        seen = set()
+        seen, unread = set(), []
         msgs = []
         for f in snap["flows"]:
             for m in snapshot._iter_messages(f["steps"]):
@@ -178,6 +178,7 @@ def scan():
                 tpl = src.template_full(tid)
             except KlaviyoError as e:
                 log.warning("Scan could not read template %s: %s", tid, str(e)[:200])
+                unread.append(str(e))
                 continue
             where = {"flow_id": f["id"], "flow": f["name"], "flow_status": f["status"], "message": m.get("name"),
                      "message_id": m.get("message_id"), "template_id": tid, "editor": tpl.get("editor_type")}
@@ -218,8 +219,11 @@ def scan():
                                   "Approve to add it to the Klaviyo to-do list, or dismiss if the deadline is real.",
                            "change": f"In Klaviyo: open this message and reword the {label.lower()}."}
                     _upsert(fix)
+        if unread:
+            scan_status["error"] = (f"Couldn't read {len(unread)} of {len(seen)} templates, so this scan is incomplete. "
+                                    f"First error: {unread[0][:200]}")
         scan_status.update(step="Done", finished_at=_now())
-        log.info("Fix scan done: %d templates checked", len(seen))
+        log.info("Fix scan done: %d templates, %d unreadable, template API revision %s", len(seen), len(unread), LiveSource._template_revision)
     except Exception as e:
         scan_status.update(error=str(e)[:300], step="Failed")
         log.exception("Fix scan failed")

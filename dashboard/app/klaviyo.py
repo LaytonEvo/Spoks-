@@ -22,6 +22,10 @@ KNOWN_METRICS = {
 }
 
 
+# Newest first. Reading and writing drag-and-drop template definitions needs a recent revision.
+TEMPLATE_REVISIONS = [r for r in (config.KLAVIYO_TEMPLATE_REVISION,) if r] + [
+    "2026-07-15", "2026-04-15", "2026-01-15", "2026-07-15.pre", "2026-04-15.pre", "2025-10-15"]
+
 # Counts (not rates) so weeks and messages can be added together.
 SERIES_STATS = ("recipients", "delivered", "opens_unique", "clicks_unique", "conversions",
                 "conversion_value", "unsubscribe_uniques")
@@ -114,9 +118,27 @@ class LiveSource:
         at = d["data"]["attributes"]
         return at.get("date_times") or [], at.get("results") or []
 
+    _template_revision = None  # the newest API revision that returns template definitions, found on first use
+
+    def _template_request(self, method, url, **kw):
+        """Template block structures need a newer API revision than the reports; try recent ones and remember what works."""
+        candidates = [LiveSource._template_revision] if LiveSource._template_revision else TEMPLATE_REVISIONS
+        last = None
+        for rev in candidates:
+            headers = dict(self.client.headers, revision=rev)
+            try:
+                out = self._request(method, url, headers=headers, **kw)
+                LiveSource._template_revision = rev
+                return out
+            except KlaviyoError as e:
+                last = e
+                if "revision" not in str(e).lower() and "additional-fields" not in str(e):
+                    raise
+        raise last
+
     def template_full(self, template_id):
         """A template's html plus, for drag-and-drop templates, its block structure."""
-        d = self._request("GET", f"/templates/{template_id}", params={
+        d = self._template_request("GET", f"/templates/{template_id}", params={
             "additional-fields[template]": "definition",
             "fields[template]": "name,editor_type,html,definition,updated"})
         at = d["data"]["attributes"]
@@ -152,7 +174,7 @@ class WriteClient(LiveSource):
         elif html is not None:
             attrs["html"] = html
         body = {"data": {"type": "template", "id": template_id, "attributes": attrs}}
-        return self._request("PATCH", f"/templates/{template_id}", content=json.dumps(body))
+        return self._template_request("PATCH", f"/templates/{template_id}", content=json.dumps(body))
 
     def create_template(self, name, html):
         body = {"data": {"type": "template", "attributes": {"name": name, "editor_type": "CODE", "html": html}}}
