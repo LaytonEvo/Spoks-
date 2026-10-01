@@ -44,12 +44,13 @@ SLOTS = {
                now_status="Have (check badges)", none="Always available. The main photo must carry no \"FREE GIFT\" or sale badges."),
 }
 
-LIVE = {"logo": KL + "07b49b80-e6e5-480f-9c79-25e6f90550a5.png", "roundel": KL + "4aa15d13-2505-4b2d-bec3-2603c69d2397.png",
+LIVE = {"logo": "https://cdn.klaviyomail.com/company/SiyYRR/images/079dc837-5851-48e3-8559-cbb12973b1ca.png",  # all-white logo (1 Oct)
+        "roundel": KL + "4aa15d13-2505-4b2d-bec3-2603c69d2397.png",
         "product": "{{ event.extra.line_items.0.product.images.0.src }}",
         "H1": KL + "648eead5-a37c-4669-90b8-c48143fc11f9.png",
         "H2": "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/2026M1DHCFoldedSide.png",
         "M1": KL + "02c3ea4e-ded3-4e4d-8be8-05539930335d.png"}
-PREV_FILES = {"logo": "p-logo.png", "roundel": "p-roundel.png", "product": "p-product.jpg",
+PREV_FILES = {"logo": "p-logo-white.png", "roundel": "p-roundel.png", "product": "p-product.jpg",
               "H1": "p-life1.jpg", "H2": "p-folded.jpg", "M1": "p-member.jpg"}
 
 
@@ -109,8 +110,9 @@ def shell(ctx, body, preheader, bg=WHITE, header=True):
     # Klaviyo strips <link> tags, so the website font is loaded with @import; Gmail and Outlook fall back to Arial.
     fonts = ("<style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@400;600;700&display=swap');</style>"
              if ctx.web_fonts else "")
-    head = (f'<tr><td bgcolor="{DG}" style="background:{DG};padding:18px 32px;">'
-            f'<a href="https://evolutiongolf.co.uk/"><img src="{ctx.img["logo"]}" width="170" alt="Evolution Golf" style="width:170px;height:auto;"></a></td></tr>') if header else ""
+    head = (f'<tr><td align="center" bgcolor="{DG}" style="background:{DG};padding:20px 32px;text-align:center;">'
+            f'<a href="https://evolutiongolf.co.uk/" style="display:inline-block;"><img src="{ctx.img["logo"]}" width="190" alt="Evolution Golf" '
+            f'style="width:190px;height:auto;margin:0 auto;"></a></td></tr>') if header else ""
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Evolution Golf</title>{fonts}
 <style>

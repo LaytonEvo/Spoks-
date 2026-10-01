@@ -224,7 +224,7 @@ def page(frames, images):
 
 def build(img_dir):
     icons = local_icons()
-    images = {k: data_uri(img_dir / f) for k, f in {"logo": "p-logo.png", "roundel": "p-roundel.png"}.items()}
+    images = {k: data_uri(img_dir / f) for k, f in {"logo": "p-logo-white.png", "roundel": "p-roundel.png"}.items()}
     prev = {k: f"__IMG_{k}__" for k in images}
     frames = {f"{e['key']}|{m}": e["fn"](Ctx(prev, "none", True, icons)) for e in EMAILS for m in f1.MODES}
     (OUT / "f2-preview.html").write_text(page(frames, images))

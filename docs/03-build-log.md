@@ -80,3 +80,4 @@
 - Untested against Klaviyo until the first approval: flow-create revision, segment triggers, and the extra settings.
   The app drops any optional setting Klaviyo refuses and lists it for the editor.
 - 1 Oct: new look (Layton): website font Noto Sans Display, green accents, pale-green panels (no Fraunces/cream). F1 v3 pack added; F1 v2 (STnrqk, created 14:55, all settings accepted incl. send times) is frozen — delete it and TQe2j4 once v3 is created.
+- 1 Oct: header now all-white logo (Klaviyo image 378081689), centred, 190px. Applied to F1 v3 and F2 packs (none created yet).
