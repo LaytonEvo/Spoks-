@@ -16,7 +16,7 @@ from build_f3_b import G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SLOTBG, SERI
 OUT = pathlib.Path(__file__).parent
 ICON_DIR = OUT / "assets" / "icons-png"
 ICON_WHITE_DIR = OUT / "assets" / "icons-white-png"
-HOSTED = OUT / "f1" / "icons.json"  # name -> Klaviyo CDN URL, written after upload
+HOSTED = OUT / "icons-hosted.json"  # name -> Klaviyo CDN URL (icons imported into the Klaviyo library)
 
 SITE = "https://evolutiongolf.co.uk"
 URL = {
@@ -49,7 +49,7 @@ SLOTS = {
                none="Text signature only (plain-letter style)."),
 }
 
-ICONS = ["free-delivery", "expert-advice", "custom-fitting", "member-card", "member-card-gold", "free-returns",
+ICONS = ["monthly-prize-draw", "members-portal", "member-price-tag", "free-delivery", "expert-advice", "custom-fitting", "member-card", "member-card-gold", "free-returns",
          "free-delivery-members", "trade-in", "calendar", "electric-trolley", "used-pre-owned", "golf-shoe",
          "waterproof-jacket", "golf-ball", "reply-to-email", "arrow-right", "check"]
 WHITE_ICONS = ["free-returns", "free-delivery-members", "trade-in", "calendar"]
@@ -80,6 +80,11 @@ def first_name(ctx):
     return "{{ person.first_name|default:'there' }}" if ctx.live else "there"
 
 
+def name_suffix(ctx):
+    """", Sam" when we know the name, nothing when we don't (avoids "Welcome, there.")."""
+    return "{% if person.first_name %}, {{ person.first_name }}{% endif %}" if ctx.live else ", Sam"
+
+
 def hero(ctx, key):
     s = ctx.slot(key, 600, 360)
     return f'<tr><td style="padding:0;">{s}</td></tr>' if s else ""
@@ -108,7 +113,7 @@ def button(label, href, bg=G, fg=WHITE, align="left"):
 
 def usp3(ctx):
     """Three-item USP strip (spec: cream, 8px radius, 20px padding, 186/1/186/1/186)."""
-    items = [("free-delivery", "Free UK delivery"), ("expert-advice", "Advice from golfers"), ("custom-fitting", "Custom fitting")]
+    items = [("free-delivery", "Free delivery over £50"), ("expert-advice", "Advice from golfers"), ("custom-fitting", "Custom fitting")]
     cells = []
     for name, label in items:
         cells.append(f'<td class="usp-c" width="186" align="center" valign="top" style="width:186px;">'
@@ -141,14 +146,14 @@ def icon_rows(ctx, rows):
     return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>', "8px 44px 20px")
 
 
-def footer(ctx):
+def footer(ctx, reason="you joined the Evolution Golf mailing list"):
     a = f'style="color:{WHITE};text-decoration:none;"'
     dot = f'<span style="color:{GOLD};">&nbsp;·&nbsp;</span>'
     return (f'<tr><td align="center" bgcolor="{DG}" style="background:{DG};padding:32px 24px 28px;">'
             f'<img src="{ctx.img["roundel"]}" width="44" height="44" alt="Evolution Golf" style="width:44px;height:44px;margin:0 auto 16px;">'
             f'<p style="margin:0 0 12px;font:13px/20px {SANS};color:#CFE0D6;">Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL</p>'
             f'<p style="margin:0 0 18px;font:600 13px/20px {SANS};">' + dot.join(f'<a href="{u}" {a}>{n}</a>' for n, u in b.SOCIAL.items()) + '</p>'
-            f'<p class="foot" style="margin:0;font:12px/18px {SANS};color:#A9C2B5;">You\'re receiving this because you joined the Evolution Golf mailing list.<br>'
+            f'<p class="foot" style="margin:0;font:12px/18px {SANS};color:#A9C2B5;">You\'re receiving this because {reason}.<br>'
             + unsub(ctx, "#CFE0D6") + '</p></td></tr>')
 
 
@@ -184,7 +189,7 @@ def membership_dark(ctx, heading, cta="Join for £36 a year"):
 
 def e1(ctx):
     body = (hero(ctx, "W1")
-            + intro("Welcome to Evolution Golf", f"Welcome, {first_name(ctx)}.",
+            + intro("Welcome to Evolution Golf", f"Welcome{name_suffix(ctx)}.",
                     "We're a golf shop run by people who play, and we'd rather help you into the right trolley than the expensive one.")
             + text_row(p("We don't send a stream of codes. If you want to pay less, we do membership instead.", margin="16px 0 20px"))
             + membership_dark(ctx, "Pay less on every month's order, starting with your first.")
@@ -256,7 +261,7 @@ def e3(ctx):
             f'<p style="{pp}">Alex here, I run the online side at Evolution Golf. Quick one: if you\'re weighing up a trolley, some clubs or anything else, '
             f'reply to this email and tell me what you play and what you\'re trying to fix. I\'ll give you an honest answer, even if it\'s "don\'t buy that".</p>'
             f'<p style="{pp}">No product list in this one. Just the offer of a proper conversation.</p>'
-            f'{sig}<p style="margin:22px 0 0;font:15px/22px {SANS};color:{MUTED};">Rather talk? Call us on {confirm("phone")} '
+            f'{sig}<p style="margin:22px 0 0;font:15px/22px {SANS};color:{MUTED};">Rather talk? Call us on <a href="tel:03301227089" style="color:{G};">0330 122 7089</a> '
             f'or use our <a href="{URL["contact"]}" style="color:{G};">contact page</a>.</p></td></tr>'
             f'<tr><td class="px foot-light" style="padding:18px 44px 24px;border-top:1px solid {LINE};font:12px/18px {SANS};color:{MUTED};">'
             f'Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL<br>'
@@ -334,12 +339,12 @@ def page(frames, images):
             raise SystemExit("template text not found: " + a[:50])
         tpl = tpl.replace(a, c)
     flags = """
-      <li><strong>Welcome email 1:</strong> your current 5% email makes most of the welcome money. The draft uses the new membership email; a copy of your current one (with the "expires" wording taken out) sits next to it as a template so you can swap it in.</li>
+      <li><strong>Welcome email 1:</strong> your current 5% email makes most of the welcome money, but it still sells the old Clubhouse offer (15% off, £19.99 a month). The draft uses the new membership email; you can swap the old one back in the Klaviyo editor if you want to.</li>
       <li><strong>Choosing E2:</strong> people who looked at trolleys or clubs in their first day get Hardware; everyone else gets Everything else. Klaviyo can't tag interest from link clicks here, so it uses what they browsed.</li>
       <li><strong>Send times:</strong> the flow tool can't set "send at 09:30". Set the time of day on each wait in the Klaviyo editor.</li>
       <li><strong>Starting a checkout:</strong> anyone who starts a checkout leaves this flow, so the basket emails take over. (The plan said "pause for 2 days"; Klaviyo can't join paths back together, so pausing would mean 16 copies of the same emails.)</li>
       <li><strong>Timing:</strong> E1 straight away, SMS 1 hour later, E2 the next day, E3 two days after that, E4 three days after that.</li>
-      <li><strong>Still to confirm:</strong> the phone number in Alex's email, and the wording for how used clubs are checked.</li>
+      <li><strong>Still to confirm:</strong> the wording for how used clubs are checked.</li>
       <li><strong>Trustpilot figure:</strong> 4.8 from 611 reviews is written into E1 and E4, so it needs re-checking every quarter.</li>
     """
     tpl = re.sub(r'(<section class="block flags">.*?<ol>).*?(</ol>)', lambda m: m.group(1) + flags + m.group(2), tpl, flags=re.S)
