@@ -30,7 +30,7 @@ Spoks store id: `2745819a-e9db-41a1-8f76-442730a6a213` (workspace "Evolution Gol
   Switching flows on/off stays in the Klaviyo flow editor (the app has no code path for it). Writes use a separate
   `KLAVIYO_WRITE_KEY`; without it the app is read-only. **Finding (30 Sep): Klaviyo's API refuses any edit to a template
   that belongs to a flow message (404, even a no-op, even with a full-access key)**, so fixes to existing flow emails are
-  tracked as to-dos for the Klaviyo editor and verified by rescanning; API writes are only possible for new templates/drafts. Two-path simplification of the rebuild: not yet decided.
+  tracked as to-dos for the Klaviyo editor and verified by rescanning; API writes are only possible for new templates/drafts. **Two-group rebuild (Layton, 1 Oct 2026):** category-routed flows use 2 paths, Hardware (trolleys + clubs + used clubs) and Everything else, instead of the pack's 4; category detail goes in conditional content blocks. Record as a deviation from the pack.
 - Never touch contact records. Never resolve a `[CONFIRM]` by guessing. If the MCP can't do something, record it in the gap register — no pretend workarounds.
 
 ## Phases (stop at every ⏸)

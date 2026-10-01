@@ -11,7 +11,7 @@ Run: python3 klaviyo/design/build_f3_b.py <scratch img dir>
 """
 import base64, json, pathlib, sys
 
-IMG_DIR = pathlib.Path(sys.argv[1])
+IMG_DIR = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else None
 OUT = pathlib.Path(__file__).parent
 KL = "https://d3k81ch9hvuctc.cloudfront.net/company/SiyYRR/images/"
 
