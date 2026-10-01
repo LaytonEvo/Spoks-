@@ -178,8 +178,8 @@ const FLOWS = [
     segments: "Creates <span class=\"seg\">EG · Members · Annual</span>.",
     paths: "None.",
     steps: [["Straight away", "email", "Welcome: where your codes are (always sends)"], ["Day 3 · 09:30", "email", "Free returns and how they work"],
-            ["Day 30 · 09:30", "email", "Your first month"], ["Day 60 · 09:30", "email", "Your trade-in bonus is on (proposed: widen to \"two months in\")"],
-            ["Months 3–10", "email", "<span class=\"opt\">Proposed: a short \"your 10% for this month is ready\" reminder</span>"],
+            ["Day 30 · 09:30", "email", "Your first month"], ["Day 60 · 09:30", "email", "Two months in: trade-in bonus is on, plus this month's 10% and prize draw"],
+            ["Day 90–300", "email", "Every 30 days (8 emails): your 10% for this month is ready, and the prize draw"],
             ["Day 335 · 09:30", "email", "Your membership renews in about a month"]],
     replaces: "FLOW: Welcome — Club Access Member (£3,615 in the last 90 days), Evolution Pro and Evolution Pro Annual, for new joiners." },
   { id: "F3", name: "Checkout abandonment", status: "next",
@@ -283,7 +283,6 @@ const CHECKS = [
 ];
 const DECISIONS = [
   "<b>Approve F1 v3, F2 Free and F2 Annual</b> on the dashboard. Then delete the old drafts “EG · F1 Welcome” and “EG · F1 Welcome v2” in Klaviyo.",
-  "<b>F2 Annual:</b> widen the day-60 email to \"two months in\" and add the monthly \"your 10% is ready\" reminders? Decide before approving.",
   "<b>The welcome code:</b> the new F1 drops the 5% code that earns most welcome revenue. Do you switch straight over, or run the old and new email 1 side by side for a few weeks first?",
   "<b>Optional codes:</b> allow a unique, genuinely expiring 5% code on the Everything-else path in F3, F4, F10 and F12? Never on trolleys or clubs. Off unless you say yes.",
   "<b>Cart tracking:</b> who can look at the Klaviyo onsite tracking on the Shopify theme? I can tell them exactly what to check.",

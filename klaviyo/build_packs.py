@@ -157,21 +157,28 @@ def f2_packs():
     }
     annual = {
         "id": "f2-annual", "title": "F2 Membership · Annual (£36)",
-        "summary": "New £36 annual members (tagged AnnualMember): welcome, free returns, first month, trade-in bonus at day 60, "
-                   "and the renewal reminder we promise in the welcome emails.",
+        "summary": "New £36 annual members (tagged AnnualMember): welcome, free returns, first month, two months in (trade-in bonus), "
+                   "a short monthly reminder that their 10% is ready, and the renewal reminder we promise in the welcome emails.",
         "replaces": "Replaces the old Club Access, Pro and Annual welcomes for new joiners (those old tiers aren't sold any more).",
         "outline": ["Starts: someone is tagged MemberTier = AnnualMember (a new segment, “EG · Members · Annual”, is created for this).",
                     "Leaves if they stop being an annual member.", "Day 0: welcome (always sends)", "Day 3, 09:30: free returns",
-                    "Day 30, 09:30: first month", "Day 60, 09:30: trade-in bonus on", "Day 335, 09:30: renewal reminder"],
+                    "Day 30, 09:30: first month", "Day 60, 09:30: two months in (trade-in bonus on, plus this month's 10%)",
+                    "Days 90 to 300, every 30 days: \"your 10% for this month is ready\"", "Day 335, 09:30: renewal reminder"],
         "after": ["Send yourself a test of each email.", "Switch on in Klaviyo."],
         "segments": [{"key": "annual", "name": "EG · Members · Annual", "definition": any_of(tier("equals", "AnnualMember"))}],
-        "templates": templates("f2-annual", [m[k] for k in ("pe1", "pe2", "pe3", "pe4", "pe5")], "EG · F2 Annual", ROOT / "design" / "f2"),
+        "templates": templates("f2-annual", [m[k] for k in ("pe1", "pe2", "pe3", "pe4", "pem", "pe5")], "EG · F2 Annual", ROOT / "design" / "f2"),
         "flow": {"name": "EG · F2 Membership · Annual", "definition": {
             "triggers": [{"type": "segment", "ref": "annual"}], "profile_filter": all_of(NO_BOUNCE, tier("equals", "AnnualMember")),
             "entry_action_id": "pe1",
             "actions": [E("pe1", "pe1", "w3", smart=False), wait("w3", 3, "days", "pe2", at="09:30"), E("pe2", "pe2", "w27"),
                         wait("w27", 27, "days", "pe3", at="09:30"), E("pe3", "pe3", "w30"), wait("w30", 30, "days", "pe4", at="09:30"),
-                        E("pe4", "pe4", "w275"), wait("w275", 275, "days", "pe5", at="09:30"), E("pe5", "pe5", None)]}},
+                        E("pe4", "pe4", "wm1")]
+            # Months 3 to 10: the monthly 10% reminder every 30 days (days 90 to 300), then the renewal reminder at day 335.
+            + [x for i in range(1, 9) for x in (
+                wait(f"wm{i}", 30, "days", f"pm{i}", at="09:30"),
+                email(f"pm{i}", "pem", f"F2 Annual · Monthly 10% reminder · month {i + 2}", m["pem"]["subject"], m["pem"]["preview"],
+                      f"wm{i + 1}" if i < 8 else "w35"))]
+            + [wait("w35", 35, "days", "pe5", at="09:30"), E("pe5", "pe5", None)]}},
     }
     return [("f2-free", free), ("f2-annual", annual)]
 

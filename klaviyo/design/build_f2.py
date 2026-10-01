@@ -154,14 +154,28 @@ def pe3(ctx):
 
 
 def pe4(ctx):
-    body = (intro("Trade-in bonus", "Your trade-in bonus is now on",
-                  "You've been a member for 60 days, so you now get 5% more on any trade-in value.")
-            + steps([("Get a quote.", "Tell us what you've got: clubs or a trolley."),
-                     ("Send it in.", "We check it and confirm the value."),
-                     ("Spend it.", "The value comes off your next order, with your +5% on top.")])
-            + text_row(button("Get a trade-in quote", TRADE_IN), "12px 44px 32px")
-            + footer(ctx))
-    return shell(ctx, body, "5% more on any trade-in value, from today.")
+    rows = [("trade-in", "Your trade-in bonus is on",
+             "You've been a member for 60 days, so you now get 5% more on any trade-in value. Clubs or a trolley, we take the value off your next order.",
+             link("Get a trade-in quote", TRADE_IN)),
+            ("member-price-tag", "This month's 10%", "One order this month gets 10% off. The code is waiting in your member portal.", link("Open my portal", PORTAL)),
+            ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", "")]
+    body = (intro("Two months in", "Two months in: your trade-in bonus is on",
+                  "One new benefit from today, and a reminder of the two that come round every month.")
+            + icon_rows(ctx, rows) + text_row("", "0 0 12px") + footer(ctx))
+    return shell(ctx, body, "5% more on any trade-in from today, plus this month's 10% and prize draw.")
+
+
+def pem(ctx):
+    body = (intro("Your monthly 10%", "This month's 10% is ready",
+                  "As a member, one order every month gets 10% off. A new month means a new one.")
+            + steps([("Open your member portal.", "The code is in the Codes section."),
+                     ("Use it on one order this month.", "Anything you need: balls, a glove, or something bigger."),
+                     ("Next month there's another.", "A new month brings a new 10%.")])
+            + text_row(button("Open my member portal", PORTAL), "8px 44px 24px")
+            + member_note(ctx, "You're in this month's prize draw", "Every member is entered automatically. We draw it at the start of next month.",
+                          "See member benefits", JOIN)
+            + text_row("", "0 0 32px") + footer(ctx))
+    return shell(ctx, body, "One order this month gets 10% off. Your code is in your member portal.")
 
 
 def pe5(ctx):
@@ -189,8 +203,10 @@ EMAILS = [
          subject="Free returns, and how they work", preview="Order two sizes, keep one, send one back. Free, four times a year.", slots=[]),
     dict(key="pe3", fn=pe3, name="Annual E3 · First month", timing="Annual · day 30", sender=BR,
          subject="Your first month as a member", preview="Your monthly 10%, this month's prize draw and what's coming at day 60.", slots=[]),
-    dict(key="pe4", fn=pe4, name="Annual E4 · Trade-in bonus on", timing="Annual · day 60", sender=BR,
-         subject="Your trade-in bonus is now on", preview="5% more on any trade-in value, from today.", slots=[]),
+    dict(key="pe4", fn=pe4, name="Annual E4 · Two months in", timing="Annual · day 60", sender=BR,
+         subject="Two months in: your trade-in bonus is on", preview="5% more on any trade-in from today, plus this month's 10% and prize draw.", slots=[]),
+    dict(key="pem", fn=pem, name="Annual · Monthly 10% reminder", timing="Annual · months 3 to 10, every 30 days", sender=BR,
+         subject="Your 10% for this month is ready", preview="One order this month gets 10% off. Your code is in your member portal.", slots=[]),
     dict(key="pe5", fn=pe5, name="Annual E5 · Renewal reminder", timing="Annual · day 335", sender=BR,
          subject="Your membership renews in about a month", preview="A reminder before your £36 annual membership renews. Nothing to do if you're staying.", slots=[]),
 ]

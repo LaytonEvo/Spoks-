@@ -296,3 +296,16 @@ def draft_email(pid: str, key: str, user=Depends(auth)):
     except (KeyError, FileNotFoundError):
         raise HTTPException(404)
     return HTMLResponse(snapshot.fill_tags(html), headers={"Content-Security-Policy": "script-src 'none'"})
+
+
+# ---------- flow map (the same page as the shared artifact) ----------
+@app.get("/flow-map", response_class=HTMLResponse)
+def flow_map(user=Depends(auth)):
+    body = (config.BASE_DIR / "app" / "flowmap.html").read_text()
+    page = ('<!doctype html><html lang="en-GB"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script></head><body>'
+            + body +
+            '<script>window.mermaid && mermaid.initialize({startOnLoad: true, theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "neutral"});</script>'
+            '</body></html>')
+    return HTMLResponse(page)

@@ -471,3 +471,10 @@ document.addEventListener("click", async (e) => {
   catch (err) { alertInline(b, err.message); return; }
   state.draftId ? renderDraft() : renderDrafts();
 });
+
+// ---------- flow map: the programme on one page (also shared as an artifact) ----------
+function renderFlowMap() {
+  $("#main").innerHTML = `<div class="flowmap-bar"><p class="muted">Every flow: who gets in, who's kept out, when they leave, and what they receive.</p>
+    <a href="/flow-map" target="_blank" rel="noopener">Open full screen ↗</a></div>
+    <iframe class="flowmap" src="/flow-map" title="Flow map"></iframe>`;
+}
