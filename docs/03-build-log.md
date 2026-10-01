@@ -63,3 +63,19 @@
 6. CONFIRM tokens: phone number (E3), wording for how used clubs are checked (E2 Hardware).
 7. Re-entry: leave off (pack).
 8. Category names in the Hardware split: check irons appear under "Golf Clubs" (no separate irons collection was confirmed).
+
+## 1 Oct 2026 · Drafts page, F1 v2, F2 (two drafts)
+- Layton approved (1 Oct) the dashboard creating new drafts after approval on its new **Drafts** page ("New flows to approve").
+  Packs: `dashboard/app/drafts/{f1-welcome-v2,f2-free,f2-annual}.json`, built by `klaviyo/build_packs.py` from the email builders.
+- Layton's answers: £36 members are tagged `MemberTier = AnnualMember`; returns start from a request form in the member portal;
+  the prize draw is automatic and drawn at the start of each month for the month before. The £19.95 basket pop-up is in the site
+  code but not visible (no action).
+- **F1 v2** (pack `f1-welcome-v2`): fixes "Welcome, there.", "Free delivery over £50" (site banner), phone 0330 122 7089 (site header);
+  adds preview text, message names, send times (09:30 / 17:30), UTM tracking, SMS opt-out wording on and company-name prefix off.
+  Once created, Layton deletes the first draft **TQe2j4**.
+- **F2** deviates from the pack's four tiers: the members page now sells Free (£0) and an Annual plan (£36/year).
+  `EG · F2 Membership · Free` starts from the existing segment W3N8WF ("Free TIer Members", MemberTier contains "Free");
+  3 emails, upgrade checks before E2/E3. `EG · F2 Membership · Annual` starts from a new segment "EG · Members · Annual"
+  (MemberTier equals "AnnualMember"); 5 emails to day 335 (renewal reminder). Old Club/Pro/Annual tiers get nothing new.
+- Untested against Klaviyo until the first approval: flow-create revision, segment triggers, and the extra settings.
+  The app drops any optional setting Klaviyo refuses and lists it for the editor.

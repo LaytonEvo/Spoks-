@@ -1,0 +1,312 @@
+{
+ "id": "f2-annual",
+ "title": "F2 Membership · Annual (£36)",
+ "summary": "New £36 annual members (tagged AnnualMember): welcome, free returns, first month, trade-in bonus at day 60, and the renewal reminder we promise in the welcome emails.",
+ "replaces": "Replaces the old Club Access, Pro and Annual welcomes for new joiners (those old tiers aren't sold any more).",
+ "outline": [
+  "Starts: someone is tagged MemberTier = AnnualMember (a new segment, “EG · Members · Annual”, is created for this).",
+  "Leaves if they stop being an annual member.",
+  "Day 0: welcome (always sends)",
+  "Day 3, 09:30: free returns",
+  "Day 30, 09:30: first month",
+  "Day 60, 09:30: trade-in bonus on",
+  "Day 335, 09:30: renewal reminder"
+ ],
+ "after": [
+  "Send yourself a test of each email.",
+  "Switch on in Klaviyo."
+ ],
+ "segments": [
+  {
+   "key": "annual",
+   "name": "EG · Members · Annual",
+   "definition": {
+    "condition_groups": [
+     {
+      "conditions": [
+       {
+        "type": "profile-property",
+        "property": "properties['MemberTier']",
+        "filter": {
+         "type": "string",
+         "operator": "equals",
+         "value": "AnnualMember"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "templates": [
+  {
+   "key": "pe1",
+   "file": "f2-annual/pe1.html",
+   "template_name": "EG · F2 Annual · Annual E1 · Welcome",
+   "name": "Annual E1 · Welcome",
+   "subject": "Welcome to Evolution Golf membership",
+   "preview": "10% off your first order and one order every month, free returns and more. All live now.",
+   "when": "Annual · straight away · smart sending off",
+   "sender": "⛳ Evolution Golf"
+  },
+  {
+   "key": "pe2",
+   "file": "f2-annual/pe2.html",
+   "template_name": "EG · F2 Annual · Annual E2 · Free returns",
+   "name": "Annual E2 · Free returns",
+   "subject": "Free returns, and how they work",
+   "preview": "Order two sizes, keep one, send one back. Free, four times a year.",
+   "when": "Annual · day 3",
+   "sender": "⛳ Evolution Golf"
+  },
+  {
+   "key": "pe3",
+   "file": "f2-annual/pe3.html",
+   "template_name": "EG · F2 Annual · Annual E3 · First month",
+   "name": "Annual E3 · First month",
+   "subject": "Your first month as a member",
+   "preview": "Your monthly 10%, this month's prize draw and what's coming at day 60.",
+   "when": "Annual · day 30",
+   "sender": "⛳ Evolution Golf"
+  },
+  {
+   "key": "pe4",
+   "file": "f2-annual/pe4.html",
+   "template_name": "EG · F2 Annual · Annual E4 · Trade-in bonus on",
+   "name": "Annual E4 · Trade-in bonus on",
+   "subject": "Your trade-in bonus is now on",
+   "preview": "5% more on any trade-in value, from today.",
+   "when": "Annual · day 60",
+   "sender": "⛳ Evolution Golf"
+  },
+  {
+   "key": "pe5",
+   "file": "f2-annual/pe5.html",
+   "template_name": "EG · F2 Annual · Annual E5 · Renewal reminder",
+   "name": "Annual E5 · Renewal reminder",
+   "subject": "Your membership renews in about a month",
+   "preview": "A reminder before your £36 annual membership renews. Nothing to do if you're staying.",
+   "when": "Annual · day 335",
+   "sender": "⛳ Evolution Golf"
+  }
+ ],
+ "flow": {
+  "name": "EG · F2 Membership · Annual",
+  "definition": {
+   "triggers": [
+    {
+     "type": "segment",
+     "ref": "annual"
+    }
+   ],
+   "profile_filter": {
+    "condition_groups": [
+     {
+      "conditions": [
+       {
+        "type": "profile-metric",
+        "metric_id": "Y2WUPe",
+        "measurement": "count",
+        "measurement_filter": {
+         "type": "numeric",
+         "operator": "equals",
+         "value": 0
+        },
+        "timeframe_filter": {
+         "type": "date",
+         "operator": "in-the-last",
+         "unit": "day",
+         "quantity": 30
+        },
+        "metric_filters": null
+       }
+      ]
+     },
+     {
+      "conditions": [
+       {
+        "type": "profile-property",
+        "property": "properties['MemberTier']",
+        "filter": {
+         "type": "string",
+         "operator": "equals",
+         "value": "AnnualMember"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "entry_action_id": "pe1",
+   "actions": [
+    {
+     "temporary_id": "pe1",
+     "type": "send-email",
+     "links": {
+      "next": "w3"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Welcome to Evolution Golf membership",
+       "preview_text": "10% off your first order and one order every month, free returns and more. All live now.",
+       "template_ref": "pe1",
+       "smart_sending_enabled": false,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Annual E1 · Welcome"
+      }
+     }
+    },
+    {
+     "temporary_id": "w3",
+     "type": "time-delay",
+     "links": {
+      "next": "pe2"
+     },
+     "data": {
+      "unit": "days",
+      "value": 3,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "pe2",
+     "type": "send-email",
+     "links": {
+      "next": "w27"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Free returns, and how they work",
+       "preview_text": "Order two sizes, keep one, send one back. Free, four times a year.",
+       "template_ref": "pe2",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Annual E2 · Free returns"
+      }
+     }
+    },
+    {
+     "temporary_id": "w27",
+     "type": "time-delay",
+     "links": {
+      "next": "pe3"
+     },
+     "data": {
+      "unit": "days",
+      "value": 27,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "pe3",
+     "type": "send-email",
+     "links": {
+      "next": "w30"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your first month as a member",
+       "preview_text": "Your monthly 10%, this month's prize draw and what's coming at day 60.",
+       "template_ref": "pe3",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Annual E3 · First month"
+      }
+     }
+    },
+    {
+     "temporary_id": "w30",
+     "type": "time-delay",
+     "links": {
+      "next": "pe4"
+     },
+     "data": {
+      "unit": "days",
+      "value": 30,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "pe4",
+     "type": "send-email",
+     "links": {
+      "next": "w275"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your trade-in bonus is now on",
+       "preview_text": "5% more on any trade-in value, from today.",
+       "template_ref": "pe4",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Annual E4 · Trade-in bonus on"
+      }
+     }
+    },
+    {
+     "temporary_id": "w275",
+     "type": "time-delay",
+     "links": {
+      "next": "pe5"
+     },
+     "data": {
+      "unit": "days",
+      "value": 275,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "pe5",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your membership renews in about a month",
+       "preview_text": "A reminder before your £36 annual membership renews. Nothing to do if you're staying.",
+       "template_ref": "pe5",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Annual E5 · Renewal reminder"
+      }
+     }
+    }
+   ]
+  }
+ }
+}

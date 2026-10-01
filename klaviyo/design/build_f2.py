@@ -100,7 +100,7 @@ def fe2(ctx):
 def fe3(ctx):
     rows = [("free-returns", "Free returns",
              "Order two sizes of a shoe, keep the one that fits and send the other back free. Four free returns a year.", ""),
-            ("monthly-prize-draw", "A prize draw every month", "Every annual member gets an entry each month.", ""),
+            ("monthly-prize-draw", "A prize draw every month", "You're entered automatically every month, and we draw it at the start of the next one.", ""),
             ("trade-in", "More for your trade-in",
              "After 60 days, members get 5% more on any trade-in value. Worth having when your irons are due a change.", link("How trade-in works", TRADE_IN)),
             ("calendar", "First look at new kit", "48 hours' early access to new products before everyone else.", "")]
@@ -130,10 +130,10 @@ def pe1(ctx):
 def pe2(ctx):
     body = (intro("Free returns", "Free returns, and how they work",
                   "You get four free returns a year. Order two sizes, keep the one that fits, send the other back.")
-            + steps([("Start the return.", "Follow the steps on our returns page " + confirm("member returns process") + "."),
-                     ("Send it back.", "Pack it up and post it. As a member, the return is free."),
-                     ("Keep going.", "You've got four a year, so don't save them for an emergency.")])
-            + text_row(link("Read the returns page", RETURNS), "4px 44px 24px")
+            + steps([("Log in to your member portal.", "That's where returns start."),
+                     ("Fill in the returns request form.", "Tell us what's coming back and why."),
+                     ("Send it back.", "As a member, the return is free. You've got four a year, so don't save them for an emergency.")])
+            + text_row(button("Start a return in my portal", PORTAL), "8px 44px 24px")
             + member_note(ctx, "Your monthly 10% is ready", "One order a month gets 10% off. The code is in your member portal.",
                           "Open my portal", PORTAL)
             + text_row("", "0 0 32px")
@@ -146,7 +146,7 @@ def pe3(ctx):
                   "A quick reminder of what's there for you, now you've had a month.")
             + icon_rows(ctx, [
                 ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order. It's in your portal.", link("Open my portal", PORTAL)),
-                ("monthly-prize-draw", "This month's prize draw", "Your entry is part of your membership " + confirm("draw entry mechanics") + ".", ""),
+                ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
                 ("trade-in", "Trade-in bonus in 30 days", "Your +5% trade-in bonus starts at 60 days. Worth getting a quote ready.", link("Get a trade-in quote", TRADE_IN))])
             + text_row("", "0 0 12px")
             + footer(ctx))
@@ -213,9 +213,8 @@ def page(frames, images):
     tpl = re.sub(r'<section class="block">\s*<p class="eyebrow">Day 2, 18:00.*?</section>', '', tpl, flags=re.S)
     flags = """
       <li><strong>Two plans, not four:</strong> the plan was written for Free, Club Access, Pro and Annual. Your site now sells Free and the £36 annual plan, so the flow has two branches. Existing Club, Pro and Annual members aren't sent anything.</li>
-      <li><strong>Upgrades:</strong> if a Free member upgrades in their first 12 days, they get the annual welcome instead of the next upgrade email.</li>
-      <li><strong>Old £19.95 pop-up:</strong> the basket pop-up on your site still offers "Clubhouse membership, 10% off, £19.95 per year". That clashes with the £36 plan.</li>
-      <li><strong>Still to confirm:</strong> how members start a free return, and how the monthly prize draw entry works.</li>
+      <li><strong>Two drafts:</strong> "EG · F2 Membership · Free" starts when someone joins your Free members segment; "EG · F2 Membership · Annual" starts when someone is tagged AnnualMember. A Free member who upgrades at any point moves to the Annual one.</li>
+      <li><strong>Old member welcomes:</strong> when you switch these on, switch off "FLOW: Welcome - Evolution Free" (it starts from the same segment) so nobody gets both.</li>
       <li><strong>No images needed:</strong> these emails use icons only.</li>
     """
     tpl = re.sub(r'(<section class="block flags">.*?<ol>).*?(</ol>)', lambda m: m.group(1) + flags + m.group(2), tpl, flags=re.S)

@@ -1,7 +1,7 @@
-"""Read-only access to Klaviyo: a live API source and a fixture source with the same interface.
+"""Access to Klaviyo: a live API source and a fixture source with the same interface.
 
-Nothing in this module writes to Klaviyo. The only POST calls are the reporting and
-template-render endpoints, which read data and change nothing.
+LiveSource only reads (its POST calls are the reporting and template-render endpoints, which change nothing).
+WriteClient, at the bottom, is the only code that writes, and only after an approval in the app.
 """
 import datetime as dt
 import json
@@ -25,6 +25,9 @@ KNOWN_METRICS = {
 # Newest first. Reading and writing drag-and-drop template definitions needs a recent revision.
 TEMPLATE_REVISIONS = [r for r in (config.KLAVIYO_TEMPLATE_REVISION,) if r] + [
     "2026-07-15", "2026-04-15", "2026-01-15", "2026-07-15.pre", "2026-04-15.pre", "2025-10-15"]
+
+# Creating flows and segments: newest first, including the beta revisions flow creation started on.
+FLOW_REVISIONS = ["2026-07-15", "2026-04-15", "2026-01-15", "2025-10-15", "2026-07-15.pre", "2025-10-15.pre", "2024-10-15.pre"]
 
 # Counts (not rates) so weeks and messages can be added together.
 SERIES_STATS = ("recipients", "delivered", "opens_unique", "clicks_unique", "conversions",
@@ -165,8 +168,9 @@ class LiveSource:
 
 
 class WriteClient(LiveSource):
-    """The only code that changes Klaviyo. It can read, update and create email templates, nothing else:
-    no flow status changes, no sends, no profiles. Uses its own key (KLAVIYO_WRITE_KEY)."""
+    """The only code that changes Klaviyo. It can update and create email templates, and create new segments and
+    draft flows from approved packs. Nothing else: no flow status changes, no edits to existing flows, no deletes,
+    no sends, no profiles. Uses its own key (KLAVIYO_WRITE_KEY)."""
 
     def __init__(self):
         if not config.KLAVIYO_WRITE_KEY:
@@ -187,7 +191,37 @@ class WriteClient(LiveSource):
         body = {"data": {"type": "template", "attributes": {"name": name, "editor_type": "CODE", "html": html}}}
         return self._request("POST", "/templates", content=json.dumps(body))["data"]["id"]
 
-    # Deliberately absent: flow status, flow edits, campaigns, sends, profiles.
+    # ---- new draft flows (only from packs Layton approves on the Drafts page) ----
+    def _revised(self, method, url, revisions, **kw):
+        """Flow creation needs a recent API revision; try newest first, moving on only when the revision is the problem."""
+        last = None
+        for rev in revisions:
+            try:
+                return self._request(method, url, headers=dict(self.client.headers, revision=rev), **kw)
+            except KlaviyoError as e:
+                last = e
+                if "revision" not in str(e).lower():
+                    raise
+        raise last
+
+    def segment_by_name(self, name):
+        d = self._request("GET", "/segments", params={"filter": f'equals(name,"{name}")', "fields[segment]": "name"})
+        return (d.get("data") or [{}])[0].get("id")
+
+    def create_segment(self, name, definition):
+        body = {"data": {"type": "segment", "attributes": {"name": name, "definition": definition}}}
+        return self._revised("POST", "/segments", FLOW_REVISIONS, content=json.dumps(body))["data"]["id"]
+
+    def flow_by_name(self, name):
+        d = self._request("GET", "/flows", params={"filter": f'equals(name,"{name}")', "fields[flow]": "name,status"})
+        return (d.get("data") or [{}])[0].get("id")
+
+    def create_flow(self, name, definition):
+        """Creates a flow. Klaviyo creates every new flow, and every message in it, as a draft."""
+        body = {"data": {"type": "flow", "attributes": {"name": name, "definition": definition}}}
+        return self._revised("POST", "/flows", FLOW_REVISIONS, content=json.dumps(body))["data"]["id"]
+
+    # Deliberately absent: flow status, flow edits, deletes, campaigns, sends, profiles.
 
 
 class FixtureSource:

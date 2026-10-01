@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, digest, fixes, review, snapshot
+from . import config, digest, drafts, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -261,4 +261,38 @@ def fix_preview(fid: str, which: str = "after", user=Depends(auth)):
     if not f:
         raise HTTPException(404)
     html = f.get("after_preview" if which == "after" else "before_preview") or "<p>No preview.</p>"
+    return HTMLResponse(snapshot.fill_tags(html), headers={"Content-Security-Policy": "script-src 'none'"})
+
+
+# ---------- new draft flows: approve, then the app creates them in Klaviyo (switched off) ----------
+PACK_RE = re.compile(r"^[a-z0-9-]{2,60}$")
+
+
+def _pack_id(pid):
+    if not PACK_RE.match(pid):
+        raise HTTPException(404)
+    return pid
+
+
+@app.get("/api/drafts")
+def api_drafts(user=Depends(auth)):
+    return {"packs": drafts.all_public(), "writes_enabled": bool(config.KLAVIYO_WRITE_KEY) and not config.USE_FIXTURES}
+
+
+@app.post("/api/drafts/{pid}/approve")
+def api_draft_approve(pid: str, user=Depends(auth)):
+    try:
+        return drafts.approve(_pack_id(pid), user)
+    except KeyError:
+        raise HTTPException(404, "No such draft")
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.get("/drafts/{pid}/email/{key}", response_class=HTMLResponse)
+def draft_email(pid: str, key: str, user=Depends(auth)):
+    try:
+        html = drafts.email_html(_pack_id(pid), _pack_id(key))
+    except (KeyError, FileNotFoundError):
+        raise HTTPException(404)
     return HTMLResponse(snapshot.fill_tags(html), headers={"Content-Security-Policy": "script-src 'none'"})

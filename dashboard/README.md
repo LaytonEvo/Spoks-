@@ -1,4 +1,4 @@
-# Evolution Golf flow dashboard (read-only)
+# Evolution Golf flow dashboard
 
 One clear view of every Klaviyo flow: the journey, each email and SMS, its performance, rule-based
 health checks, Claude's written review, and team notes. It never changes anything in Klaviyo.
@@ -16,10 +16,14 @@ Data is cached in a snapshot and refreshed daily or with the "Refresh from Klavi
 ## Pages
 - **Overview**: sortable table with a verdict per flow, colour cues against your own median flow, and a revenue trend.
 - **Flow**: week-by-week sends, revenue and revenue per send; the journey with a preview pane; Claude's review; notes.
-- **Fixes to approve**: scans every email in the flows and proposes fixes (broken unsubscribe link, deadline claims).
-  Approve → the app edits that one template in Klaviyo, reads it back to check, logs who approved it, and offers Undo.
-  Subject lines and SMS text can't be changed through the API, so those become to-dos for the Klaviyo editor.
-  The app never switches flows on or off, changes timings, or sends anything.
+- **New flows to approve**: finished `EG ·` flows (packs in `app/drafts/`, written by `klaviyo/build_packs.py`), each with
+  how it runs and a preview of every email. Approve → the app creates any segment it starts from, the emails and the
+  flow in Klaviyo as a draft (switched off), checks it in Klaviyo and logs who approved it. Progress is saved per step,
+  so "Try again" never duplicates. Settings Klaviyo refuses on create (e.g. send times) are dropped and listed for the editor.
+- **Fixes to approve**: scans every email in the flows and groups what needs fixing (broken unsubscribe link, deadline
+  claims) per flow. Klaviyo doesn't let apps edit emails inside flows, so approving puts the card on the Klaviyo to-do
+  list; the next scan checks each email and ticks it off.
+- The app never switches flows on or off, edits existing flows, deletes, or sends anything.
 - **Programme**: the Build Pack flows (F1–F13) in build order, with status worked out from Klaviyo (`EG · F<n>` names),
   what each replaces, to-dos and open questions. Edit `app/programme.json` to update it.
 - **Compare**: new flow or path against the one it replaces. After launch, the weeks since launch are set against the

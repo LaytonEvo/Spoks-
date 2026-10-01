@@ -7,7 +7,7 @@ const gbp = (v, dp = 0) => (v == null ? "–" : "£" + v.toLocaleString("en-GB",
 const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", last_365_days: "last 12 months" };
 
 const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "all", page: null, cmp: null };
-const PAGES = { fixes: "Fixes to approve", programme: "Programme", compare: "Compare", tests: "A/B tests", summary: "Monday summary" };
+const PAGES = { drafts: "New flows to approve", fixes: "Fixes to approve", programme: "Programme", compare: "Compare", tests: "A/B tests", summary: "Monday summary" };
 const WIDE = window.matchMedia("(min-width: 1200px)");
 try { state.tf = localStorage.getItem("eg-tf") || state.tf; } catch (e) { /* storage unavailable */ }
 
@@ -391,7 +391,8 @@ function render() {
   document.querySelectorAll("#period button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tf === state.tf)));
   document.querySelectorAll("#period button").forEach((b) => { b.disabled = !state.snap.timeframes.includes(b.dataset.tf); b.title = b.disabled ? "Not in this snapshot yet" : ""; });
   renderSidebar();
-  if (state.page === "fixes") renderFixes();
+  if (state.page === "drafts") renderDrafts();
+  else if (state.page === "fixes") renderFixes();
   else if (state.page === "programme") renderProgramme();
   else if (state.page === "compare") renderCompare();
   else if (state.page === "tests") renderTests();

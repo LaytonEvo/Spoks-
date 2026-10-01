@@ -1,0 +1,235 @@
+{
+ "id": "f2-free",
+ "title": "F2 Membership · Free",
+ "summary": "New Free members: what Free gives them, then two honest emails about the £36 plan. If they upgrade, they leave this flow and the Annual one picks them up.",
+ "replaces": "Replaces “FLOW: Welcome - Evolution Free”. Switch that off when you switch this on (same starting segment).",
+ "outline": [
+  "Starts: someone joins your “Free TIer Members” segment.",
+  "Day 0: You're in",
+  "Day 4, 09:30: the honest maths on £36 (only if still on Free)",
+  "Day 12, 09:30: the plan in use (only if still on Free)"
+ ],
+ "after": [
+  "Send yourself a test of each email.",
+  "Switch on in Klaviyo, and switch off “FLOW: Welcome - Evolution Free”."
+ ],
+ "templates": [
+  {
+   "key": "fe1",
+   "file": "f2-free/fe1.html",
+   "template_name": "EG · F2 Free · Free E1 · You're in",
+   "name": "Free E1 · You're in",
+   "subject": "You're in: your free Evolution Golf membership",
+   "preview": "5% off member deals, free delivery over £30 and loyalty points. All live now.",
+   "when": "Free · straight away",
+   "sender": "⛳ Evolution Golf"
+  },
+  {
+   "key": "fe2",
+   "file": "f2-free/fe2.html",
+   "template_name": "EG · F2 Free · Free E2 · The honest maths",
+   "name": "Free E2 · The honest maths",
+   "subject": "Is the £36 plan worth it? The honest maths",
+   "preview": "10% off one order a month pays back the £36 at about £30 an order. The full sum inside.",
+   "when": "Free · day 4 · still on Free",
+   "sender": "⛳ Evolution Golf"
+  },
+  {
+   "key": "fe3",
+   "file": "f2-free/fe3.html",
+   "template_name": "EG · F2 Free · Free E3 · The plan in use",
+   "name": "Free E3 · The plan in use",
+   "subject": "What £36 a year actually gets used for",
+   "preview": "Free returns, a monthly prize draw and a bigger trade-in. Then it's up to you.",
+   "when": "Free · day 12 · still on Free",
+   "sender": "⛳ Evolution Golf"
+  }
+ ],
+ "flow": {
+  "name": "EG · F2 Membership · Free",
+  "definition": {
+   "triggers": [
+    {
+     "type": "segment",
+     "id": "W3N8WF"
+    }
+   ],
+   "profile_filter": {
+    "condition_groups": [
+     {
+      "conditions": [
+       {
+        "type": "profile-metric",
+        "metric_id": "Y2WUPe",
+        "measurement": "count",
+        "measurement_filter": {
+         "type": "numeric",
+         "operator": "equals",
+         "value": 0
+        },
+        "timeframe_filter": {
+         "type": "date",
+         "operator": "in-the-last",
+         "unit": "day",
+         "quantity": 30
+        },
+        "metric_filters": null
+       }
+      ]
+     }
+    ]
+   },
+   "entry_action_id": "fe1",
+   "actions": [
+    {
+     "temporary_id": "fe1",
+     "type": "send-email",
+     "links": {
+      "next": "w4"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "You're in: your free Evolution Golf membership",
+       "preview_text": "5% off member deals, free delivery over £30 and loyalty points. All live now.",
+       "template_ref": "fe1",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Free E1 · You're in"
+      }
+     }
+    },
+    {
+     "temporary_id": "w4",
+     "type": "time-delay",
+     "links": {
+      "next": "free1"
+     },
+     "data": {
+      "unit": "days",
+      "value": 4,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "free1",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "string",
+            "operator": "contains",
+            "value": "Free"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "fe2",
+      "next_if_false": null
+     }
+    },
+    {
+     "temporary_id": "fe2",
+     "type": "send-email",
+     "links": {
+      "next": "w8"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Is the £36 plan worth it? The honest maths",
+       "preview_text": "10% off one order a month pays back the £36 at about £30 an order. The full sum inside.",
+       "template_ref": "fe2",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Free E2 · The honest maths"
+      }
+     }
+    },
+    {
+     "temporary_id": "w8",
+     "type": "time-delay",
+     "links": {
+      "next": "free2"
+     },
+     "data": {
+      "unit": "days",
+      "value": 8,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "free2",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "string",
+            "operator": "contains",
+            "value": "Free"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "fe3",
+      "next_if_false": null
+     }
+    },
+    {
+     "temporary_id": "fe3",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "What £36 a year actually gets used for",
+       "preview_text": "Free returns, a monthly prize draw and a bigger trade-in. Then it's up to you.",
+       "template_ref": "fe3",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F2 Free E3 · The plan in use"
+      }
+     }
+    }
+   ]
+  }
+ }
+}
