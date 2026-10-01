@@ -81,3 +81,4 @@
   The app drops any optional setting Klaviyo refuses and lists it for the editor.
 - 1 Oct: new look (Layton): website font Noto Sans Display, green accents, pale-green panels (no Fraunces/cream). F1 v3 pack added; F1 v2 (STnrqk, created 14:55, all settings accepted incl. send times) is frozen — delete it and TQe2j4 once v3 is created.
 - 1 Oct: header now all-white logo (Klaviyo image 378081689), centred, 190px. Applied to F1 v3 and F2 packs (none created yet).
+- 1 Oct: flow map published (docs/flow-map.html → https://claude.ai/artifact/ET69bS6qbZM829pvLQXtcp). Checks: Added to Cart uniques Jun 441/Jul 565/Aug 185/Sep 136 vs Checkout Started 994/860/781 → cart tracking likely broken since Aug (F4/F5 held); Delivered Shipment ~47–59% of Placed Order, Fulfilled Order ~100% → F9 uses Fulfilled Order + 3d; back-in-stock sign-ups 0 Jul–Sep. F1 v3: added member split before E4.

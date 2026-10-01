@@ -105,7 +105,11 @@ def f1_pack():
                split("hw", hw, "e2h", "e2e")]
     for g in ("h", "e"):
         actions += [E("e2" + g, "e2" + g, "w2" + g), wait("w2" + g, 2, "days", "e3" + g, at="09:30"),
-                    E("e3" + g, "e3", "w3" + g, ALEX), wait("w3" + g, 3, "days", "e4" + g, at="17:30"), E("e4" + g, "e4", None)]
+                    E("e3" + g, "e3", "w3" + g, ALEX), wait("w3" + g, 3, "days", "m4" + g, at="17:30"),
+                    # E4 sells membership: skip anyone who joined during the flow
+                    split("m4" + g, any_of({"type": "profile-property", "property": "properties['MemberTier']",
+                                            "filter": {"type": "existence", "operator": "is-set"}}), None, "e4" + g),
+                    E("e4" + g, "e4", None)]
     return pid, {
         "id": pid, "title": "F1 Welcome (v3, new look)",
         "summary": "New subscribers who haven't bought. Same flow as v2, in the new look: your website's font "
@@ -119,7 +123,9 @@ def f1_pack():
                   "Send yourself a test of each email from the Klaviyo editor.",
                   "When happy, switch it on in Klaviyo and switch off “1. SM: Welcome Sequence”."],
         "split_labels": {"member": {"label": "Already a member?", "yes": "Member: leaves (gets F2)", "no": "Not a member"},
-                         "hw": {"label": "Looked at trolleys, clubs or used clubs in the last 7 days", "yes": "Hardware", "no": "Everything else"}},
+                         "hw": {"label": "Looked at trolleys, clubs or used clubs in the last 7 days", "yes": "Hardware", "no": "Everything else"},
+                         "m4h": {"label": "Joined membership during the flow?", "yes": "Member: skips E4", "no": "Not a member"},
+                         "m4e": {"label": "Joined membership during the flow?", "yes": "Member: skips E4", "no": "Not a member"}},
         "templates": templates(pid, f1.EMAILS, "EG · F1 v3", ROOT / "design" / "f1"),
         "flow": {"name": "EG · F1 Welcome v3", "definition": {
             "triggers": [{"type": "list", "id": "Tzck9t"}],

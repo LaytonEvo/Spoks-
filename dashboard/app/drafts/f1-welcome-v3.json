@@ -25,6 +25,16 @@
    "label": "Looked at trolleys, clubs or used clubs in the last 7 days",
    "yes": "Hardware",
    "no": "Everything else"
+  },
+  "m4h": {
+   "label": "Joined membership during the flow?",
+   "yes": "Member: skips E4",
+   "no": "Not a member"
+  },
+  "m4e": {
+   "label": "Joined membership during the flow?",
+   "yes": "Member: skips E4",
+   "no": "Not a member"
   }
  },
  "templates": [
@@ -739,7 +749,7 @@
      "temporary_id": "w3h",
      "type": "time-delay",
      "links": {
-      "next": "e4h"
+      "next": "m4h"
      },
      "data": {
       "unit": "days",
@@ -747,6 +757,32 @@
       "secondary_value": 0,
       "timezone": "profile",
       "delay_until_time": "17:30"
+     }
+    },
+    {
+     "temporary_id": "m4h",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "existence",
+            "operator": "is-set"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": null,
+      "next_if_false": "e4h"
      }
     },
     {
@@ -833,7 +869,7 @@
      "temporary_id": "w3e",
      "type": "time-delay",
      "links": {
-      "next": "e4e"
+      "next": "m4e"
      },
      "data": {
       "unit": "days",
@@ -841,6 +877,32 @@
       "secondary_value": 0,
       "timezone": "profile",
       "delay_until_time": "17:30"
+     }
+    },
+    {
+     "temporary_id": "m4e",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "existence",
+            "operator": "is-set"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": null,
+      "next_if_false": "e4e"
      }
     },
     {
