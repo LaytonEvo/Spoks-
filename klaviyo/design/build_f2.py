@@ -55,14 +55,14 @@ def benefit_list(ctx, items):
 def steps(items):
     rows = ""
     for i, (head, text) in enumerate(items, 1):
-        rows += (f'<tr><td width="44" style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:600 30px/30px {SERIF};color:{GOLD};">{i}</td>'
+        rows += (f'<tr><td width="44" style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:700 30px/30px {SERIF};color:{GOLD};">{i}</td>'
                  f'<td style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:16px/24px {SANS};color:{INK};">'
                  f'<strong style="font-weight:600;color:{DG};">{head}</strong> {text}</td></tr>')
     return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{rows}</table>', "12px 44px 12px")
 
 
 def h2(text):
-    return text_row(f'<p style="margin:0;font:500 22px/29px {SERIF};color:{DG};">{text}</p>', "24px 44px 0")
+    return text_row(f'<p style="margin:0;font:700 22px/29px {SERIF};color:{DG};">{text}</p>', "24px 44px 0")
 
 
 # ---------------- Free branch ----------------
@@ -82,7 +82,7 @@ def fe1(ctx):
 def fe2(ctx):
     maths = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:{CREAM};border-radius:8px;padding:24px;">'
              f'<p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">The sum</p>'
-             f'<p style="margin:0 0 10px;font:500 22px/29px {SERIF};color:{DG};">£36 a year pays for itself at £30 an order.</p>'
+             f'<p style="margin:0 0 10px;font:700 22px/29px {SERIF};color:{DG};">£36 a year pays for itself at £30 an order.</p>'
              f'<p style="margin:0;font:15px/23px {SANS};color:{INK};">10% off one £30 order a month is £3. Twelve months of that is £36. '
              f'Your first order gets 10% off too. Spend more than £30 an order and you\'re ahead.</p></td></tr></table>')
     body = (intro("Free or £36 a year?", "Is the annual membership worth it? Here's the honest maths.",

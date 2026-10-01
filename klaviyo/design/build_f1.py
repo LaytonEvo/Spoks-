@@ -11,7 +11,7 @@ Run: python3 klaviyo/design/build_f1.py <scratch img dir>
 import json, pathlib, re, sys
 
 import build_f3_b as b
-from build_f3_b import G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SLOTBG, SERIF, SANS, confirm, unsub, data_uri
+from build_f3_b import ON_DARK, G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SLOTBG, SERIF, SANS, confirm, unsub, data_uri
 
 OUT = pathlib.Path(__file__).parent
 ICON_DIR = OUT / "assets" / "icons-png"
@@ -130,7 +130,7 @@ def member_note(ctx, heading, body, label="See what membership includes", href=U
     return (f'<tr><td class="px" style="padding:12px 20px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
             f'<tr><td style="background:{CREAM};border-radius:8px;padding:24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
             f'<td width="40" valign="middle" style="width:40px;">{icon(ctx, "member-card-gold", 40)}</td><td width="24" style="width:24px;"></td>'
-            f'<td valign="middle"><p style="margin:0 0 8px;font:500 22px/28px {SERIF};color:{DG};">{heading}</p>'
+            f'<td valign="middle"><p style="margin:0 0 8px;font:700 22px/28px {SERIF};color:{DG};">{heading}</p>'
             f'<p style="margin:0 0 12px;font:14px/20px {SANS};color:{MUTED};">{body}</p>{link(label, href)}</td>'
             f'</tr></table></td></tr></table></td></tr>')
 
@@ -141,14 +141,14 @@ def icon_rows(ctx, rows):
     for name, head, text, extra in rows:
         out += (f'<tr><td width="48" valign="top" style="width:48px;padding:20px 0;border-top:1px solid {LINE};">{icon(ctx, name, 32)}</td>'
                 f'<td valign="top" style="padding:20px 0;border-top:1px solid {LINE};">'
-                f'<p style="margin:0 0 6px;font:500 20px/27px {SERIF};color:{DG};">{head}</p>'
+                f'<p style="margin:0 0 6px;font:700 20px/27px {SERIF};color:{DG};">{head}</p>'
                 f'<p style="margin:0 0 {10 if extra else 0}px;font:16px/24px {SANS};color:{INK};">{text}</p>{extra}</td></tr>')
     return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>', "8px 44px 20px")
 
 
 def footer(ctx, reason="you joined the Evolution Golf mailing list"):
     a = f'style="color:{WHITE};text-decoration:none;"'
-    dot = f'<span style="color:{GOLD};">&nbsp;·&nbsp;</span>'
+    dot = f'<span style="color:{ON_DARK};">&nbsp;·&nbsp;</span>'
     return (f'<tr><td align="center" bgcolor="{DG}" style="background:{DG};padding:32px 24px 28px;">'
             f'<img src="{ctx.img["roundel"]}" width="44" height="44" alt="Evolution Golf" style="width:44px;height:44px;margin:0 auto 16px;">'
             f'<p style="margin:0 0 12px;font:13px/20px {SANS};color:#CFE0D6;">Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL</p>'
@@ -177,8 +177,8 @@ def membership_dark(ctx, heading, cta="Join for £36 a year"):
                   f'<td valign="middle" style="padding:5px 0;font:15px/22px {SANS};color:{WHITE};">{t}</td></tr>' for n, t in BENEFITS)
     return (f'<tr><td class="px" style="padding:8px 44px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="{DG}" style="background:{DG};border-radius:8px;">'
             f'<tr><td style="padding:28px 28px 30px;">'
-            f'<p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">Evolution Golf Membership · £36 a year</p>'
-            f'<p style="margin:0 0 12px;font:500 22px/29px {SERIF};color:{WHITE};">{heading}</p>'
+            f'<p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{ON_DARK};">Evolution Golf Membership · £36 a year</p>'
+            f'<p style="margin:0 0 12px;font:700 22px/29px {SERIF};color:{WHITE};">{heading}</p>'
             f'<p style="margin:0 0 14px;font:15px/23px {SANS};color:#E3ECE7;">10% off your first order, then 10% off one order every month after. Plus:</p>'
             f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">{lis}</table>'
             f'<p style="margin:0 0 20px;font:13px/19px {SANS};color:#A9C2B5;">Renews at £36 a year. We\'ll remind you before it does, and you can cancel any time from your account. '
@@ -274,7 +274,7 @@ def way_card(ctx, n, name, head, text, cta, href):
             f'<tr><td style="padding:24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
             f'<td width="56" valign="top" style="width:56px;">{icon(ctx, name, 40)}</td><td valign="top">'
             f'<p style="margin:0 0 4px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">Way {n}</p>'
-            f'<p style="margin:0 0 8px;font:500 22px/28px {SERIF};color:{DG};">{head}</p>'
+            f'<p style="margin:0 0 8px;font:700 22px/28px {SERIF};color:{DG};">{head}</p>'
             f'<p style="margin:0 0 16px;font:16px/24px {SANS};color:{INK};">{text}</p>'
             + button(cta, href) + '</td></tr></table></td></tr></table></td></tr>')
 

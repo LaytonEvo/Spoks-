@@ -5,6 +5,7 @@ Flows are written in Klaviyo's API format (actions with "data"), so they can car
 preview text, message names, send times, UTM tracking and SMS settings.
 
 Run: python3 klaviyo/build_packs.py   (after build_f1.py / build_f2.py have written the live emails)
+A pack that has been created in Klaviyo is frozen: give changes a new pack id and flow name (v2, v3 …).
 """
 import json
 import pathlib
@@ -90,7 +91,7 @@ def meta(emails):
 
 
 def f1_pack():
-    pid, m = "f1-welcome-v2", meta(f1.EMAILS)
+    pid, m = "f1-welcome-v3", meta(f1.EMAILS)
     hw = any_of(*[metric("WDFj3H", "greater-than-or-equal", 1, last(7),
                          [{"property": "Categories", "filter": {"type": "string", "operator": "contains", "value": c}}])
                   for c in ["Electric Trolleys", "GPS Electric Trolleys", "Remote Electric Trolleys", "Motocaddy Electric Golf Trolleys",
@@ -106,11 +107,10 @@ def f1_pack():
         actions += [E("e2" + g, "e2" + g, "w2" + g), wait("w2" + g, 2, "days", "e3" + g, at="09:30"),
                     E("e3" + g, "e3", "w3" + g, ALEX), wait("w3" + g, 3, "days", "e4" + g, at="17:30"), E("e4" + g, "e4", None)]
     return pid, {
-        "id": pid, "title": "F1 Welcome (v2)",
-        "summary": "New subscribers who haven't bought. Same as the first F1 draft, with the fixes: no \"Welcome, there.\", "
-                   "free delivery shown as over £50, your phone number in Alex's email, plus preview text, send times, "
-                   "message names and link tracking set up front.",
-        "replaces": "Delete the first draft “EG · F1 Welcome” (TQe2j4) once this one is created.",
+        "id": pid, "title": "F1 Welcome (v3, new look)",
+        "summary": "New subscribers who haven't bought. Same flow as v2, in the new look: your website's font "
+                   "(Noto Sans Display), green headings and pale-green boxes instead of cream.",
+        "replaces": "Once this is created, delete the earlier drafts “EG · F1 Welcome” (TQe2j4) and “EG · F1 Welcome v2” (STnrqk).",
         "outline": ["Starts: someone joins “1.0 Main Mailing List”. Leaves if they buy or start a checkout.",
                     "Members are skipped (they get F2).", "Email 1 straight away · text 1 an hour later",
                     "Next day 09:30: E2 Hardware if they looked at trolleys or clubs, otherwise E2 Everything else",
@@ -120,8 +120,8 @@ def f1_pack():
                   "When happy, switch it on in Klaviyo and switch off “1. SM: Welcome Sequence”."],
         "split_labels": {"member": {"label": "Already a member?", "yes": "Member: leaves (gets F2)", "no": "Not a member"},
                          "hw": {"label": "Looked at trolleys, clubs or used clubs in the last 7 days", "yes": "Hardware", "no": "Everything else"}},
-        "templates": templates(pid, f1.EMAILS, "EG · F1 v2", ROOT / "design" / "f1"),
-        "flow": {"name": "EG · F1 Welcome v2", "definition": {
+        "templates": templates(pid, f1.EMAILS, "EG · F1 v3", ROOT / "design" / "f1"),
+        "flow": {"name": "EG · F1 Welcome v3", "definition": {
             "triggers": [{"type": "list", "id": "Tzck9t"}],
             "profile_filter": all_of(metric("T9sNn9", "equals", 0, ALL), metric("T9sNn9", "equals", 0, FS), NO_BOUNCE,
                                      metric("SwrKKw", "equals", 0, FS)),

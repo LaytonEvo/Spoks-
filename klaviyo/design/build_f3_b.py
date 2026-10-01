@@ -15,10 +15,13 @@ IMG_DIR = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else None
 OUT = pathlib.Path(__file__).parent
 KL = "https://d3k81ch9hvuctc.cloudfront.net/company/SiyYRR/images/"
 
+# Layton, 1 Oct 2026: off the "Fraunces + cream" look. Website font (Noto Sans Display), green accents, pale-green panels.
+# GOLD is kept as a name for the accent colour (now brand green); ON_DARK is the accent on dark-green panels.
 G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SLOTBG = (
-    "#006747", "#003D27", "#B2893F", "#FAF7F1", "#1F2A24", "#5E6B63", "#E4E0D6", "#FFFFFF", "#EFE9DC")
-SERIF = "Fraunces,Georgia,'Times New Roman',serif"
-SANS = "Inter,Arial,Helvetica,sans-serif"
+    "#006747", "#003D27", "#006747", "#EAF3EE", "#1F2A24", "#5E6B63", "#DCE5E0", "#FFFFFF", "#EEF2EF")
+ON_DARK = "#A8D5BD"
+SERIF = "'Noto Sans Display',Arial,Helvetica,sans-serif"  # headings (the name is historical)
+SANS = "'Noto Sans Display',Arial,Helvetica,sans-serif"
 
 # ---- image slots: the brief for each position ----
 SLOTS = {
@@ -103,8 +106,9 @@ class Ctx:
 
 def shell(ctx, body, preheader, bg=WHITE, header=True):
     # Rule: the email canvas is always white, so white-background product shots sit seamlessly.
-    fonts = ('<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600'
-             '&family=Inter:wght@400;600&display=swap" rel="stylesheet">') if ctx.web_fonts else ""
+    # Klaviyo strips <link> tags, so the website font is loaded with @import; Gmail and Outlook fall back to Arial.
+    fonts = ("<style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@400;600;700&display=swap');</style>"
+             if ctx.web_fonts else "")
     head = (f'<tr><td bgcolor="{DG}" style="background:{DG};padding:18px 32px;">'
             f'<a href="https://evolutiongolf.co.uk/"><img src="{ctx.img["logo"]}" width="170" alt="Evolution Golf" style="width:170px;height:auto;"></a></td></tr>') if header else ""
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">
@@ -148,7 +152,7 @@ def intro(eyebrow, headline, text=""):
     t = f'<p style="margin:0;font:17px/26px {SANS};color:{INK};">{text}</p>' if text else ""
     return (f'<tr><td class="px" style="padding:36px 44px 0;">'
             f'<p style="margin:0 0 10px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">{eyebrow}</p>'
-            f'<h1 class="h1" style="margin:0 0 12px;font:600 34px/40px {SERIF};color:{DG};">{headline}</h1>{t}</td></tr>')
+            f'<h1 class="h1" style="margin:0 0 12px;font:700 34px/40px {SERIF};color:{DG};">{headline}</h1>{t}</td></tr>')
 
 
 def product_card(ctx, big=True):
@@ -196,7 +200,7 @@ def ruled_rows(items, ctx):
     out = ""
     for label, text in items:
         row = (f'<tr><td class="stack" width="150" style="padding:16px 16px 6px 0;border-top:1px solid {LINE};vertical-align:top;'
-                f'font:500 17px/24px {SERIF};color:{DG};">{label}</td>'
+                f'font:700 17px/24px {SERIF};color:{DG};">{label}</td>'
                 f'<td class="stack nb" style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:15px/23px {SANS};color:{INK};">{text}</td></tr>')
         out += ctx.if_motocaddy(row) if label == "Warranty" else row
     return f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>'
@@ -210,7 +214,7 @@ CHECKS = [("Range.", f"Does the battery cover your usual round with margin? 18-h
 def checks_block():
     rows = ""
     for i, (label, text) in enumerate(CHECKS, 1):
-        rows += (f'<tr><td width="44" style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:600 30px/30px {SERIF};color:{GOLD};">{i}</td>'
+        rows += (f'<tr><td width="44" style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:700 30px/30px {SERIF};color:{GOLD};">{i}</td>'
                  f'<td style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:16px/24px {SANS};color:{INK};">'
                  f'<strong style="font-weight:600;color:{DG};">{label}</strong> {text}</td></tr>')
     return f'<tr><td class="px" style="padding:22px 44px 12px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">{rows}</table></td></tr>'
@@ -229,7 +233,7 @@ def e1(ctx):
             + intro("Your basket is saved", "Still deciding? Fair enough. It's a big buy.", "Your basket is exactly where you left it.")
             + product_card(ctx)
             + f'<tr><td class="px" style="padding:20px 44px 36px;">{button("Back to my basket")}</td></tr>'
-            + f'<tr><td class="px" style="padding:0 44px 8px;"><p style="margin:0 0 6px;font:500 20px/28px {SERIF};color:{DG};">The things people usually want to know before they commit:</p></td></tr>'
+            + f'<tr><td class="px" style="padding:0 44px 8px;"><p style="margin:0 0 6px;font:700 20px/28px {SERIF};color:{DG};">The things people usually want to know before they commit:</p></td></tr>'
             + f'<tr><td class="px" style="padding:0 44px 28px;">' + ruled_rows(rows, ctx) + '</td></tr>'
             + trust() + usp() + footer(ctx))
     moto = "Free UK delivery, 2-year warranty, spread the cost. Pick up where you left off."
@@ -253,7 +257,7 @@ def membership_panel(ctx):
     return (f'<tr><td class="px" style="padding:12px 44px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="{DG}" style="background:{DG};">'
             f'<tr><td style="padding:28px 28px 30px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">{img_row}</table>{stop}'
             f'<p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">Evolution Golf Membership · £36 a year</p>'
-            f'<p style="margin:0 0 12px;font:500 22px/29px {SERIF};color:{WHITE};">Still happy with your pick? Good. One more thing before you check out.</p>'
+            f'<p style="margin:0 0 12px;font:700 22px/29px {SERIF};color:{WHITE};">Still happy with your pick? Good. One more thing before you check out.</p>'
             f'<p style="margin:0 0 14px;font:15px/23px {SANS};color:#E3ECE7;">Join before you check out and 10% comes off this order, then 10% off one order every month after. '
                         f'On an £800 trolley, that first 10% is £80.</p>'
             f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">{lis}</table>'
@@ -264,7 +268,7 @@ def membership_panel(ctx):
 
 def trade_in():
     return (f'<tr><td class="px" style="padding:28px 44px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:{CREAM};">'
-            f'<tr><td style="padding:22px 24px;"><p style="margin:0 0 6px;font:500 19px/26px {SERIF};color:{DG};">Trade in what you\'ve got</p>'
+            f'<tr><td style="padding:22px 24px;"><p style="margin:0 0 6px;font:700 19px/26px {SERIF};color:{DG};">Trade in what you\'ve got</p>'
             f'<p style="margin:0 0 10px;font:15px/23px {SANS};color:{INK};">Send us your old trolley and we\'ll take the value off your order. Members get a +5% bonus on top after 60 days. '
             f'Working electric trolleys {confirm("accepted brands")}</p>'
             f'<a href="#" style="font:600 15px/22px {SANS};color:{G};">Get a trade-in quote →</a> {confirm("URL")}</td></tr></table></td></tr>')
