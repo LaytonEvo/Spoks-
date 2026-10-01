@@ -15,6 +15,18 @@
   "Send yourself a test of each email from the Klaviyo editor.",
   "When happy, switch it on in Klaviyo and switch off “1. SM: Welcome Sequence”."
  ],
+ "split_labels": {
+  "member": {
+   "label": "Already a member?",
+   "yes": "Member: leaves (gets F2)",
+   "no": "Not a member"
+  },
+  "hw": {
+   "label": "Looked at trolleys, clubs or used clubs in the last 7 days",
+   "yes": "Hardware",
+   "no": "Everything else"
+  }
+ },
  "templates": [
   {
    "key": "e1",

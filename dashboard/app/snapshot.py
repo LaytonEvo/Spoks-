@@ -178,7 +178,7 @@ def _walk(start, actions, names, seen):
             steps.append({"kind": "update", "label": label or "Update profile"})
         elif t in ("conditional-split", "trigger-split"):
             flt = data.get("profile_filter") or data.get("trigger_filter")
-            steps.append({"kind": "split", "split_type": t, "label": _filter_label(flt, names), "branches": [
+            steps.append({"kind": "split", "split_type": t, "action_id": a.get("id"), "label": _filter_label(flt, names), "branches": [
                 {"label": "Yes", "steps": _walk(links.get("next_if_true"), actions, names, seen)},
                 {"label": "No", "steps": _walk(links.get("next_if_false"), actions, names, seen)},
             ]})

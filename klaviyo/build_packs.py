@@ -118,6 +118,8 @@ def f1_pack():
         "after": ["Check the used-clubs line in E2 Hardware (“every set is checked before it goes on sale”) and edit if needed.",
                   "Send yourself a test of each email from the Klaviyo editor.",
                   "When happy, switch it on in Klaviyo and switch off “1. SM: Welcome Sequence”."],
+        "split_labels": {"member": {"label": "Already a member?", "yes": "Member: leaves (gets F2)", "no": "Not a member"},
+                         "hw": {"label": "Looked at trolleys, clubs or used clubs in the last 7 days", "yes": "Hardware", "no": "Everything else"}},
         "templates": templates(pid, f1.EMAILS, "EG · F1 v2", ROOT / "design" / "f1"),
         "flow": {"name": "EG · F1 Welcome v2", "definition": {
             "triggers": [{"type": "list", "id": "Tzck9t"}],
@@ -139,6 +141,7 @@ def f2_packs():
         "outline": ["Starts: someone joins your “Free TIer Members” segment.", "Day 0: You're in",
                     "Day 4, 09:30: the honest maths on £36 (only if still on Free)", "Day 12, 09:30: the plan in use (only if still on Free)"],
         "after": ["Send yourself a test of each email.", "Switch on in Klaviyo, and switch off “FLOW: Welcome - Evolution Free”."],
+        "split_labels": {k: {"label": "Still on Free?", "yes": "Still Free", "no": "Upgraded: leaves (Annual flow takes over)"} for k in ("free1", "free2")},
         "templates": templates("f2-free", [m["fe1"], m["fe2"], m["fe3"]], "EG · F2 Free", ROOT / "design" / "f2"),
         "flow": {"name": "EG · F2 Membership · Free", "definition": {
             "triggers": [{"type": "segment", "id": "W3N8WF"}], "profile_filter": all_of(NO_BOUNCE), "entry_action_id": "fe1",

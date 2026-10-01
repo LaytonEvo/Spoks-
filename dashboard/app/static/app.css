@@ -327,3 +327,8 @@ table.mini th:first-child, table.mini td:first-child { text-align: left; }
 .fix-steps li { margin: 3px 0; }
 .fix.verified { border-left: 4px solid var(--good); }
 .fix.manual { border-left: 4px solid var(--info); }
+
+.draft-top { margin: 14px 0 18px; }
+.draft-top p { margin: 0 0 8px; }
+.eyebrow a { color: inherit; text-decoration: none; }
+.eyebrow a:hover { text-decoration: underline; }

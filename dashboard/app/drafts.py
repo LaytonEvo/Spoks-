@@ -13,6 +13,7 @@ import re
 import threading
 
 from . import config
+from . import snapshot
 from .klaviyo import KlaviyoError, WriteClient
 
 PACKS = config.BASE_DIR / "app" / "drafts"
@@ -76,7 +77,50 @@ def public(pid):
     out.update({k: st.get(k) for k in ("status", "segments", "templates", "flow_id", "dropped", "history", "error", "verify")})
     out["running"] = pid in _running
     out["klaviyo_url"] = f"https://www.klaviyo.com/flow/{st['flow_id']}/edit" if st.get("flow_id") else None
+    out.update(_journey(pk))
     return out
+
+
+def _name_splits(steps, labels):
+    for st in steps:
+        if st["kind"] == "split":
+            lab = labels.get(st.get("action_id"))
+            if lab:
+                st["label"] = lab["label"]
+                st["branches"][0]["label"], st["branches"][1]["label"] = lab["yes"], lab["no"]
+            for br in st["branches"]:
+                _name_splits(br["steps"], labels)
+
+
+AUDIENCES = {"Tzck9t": "1.0 Main Mailing List", "W3N8WF": "Free TIer Members"}
+
+
+def _journey(pk):
+    """The flow as the same step tree the flow pages use, so a draft reads like a live flow."""
+    definition = copy.deepcopy(pk["flow"]["definition"])
+    by_key = {t["key"]: t for t in pk["templates"]}
+    actions, previews = {}, {}
+    for a in definition["actions"]:
+        a["id"] = a["temporary_id"]
+        msg = (a.get("data") or {}).get("message")
+        if msg is not None:
+            msg["id"] = f"draft-{pk['id']}-{a['temporary_id']}"
+            if msg.get("template_ref"):
+                previews[msg["id"]] = f"/drafts/{pk['id']}/email/{msg['template_ref']}"
+                msg.setdefault("name", by_key[msg["template_ref"]]["name"])
+        actions[a["id"]] = a
+    steps = snapshot._walk(definition["entry_action_id"], actions, {}, set())
+    _name_splits(steps, pk.get("split_labels") or {})
+    for m in snapshot._iter_messages(steps):
+        m["preview_url"] = previews.get(m["message_id"])
+        m["draft"] = True
+        if m.get("body"):
+            m["body"] = re.sub(r"{{\s*person\.first_name[^}]*}}", "Sam", m["body"])
+    trig = (definition.get("triggers") or [{}])[0]
+    seg_names = {s["key"]: s["name"] for s in pk.get("segments", [])}
+    who = AUDIENCES.get(trig.get("id")) or seg_names.get(trig.get("ref")) or trig.get("id")
+    trigger = f"When someone joins the {trig.get('type')} “{who}”"
+    return {"steps": steps, "trigger": trigger, "flow_filter": snapshot._filter_label(definition.get("profile_filter"), {})}
 
 
 def all_public():

@@ -401,45 +401,67 @@ document.addEventListener("click", async (e) => {
 });
 
 // ---------- new flows to approve: the app creates them in Klaviyo as drafts ----------
-let draftState = { data: null, open: {} };
+let draftState = { data: null, current: null };
+const DRAFT_BADGE = { ready: ["skip", "Waiting for approval"], creating: ["draft", "Creating in Klaviyo…"], created: ["live", "Created in Klaviyo (switched off)"], failed: ["flag high", "Stopped: see below"] };
+const draftStatus = (p) => (p.running ? "creating" : p.status);
+function draftActions(p, d) {
+  const st = draftStatus(p);
+  if (st === "ready" || st === "failed") return d.writes_enabled
+    ? `<div class="fix-actions"><button type="button" class="btn" data-draft-approve="${esc(p.id)}">${st === "failed" ? "Try again" : "Approve: create in Klaviyo as a draft"}</button>
+       <span class="muted">Creates ${p.emails.length} emails and the flow “${esc(p.flow_name)}”, switched off. Nothing sends.</span></div>`
+    : `<p class="muted">The app has no Klaviyo write key, so it can't create drafts.</p>`;
+  if (st === "creating") return `<p class="muted">Creating the emails and the flow. This takes a minute.</p>`;
+  return `<div class="fix-actions"><a class="btn" href="${esc(p.klaviyo_url)}" target="_blank" rel="noopener">Open the draft in Klaviyo ↗</a>
+      ${p.verify ? `<span class="${p.verify.ok ? "muted" : "flag high"}">Checked in Klaviyo: status ${esc(p.verify.status)}, ${esc(p.verify.steps)} of ${esc(p.verify.expected)} steps.</span>` : ""}</div>
+      ${p.dropped && p.dropped.length ? `<p class="flag">Klaviyo didn't accept some settings, so set these in the editor: ${esc(p.dropped.join(", "))}.</p>` : ""}`;
+}
+const draftHist = (p) => (p.history || []).map((h) => `<li>${esc(h.at.slice(0, 16).replace("T", " "))} · ${esc(h.by)} · ${esc(h.action)}${h.detail ? ` – ${esc(h.detail)}` : ""}</li>`).join("");
 async function renderDrafts() {
   draftState.data = await api("/api/drafts");
   const d = draftState.data;
-  const badge = { ready: ["skip", "Waiting for approval"], creating: ["draft", "Creating in Klaviyo…"], created: ["live", "Created in Klaviyo (switched off)"], failed: ["flag high", "Stopped: see below"] };
   const card = (p) => {
-    const st = p.running ? "creating" : p.status;
-    const [cls, label] = badge[st] || ["skip", st];
-    const hist = (p.history || []).map((h) => `<li>${esc(h.at.slice(0, 16).replace("T", " "))} · ${esc(h.by)} · ${esc(h.action)}${h.detail ? ` – ${esc(h.detail)}` : ""}</li>`).join("");
-    const emails = p.emails.map((e) => `<li><button type="button" class="btn-line" data-draft-email="${esc(p.id)}/${esc(e.key)}">Preview</button>
-        <b>${esc(e.name)}</b> <span class="muted">· ${esc(e.when)} · from ${esc(e.sender)}</span><br>“${esc(e.subject)}” <span class="muted">– ${esc(e.preview)}</span></li>`).join("");
-    let actions = "";
-    if (st === "ready" || st === "failed") actions = d.writes_enabled
-      ? `<div class="fix-actions"><button type="button" class="btn" data-draft-approve="${esc(p.id)}">${st === "failed" ? "Try again" : "Approve: create in Klaviyo as a draft"}</button>
-         <span class="muted">Creates ${p.emails.length} emails and the flow “${esc(p.flow_name)}”, switched off. Nothing sends.</span></div>`
-      : `<p class="muted">The app has no Klaviyo write key, so it can't create drafts.</p>`;
-    else if (st === "creating") actions = `<p class="muted">Creating the emails and the flow. This takes a minute.</p>`;
-    else if (st === "created") actions = `<div class="fix-actions"><a class="btn" href="${esc(p.klaviyo_url)}" target="_blank" rel="noopener">Open the draft in Klaviyo ↗</a>
-        ${p.verify ? `<span class="${p.verify.ok ? "muted" : "flag high"}">Checked in Klaviyo: status ${esc(p.verify.status)}, ${esc(p.verify.steps)} of ${esc(p.verify.expected)} steps.</span>` : ""}</div>
-        ${p.dropped && p.dropped.length ? `<p class="flag">Klaviyo didn't accept some settings, so set these in the editor: ${esc(p.dropped.join(", "))}.</p>` : ""}`;
-    return `<article class="panel fix ${esc(st)}"><div class="fix-head"><span class="fix-kind">New flow</span><h3>${esc(p.title)}</h3><span class="stat ${cls}">${esc(label)}</span></div>
+    const [cls, label] = DRAFT_BADGE[draftStatus(p)] || ["skip", p.status];
+    return `<article class="panel fix"><div class="fix-head"><span class="fix-kind">New flow</span><h3><a href="#draft/${esc(p.id)}">${esc(p.title)}</a></h3><span class="stat ${cls}">${esc(label)}</span></div>
       <p>${esc(p.summary)}</p>${p.replaces ? `<p class="muted">${esc(p.replaces)}</p>` : ""}
-      <details class="fix-steps" open><summary>How it runs</summary><ol>${(p.outline || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ol></details>
-      <details class="fix-items" ${draftState.open[p.id] ? "open" : ""} data-draft-open="${esc(p.id)}"><summary>${p.emails.length} emails</summary><ul class="fix-list draft-emails">${emails}</ul></details>
-      ${p.error ? `<p class="flag high">${esc(p.error)}</p>` : ""}
-      ${st === "created" ? `<details class="fix-steps"><summary>Before you switch it on</summary><ol>${(p.after || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ol></details>` : ""}
-      ${actions}${hist ? `<ul class="fix-hist">${hist}</ul>` : ""}</article>`;
+      <div class="fix-actions"><a class="btn${p.status === "created" ? "-line" : ""}" href="#draft/${esc(p.id)}">See the full flow and emails →</a>
+      <span class="muted">${p.emails.length} emails · ${esc(p.trigger)}</span></div>
+      ${p.error ? `<p class="flag high">${esc(p.error)}</p>` : ""}</article>`;
   };
   const waiting = d.packs.filter((p) => p.status !== "created"), made = d.packs.filter((p) => p.status === "created");
   $("#main").innerHTML = `<p class="eyebrow">New flows</p><h1>Approve, and the app builds them in Klaviyo</h1>
-    <p class="muted" style="max-width:88ch">Each card is a finished flow: read how it runs and preview every email. <b>Approve</b> creates the emails and the flow in Klaviyo as a draft, switched off. Nothing sends until you switch it on in Klaviyo yourself. The app can't switch flows on, change existing flows or delete anything.</p>
+    <p class="muted" style="max-width:88ch">Open a flow to see every step and preview each email, laid out like your live flows. <b>Approve</b> creates the emails and the flow in Klaviyo as a draft, switched off. Nothing sends until you switch it on in Klaviyo yourself. The app can't switch flows on, change existing flows or delete anything.</p>
     <h2 class="fix-h">Waiting for approval <span class="muted">(${waiting.length})</span></h2>${waiting.length ? waiting.map(card).join("") : `<p class="muted">Nothing waiting.</p>`}
     <h2 class="fix-h">Created in Klaviyo <span class="muted">(${made.length})</span></h2>${made.length ? made.map(card).join("") : `<p class="muted">Nothing created yet.</p>`}`;
-  if (d.packs.some((p) => p.running || p.status === "creating")) setTimeout(() => { if (state.page === "drafts") renderDrafts(); }, 3000);
+  if (d.packs.some((p) => p.running || p.status === "creating")) setTimeout(() => { if (state.page === "drafts" && !state.draftId) renderDrafts(); }, 3000);
 }
-document.addEventListener("toggle", (e) => { const t = e.target.closest && e.target.closest("[data-draft-open]"); if (t) draftState.open[t.dataset.draftOpen] = t.open; }, true);
+async function renderDraft() {
+  draftState.data = await api("/api/drafts");
+  const d = draftState.data, p = d.packs.find((x) => x.id === state.draftId);
+  if (!p) { location.hash = "#drafts"; return; }
+  draftState.current = p;
+  const [cls, label] = DRAFT_BADGE[draftStatus(p)] || ["skip", p.status];
+  const emails = [...messages(p.steps)].filter((m) => m.kind === "email");
+  if (!emails.some((m) => m.message_id === state.pvId)) state.pvId = emails[0] ? emails[0].message_id : null;
+  const hist = draftHist(p);
+  $("#main").innerHTML = `
+    <p class="eyebrow"><a href="#drafts">← New flows to approve</a></p>
+    <div class="flow-head"><div><h1>${esc(p.flow_name)} <span class="stat ${cls}">${esc(label)}</span></h1>
+      <p class="meta">${esc(p.trigger)}.${p.flow_filter ? ` Only if: ${esc(p.flow_filter)}.` : ""}</p></div></div>
+    <div class="panel draft-top"><p>${esc(p.summary)}</p>${p.replaces ? `<p class="muted">${esc(p.replaces)}</p>` : ""}
+      ${p.error ? `<p class="flag high">${esc(p.error)}</p>` : ""}${draftActions(p, d)}
+      ${p.status === "created" && (p.after || []).length ? `<details class="fix-steps"><summary>Before you switch it on</summary><ol>${p.after.map((x) => `<li>${esc(x)}</li>`).join("")}</ol></details>` : ""}
+      ${hist ? `<details class="fix-steps"><summary>History</summary><ul class="fix-hist">${hist}</ul></details>` : ""}</div>
+    <div class="journey-wrap"><div class="journey">${renderSteps(p.steps)}</div>
+      <aside class="pane" aria-label="Email preview">${state.pvId ? `
+        <div class="pane-head"><div><p class="eyebrow" id="pane-name"></p><h3 id="pane-subject"></h3></div>
+          <div class="seg seg-light" id="pane-width"><button type="button" data-w="600">Desktop</button><button type="button" data-w="375">Phone</button></div></div>
+        <p class="sample-note" id="pane-note"></p>
+        <div class="frame-wrap"><iframe id="pane-frame" title="Email preview" sandbox=""></iframe></div>` : `<p class="muted" style="padding:16px">No emails in this flow.</p>`}
+      </aside></div>`;
+  if (state.pvId) showInPane(state.pvId);
+  if (draftStatus(p) === "creating") setTimeout(() => { if (state.draftId === p.id) renderDraft(); }, 3000);
+}
 document.addEventListener("click", async (e) => {
-  const pv = e.target.closest("[data-draft-email]");
-  if (pv) { openDraftEmail(pv.dataset.draftEmail); return; }
   const b = e.target.closest("[data-draft-approve]");
   if (!b) return;
   const p = draftState.data.packs.find((x) => x.id === b.dataset.draftApprove);
@@ -447,16 +469,5 @@ document.addEventListener("click", async (e) => {
   b.disabled = true; b.textContent = "Starting…";
   try { await api(`/api/drafts/${encodeURIComponent(p.id)}/approve`, { method: "POST" }); }
   catch (err) { alertInline(b, err.message); return; }
-  renderDrafts();
+  state.draftId ? renderDraft() : renderDrafts();
 });
-function openDraftEmail(path) {
-  const [pid, key] = path.split("/");
-  const p = draftState.data.packs.find((x) => x.id === pid), em = p.emails.find((x) => x.key === key);
-  $("#pv-eyebrow").textContent = `${p.title} · ${em.name}`;
-  $("#pv-title").textContent = em.subject;
-  $("#pv-sub").textContent = `From ${em.sender} · ${em.preview}`;
-  $("#pv-note").textContent = "Names show as “Sam”; in Klaviyo each person sees their own (or none).";
-  $("#pv-frame").src = `/drafts/${encodeURIComponent(pid)}/email/${encodeURIComponent(key)}`;
-  $("#preview").hidden = false;
-  $("#pv-close").focus();
-}

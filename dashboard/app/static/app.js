@@ -6,7 +6,7 @@ const pct = (v) => (v == null ? "–" : (v * 100).toFixed(1) + "%");
 const gbp = (v, dp = 0) => (v == null ? "–" : "£" + v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }));
 const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", last_365_days: "last 12 months" };
 
-const state = { snap: null, status: null, tf: "last_90_days", flowId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "all", page: null, cmp: null };
+const state = { snap: null, status: null, tf: "last_90_days", flowId: null, draftId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "all", page: null, cmp: null };
 const PAGES = { drafts: "New flows to approve", fixes: "Fixes to approve", programme: "Programme", compare: "Compare", tests: "A/B tests", summary: "Monday summary" };
 const WIDE = window.matchMedia("(min-width: 1200px)");
 try { state.tf = localStorage.getItem("eg-tf") || state.tf; } catch (e) { /* storage unavailable */ }
@@ -231,7 +231,7 @@ function msgCard(m) {
   return `<article class="msg${m.message_id === state.pvId && WIDE.matches ? " selected" : ""}"${pick}>
     <div class="msg-top"><span class="chan ${m.kind}">${m.kind.toUpperCase()}</span><span class="msg-name">${esc(m.name)}</span>
       ${m.status && m.status !== "live" ? pill(m.status) : ""}${m.from_label && m.kind === "email" ? `<span class="msg-from">from ${esc(m.from_label)}</span>` : ""}</div>
-    ${body}${metricRow(m)}${messageTrend(m)}${abTable(m)}${flagList(flags, true)}
+    ${body}${m.draft ? "" : metricRow(m) + messageTrend(m) + abTable(m)}${flagList(flags, true)}
     ${m.kind === "email" ? `<div class="msg-actions"><button type="button" class="link-btn" data-preview="${esc(m.message_id)}">Preview email →</button></div>` : ""}
   </article>`;
 }
@@ -243,6 +243,7 @@ function pathName(steps, fallback) {
 }
 function pathSummary(steps) {
   const ms = [...messages(steps)];
+  if (ms.some((m) => m.draft)) return `<span class="muted num">${ms.length} message${ms.length === 1 ? "" : "s"}</span>`;
   const sends = ms.reduce((a, m) => a + ((mstats(m) || {}).recipients || 0), 0);
   const rev = ms.reduce((a, m) => a + ((mstats(m) || {}).conversion_value || 0), 0);
   return `<span class="muted num">${ms.length} message${ms.length === 1 ? "" : "s"} · ${n(sends)} sends · ${gbp(rev)}</span>`;
@@ -269,12 +270,13 @@ function renderSteps(steps) {
     if (s.kind === "other") return `<div class="step-update">${esc(s.label)}</div>`;
     let paths;
     if (s.split_type === "trigger-split") paths = flattenChain(s);
-    else if (s.split_type === "conditional-split") paths = [{ name: "Yes", cond: s.label, steps: s.branches[0].steps }, { name: "No", cond: "", steps: s.branches[1].steps }];
+    else if (s.split_type === "conditional-split") paths = [{ name: s.branches[0].label, cond: s.label, steps: s.branches[0].steps }, { name: s.branches[1].label, cond: "", steps: s.branches[1].steps }];
     else paths = s.branches.map((b) => ({ name: b.label, cond: b.condition || "", steps: b.steps }));
     const intro = s.split_type === "trigger-split" ? `Splits into ${paths.length} paths by what was in the basket or order`
       : s.split_type === "conditional-split" ? `Split: <b>${esc(s.label)}</b>` : `Split: <b>${esc(s.label)}</b>`;
+    const openAt = Math.max(0, paths.findIndex((p) => [...messages(p.steps)].length));  // first path that sends something
     return `<div class="split"><p class="split-label">${intro}</p>${paths.map((p, i) => `
-      <details class="path" ${i === 0 ? "open" : ""}><summary><span class="path-name">${esc(p.name)}</span>${pathSummary(p.steps)}
+      <details class="path" ${i === openAt ? "open" : ""}><summary><span class="path-name">${esc(p.name)}</span>${pathSummary(p.steps)}
         ${p.cond && s.split_type === "trigger-split" ? `<span class="path-cond">${esc(p.cond)}</span>` : ""}</summary>
         <div class="path-body">${renderSteps(p.steps)}</div></details>`).join("")}</div>`;
   }).join("");
@@ -350,10 +352,15 @@ async function renderTab(f) {
 
 // ---------- preview ----------
 function findMessage(messageId) {
+  if (state.draftId && draftState.current) {
+    const d = draftState.current;
+    return [{ name: d.flow_name }, [...messages(d.steps)].find((x) => x.message_id === messageId)];
+  }
   const f = state.snap.flows.find((x) => x.id === state.flowId);
   return [f, f && [...messages(f.steps)].find((x) => x.message_id === messageId)];
 }
 function previewNote(m) {
+  if (m.draft) return "How the email will look. Names show as “Sam”; in Klaviyo each person sees their own name, or none.";
   return m.render_mode === "unpersonalised"
     ? "Klaviyo won’t fill in this template without a real customer, so it shows the default text instead. Product details stay blank, and every version of any conditional section appears."
     : "Rendered with an example basket and the name “Sam”, not a real customer.";
@@ -369,7 +376,7 @@ function showInPane(messageId) {
   document.querySelectorAll("#pane-width button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.w === state.pvWidth)));
   const fr = $("#pane-frame");
   fr.style.width = state.pvWidth + "px";
-  const src = `/render/${encodeURIComponent(messageId)}`;
+  const src = m.preview_url || `/render/${encodeURIComponent(messageId)}`;
   if (fr.getAttribute("src") !== src) fr.src = src;
 }
 function openPreview(messageId) {
@@ -380,7 +387,7 @@ function openPreview(messageId) {
   $("#pv-title").textContent = m.subject || m.name;
   $("#pv-sub").textContent = [m.from_label && `From ${m.from_label}`, m.preview_text].filter(Boolean).join(" · ");
   $("#pv-note").textContent = previewNote(m);
-  $("#pv-frame").src = `/render/${encodeURIComponent(messageId)}`;
+  $("#pv-frame").src = m.preview_url || `/render/${encodeURIComponent(messageId)}`;
   $("#preview").hidden = false;
   $("#pv-close").focus();
 }
@@ -391,7 +398,7 @@ function render() {
   document.querySelectorAll("#period button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tf === state.tf)));
   document.querySelectorAll("#period button").forEach((b) => { b.disabled = !state.snap.timeframes.includes(b.dataset.tf); b.title = b.disabled ? "Not in this snapshot yet" : ""; });
   renderSidebar();
-  if (state.page === "drafts") renderDrafts();
+  if (state.page === "drafts") (state.draftId ? renderDraft() : renderDrafts());
   else if (state.page === "fixes") renderFixes();
   else if (state.page === "programme") renderProgramme();
   else if (state.page === "compare") renderCompare();
@@ -402,6 +409,9 @@ function render() {
 function route() {
   const pg = /^#(\w+)$/.exec(location.hash);
   state.page = pg && PAGES[pg[1]] ? pg[1] : null;
+  const dm = /^#draft\/([a-z0-9-]+)/.exec(location.hash);
+  state.draftId = dm ? dm[1] : null;
+  if (state.draftId) state.page = "drafts";
   const m = /^#flow\/(\w+)(?:\/(\w+))?/.exec(location.hash);
   state.flowId = m ? m[1] : null;
   state.tab = (m && m[2]) || "journey";
@@ -476,4 +486,4 @@ window.addEventListener("hashchange", route);
   if (!state.snap.flows.length || state.status.running) pollStatus();
 })();
 
-WIDE.addEventListener("change", () => { if (state.snap && state.flowId && state.tab === "journey") renderFlow(); });
+WIDE.addEventListener("change", () => { if (state.snap && state.draftId) renderDraft(); else if (state.snap && state.flowId && state.tab === "journey") renderFlow(); });

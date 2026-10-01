@@ -13,6 +13,18 @@
   "Send yourself a test of each email.",
   "Switch on in Klaviyo, and switch off “FLOW: Welcome - Evolution Free”."
  ],
+ "split_labels": {
+  "free1": {
+   "label": "Still on Free?",
+   "yes": "Still Free",
+   "no": "Upgraded: leaves (Annual flow takes over)"
+  },
+  "free2": {
+   "label": "Still on Free?",
+   "yes": "Still Free",
+   "no": "Upgraded: leaves (Annual flow takes over)"
+  }
+ },
  "templates": [
   {
    "key": "fe1",
