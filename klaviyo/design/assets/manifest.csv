@@ -1,0 +1,319 @@
+file name,folder,what it is,size in pixels,format,colours used (hex),where it goes in the email,status (final / needs work)
+manifest.csv,/,"Full handoff inventory, dimensions, intended colours, placements and status",N/A,CSV,N/A,Developer inventory; not email content.,final
+specs.md,/,"Consolidated exact agreed rules, CSS, component specs, exceptions and outstanding status",N/A,MD,N/A,Developer handoff reference; not email content.,final
+eg-footer.png,/components,"Footer reference with logo, social and live-text placeholders; display 600 x 240",1200 x 480,PNG,#003D27; #FFFFFF; #B2893F,Bottom of email; build text and links live.,final
+eg-header-white.png,/components,White header with logo placeholder; display 600 x 72,1200 x 144,PNG,#FFFFFF; #003D27,Top of email; white header option.,final
+eg-header.png,/components,Dark header with logo placeholder; display 600 x 72,1200 x 144,PNG,#003D27; #FFFFFF; #B2893F,Top of email; replace LOGO placeholder with official logo.,final
+eg-panel-member.png,/components,Blank membership panel; display 560 x 140,1120 x 280,PNG,#FFFFFF; #FAF7F1; #003D27; #B2893F,"Contained membership module with live heading, body and text link.",final
+eg-panel-trade-in.png,/components,Blank trade-in panel; display 560 x 164,1120 x 328,PNG,#FFFFFF; #FAF7F1; #003D27; #006747,"Contained trade-in module with live heading, body and secondary button.",final
+eg-ui-divider-full-width.png,/components,Section divider,1200 x 48,PNG,#E4E0D6,Between email sections on white; display PNG at half native size.,final
+eg-ui-divider-full-width.svg,/components,Section divider,600 x 24,SVG,#E4E0D6,Between email sections on white; display PNG at half native size.,final
+eg-ui-divider-gold-centred.png,/components,Section divider,1200 x 48,PNG,#B2893F,Between email sections on white; display PNG at half native size.,final
+eg-ui-divider-gold-centred.svg,/components,Section divider,600 x 24,SVG,#B2893F,Between email sections on white; display PNG at half native size.,final
+eg-ui-divider-golf-flag.png,/components,Section divider,1200 x 80,PNG,#003D27; #E4E0D6,Between email sections on white; display PNG at half native size.,final
+eg-ui-divider-golf-flag.svg,/components,Section divider,600 x 40,SVG,#003D27; #E4E0D6,Between email sections on white; display PNG at half native size.,final
+eg-ui-product-card-1up.png,/components,Blank 1-up product card frame; display 560 x 744,1120 x 1488,PNG,#FFFFFF; #E4E0D6; #006747,Product section; real product photo and live title/price/button go into blank slots.,final
+eg-ui-product-card-270.png,/components,Blank single 270px card frame; display 270 x 454,540 x 908,PNG,#FFFFFF; #E4E0D6; #006747,One column in a two-product row.,final
+eg-ui-product-card-2up.png,/components,Blank 2-up product row; display 560 x 454,1120 x 908,PNG,#FFFFFF; #E4E0D6; #006747,Product section: two 270px cards separated by 20px.,final
+eg-ui-step-1-dark-green.png,/components,Step numeral with gold circle,80 x 80,PNG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-1-dark-green.svg,/components,Step numeral with gold circle,40 x 40,SVG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-1.png,/components,Step numeral with gold circle,80 x 80,PNG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-ui-step-1.svg,/components,Step numeral with gold circle,40 x 40,SVG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-ui-step-2-dark-green.png,/components,Step numeral with gold circle,80 x 80,PNG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-2-dark-green.svg,/components,Step numeral with gold circle,40 x 40,SVG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-2.png,/components,Step numeral with gold circle,80 x 80,PNG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-ui-step-2.svg,/components,Step numeral with gold circle,40 x 40,SVG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-ui-step-3-dark-green.png,/components,Step numeral with gold circle,80 x 80,PNG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-3-dark-green.svg,/components,Step numeral with gold circle,40 x 40,SVG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-3.png,/components,Step numeral with gold circle,80 x 80,PNG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-ui-step-3.svg,/components,Step numeral with gold circle,40 x 40,SVG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-ui-step-4-dark-green.png,/components,Step numeral with gold circle,80 x 80,PNG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-4-dark-green.svg,/components,Step numeral with gold circle,40 x 40,SVG,#003D27; #B2893F,Beside live step heading; dark-green numeral meets text contrast.,final
+eg-ui-step-4.png,/components,Step numeral with gold circle,80 x 80,PNG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-ui-step-4.svg,/components,Step numeral with gold circle,40 x 40,SVG,#B2893F,Decorative only with equivalent live step text; gold numeral misses agreed 4.5:1 text target.,needs work
+eg-fallback-club.png,/fallbacks,Neutral image-coming-soon tile with club outline; no text,800 x 800,PNG,#FFFFFF; #E4E0D6,Temporary image slot; decorative placeholder on pure white.,final
+eg-fallback-flag.png,/fallbacks,Neutral image-coming-soon tile with flag outline; no text,800 x 800,PNG,#FFFFFF; #E4E0D6,Temporary image slot; decorative placeholder on pure white.,final
+eg-fallback-trolley.png,/fallbacks,Neutral image-coming-soon tile with trolley outline; no text,800 x 800,PNG,#FFFFFF; #E4E0D6,Temporary image slot; decorative placeholder on pure white.,final
+eg-icon-arrow-left.png,/icons,Arrow left existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-arrow-left.svg,/icons,Arrow left outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-arrow-right.png,/icons,Arrow right existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-arrow-right.svg,/icons,Arrow right outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-basket.png,/icons,Basket existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-basket.svg,/icons,Basket outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-calendar.png,/icons,Calendar existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-calendar.svg,/icons,Calendar outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-cart-bag.png,/icons,Cart bag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-cart-bag.svg,/icons,Cart bag outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-check.png,/icons,Check existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-check.svg,/icons,Check outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-checkout.png,/icons,Checkout existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-checkout.svg,/icons,Checkout outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-chevron-right.png,/icons,Chevron right existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-chevron-right.svg,/icons,Chevron right outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-click-and-collect.png,/icons,Click and collect existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-click-and-collect.svg,/icons,Click and collect outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-clock.png,/icons,Clock existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-clock.svg,/icons,Clock outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-close.png,/icons,Close existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-close.svg,/icons,Close outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-custom-fitting.png,/icons,Custom fitting existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-custom-fitting.svg,/icons,Custom fitting outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-customer-support.png,/icons,Customer support existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-customer-support.svg,/icons,Customer support outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-delivery-van.png,/icons,Delivery van existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-delivery-van.svg,/icons,Delivery van outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-download.png,/icons,Download existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-download.svg,/icons,Download outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-driver.png,/icons,Driver existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-driver.svg,/icons,Driver outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-electric-trolley.png,/icons,Electric trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-electric-trolley.svg,/icons,Electric trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-expert-advice.png,/icons,Expert advice existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-expert-advice.svg,/icons,Expert advice outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-external-link.png,/icons,External link existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-external-link.svg,/icons,External link outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-family-business.png,/icons,Family business existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-family-business.svg,/icons,Family business outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-fast-delivery.png,/icons,Fast delivery existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-fast-delivery.svg,/icons,Fast delivery outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-free-delivery-members.png,/icons,Free delivery for members existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-free-delivery-members.svg,/icons,Free delivery for members outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-free-delivery.png,/icons,Free delivery existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-free-delivery.svg,/icons,Free delivery outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-free-returns.png,/icons,Free returns existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-free-returns.svg,/icons,Free returns outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-gift.png,/icons,Gift existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-gift.svg,/icons,Gift outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-golf-ball.png,/icons,Golf ball existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-ball.svg,/icons,Golf ball outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-flag-on-green.png,/icons,Golf flag on green existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-flag-on-green.svg,/icons,Golf flag on green outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-flag.png,/icons,Golf flag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-golf-flag.svg,/icons,Golf flag outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-golf-glove.png,/icons,Golf glove existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-glove.svg,/icons,Golf glove outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-shoe.png,/icons,Golf shoe existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-shoe.svg,/icons,Golf shoe outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-golf-trolley.png,/icons,Golf trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-golf-trolley.svg,/icons,Golf trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-info.png,/icons,Info existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-info.svg,/icons,Info outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-iron.png,/icons,Golf club / iron existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-iron.svg,/icons,Golf club / iron outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-location-pin.png,/icons,Location pin existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-location-pin.svg,/icons,Location pin outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-member-card-gold.svg,/icons,"Member-card panel icon, native display 40 x 40",40 x 40,SVG,#003D27; #B2893F,"Membership panel, left icon at 40 x 40.",final
+eg-icon-member-card.png,/icons,Member card existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-member-card.svg,/icons,Member card outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-member-price-tag.png,/icons,Member price tag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-member-price-tag.svg,/icons,Member price tag outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-members-portal.png,/icons,Members’ portal existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-members-portal.svg,/icons,Members’ portal outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-minus.png,/icons,Minus existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-minus.svg,/icons,Minus outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-monthly-prize-draw.png,/icons,Monthly prize draw existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-monthly-prize-draw.svg,/icons,Monthly prize draw outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-pay-later-instalments.png,/icons,Pay later / instalments existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-pay-later-instalments.svg,/icons,Pay later / instalments outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-phone.png,/icons,Phone existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-phone.svg,/icons,Phone outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-play-video.png,/icons,Play / video existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-play-video.svg,/icons,Play / video outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-plus.png,/icons,Plus existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-plus.svg,/icons,Plus outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-polo-shirt.png,/icons,Polo shirt existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-polo-shirt.svg,/icons,Polo shirt outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-price-match.png,/icons,Price match existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-price-match.svg,/icons,Price match outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-push-trolley.png,/icons,Push trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-push-trolley.svg,/icons,Push trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-putter.png,/icons,Putter existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-putter.svg,/icons,Putter outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-rangefinder-gps-watch.png,/icons,Rangefinder / GPS watch existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-rangefinder-gps-watch.svg,/icons,Rangefinder / GPS watch outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-remote-gps-trolley.png,/icons,Remote / GPS trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-remote-gps-trolley.svg,/icons,Remote / GPS trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-reply-to-email.png,/icons,Reply to email existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-reply-to-email.svg,/icons,Reply to email outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-returns-arrow.png,/icons,Returns arrow existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-returns-arrow.svg,/icons,Returns arrow outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-search.png,/icons,Search existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-search.svg,/icons,Search outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-secure-checkout.png,/icons,Secure checkout existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-secure-checkout.svg,/icons,Secure checkout outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-settings-preferences.png,/icons,Settings / preferences existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-settings-preferences.svg,/icons,Settings / preferences outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-share.png,/icons,Share existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-share.svg,/icons,Share outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-shield-warranty.png,/icons,Shield / warranty existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-shield-warranty.svg,/icons,Shield / warranty outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Original master samples: beside live labels on a light surface.,final
+eg-icon-stand-bag.png,/icons,Golf bag / stand bag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-stand-bag.svg,/icons,Golf bag / stand bag outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-tees.png,/icons,Tees existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-tees.svg,/icons,Tees outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-thumbs-up-recommended.png,/icons,Thumbs up / recommended existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-thumbs-up-recommended.svg,/icons,Thumbs up / recommended outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-trade-in-40px.svg,/icons,"Trade-in panel icon, native display 40 x 40",40 x 40,SVG,#003D27,"Trade-in panel, left icon at 40 x 40.",final
+eg-icon-trade-in.png,/icons,Trade-in existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-trade-in.svg,/icons,Trade-in outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-trolley-battery.png,/icons,Trolley battery existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-trolley-battery.svg,/icons,Trolley battery outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-uk-based.png,/icons,UK based existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-uk-based.svg,/icons,UK based outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Membership & brand: beside live labels on a light surface.,final
+eg-icon-unsubscribe-mail-off.png,/icons,Unsubscribe / mail off existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-unsubscribe-mail-off.svg,/icons,Unsubscribe / mail off outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Navigation & utility: beside live labels on a light surface.,final
+eg-icon-used-pre-owned.png,/icons,Used / pre-owned existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-used-pre-owned.svg,/icons,Used / pre-owned outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-warranty.png,/icons,Warranty existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-warranty.svg,/icons,Warranty outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Service & shopping: beside live labels on a light surface.,final
+eg-icon-waterproof-jacket.png,/icons,Waterproof jacket existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-waterproof-jacket.svg,/icons,Waterproof jacket outline icon; transparent; audited final geometry,24 x 24,SVG,#003D27,Equipment & categories: beside live labels on a light surface.,final
+eg-icon-arrow-left-white.png,/icons-white,Arrow left existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-arrow-left-white.svg,/icons-white,Arrow left outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-arrow-right-white.png,/icons-white,Arrow right existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-arrow-right-white.svg,/icons-white,Arrow right outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-basket-white.png,/icons-white,Basket existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-basket-white.svg,/icons-white,Basket outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-calendar-white.png,/icons-white,Calendar existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-calendar-white.svg,/icons-white,Calendar outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-cart-bag-white.png,/icons-white,Cart bag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-cart-bag-white.svg,/icons-white,Cart bag outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-check-white.png,/icons-white,Check existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-check-white.svg,/icons-white,Check outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-checkout-white.png,/icons-white,Checkout existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-checkout-white.svg,/icons-white,Checkout outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-chevron-right-white.png,/icons-white,Chevron right existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-chevron-right-white.svg,/icons-white,Chevron right outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-click-and-collect-white.png,/icons-white,Click and collect existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-click-and-collect-white.svg,/icons-white,Click and collect outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-clock-white.png,/icons-white,Clock existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-clock-white.svg,/icons-white,Clock outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-close-white.png,/icons-white,Close existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-close-white.svg,/icons-white,Close outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-custom-fitting-white.png,/icons-white,Custom fitting existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-custom-fitting-white.svg,/icons-white,Custom fitting outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-customer-support-white.png,/icons-white,Customer support existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-customer-support-white.svg,/icons-white,Customer support outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-delivery-van-white.png,/icons-white,Delivery van existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-delivery-van-white.svg,/icons-white,Delivery van outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-download-white.png,/icons-white,Download existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-download-white.svg,/icons-white,Download outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-driver-white.png,/icons-white,Driver existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-driver-white.svg,/icons-white,Driver outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-electric-trolley-white.png,/icons-white,Electric trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-electric-trolley-white.svg,/icons-white,Electric trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-expert-advice-white.png,/icons-white,Expert advice existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-expert-advice-white.svg,/icons-white,Expert advice outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-external-link-white.png,/icons-white,External link existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-external-link-white.svg,/icons-white,External link outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-family-business-white.png,/icons-white,Family business existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-family-business-white.svg,/icons-white,Family business outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-fast-delivery-white.png,/icons-white,Fast delivery existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-fast-delivery-white.svg,/icons-white,Fast delivery outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-free-delivery-members-white.png,/icons-white,Free delivery for members existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-free-delivery-members-white.svg,/icons-white,Free delivery for members outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-free-delivery-white.png,/icons-white,Free delivery existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-free-delivery-white.svg,/icons-white,Free delivery outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-free-returns-white.png,/icons-white,Free returns existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-free-returns-white.svg,/icons-white,Free returns outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-gift-white.png,/icons-white,Gift existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-gift-white.svg,/icons-white,Gift outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-ball-white.png,/icons-white,Golf ball existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-ball-white.svg,/icons-white,Golf ball outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-flag-on-green-white.png,/icons-white,Golf flag on green existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-flag-on-green-white.svg,/icons-white,Golf flag on green outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-flag-white.png,/icons-white,Golf flag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-flag-white.svg,/icons-white,Golf flag outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-glove-white.png,/icons-white,Golf glove existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-glove-white.svg,/icons-white,Golf glove outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-shoe-white.png,/icons-white,Golf shoe existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-shoe-white.svg,/icons-white,Golf shoe outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-trolley-white.png,/icons-white,Golf trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-golf-trolley-white.svg,/icons-white,Golf trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-info-white.png,/icons-white,Info existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-info-white.svg,/icons-white,Info outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-iron-white.png,/icons-white,Golf club / iron existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-iron-white.svg,/icons-white,Golf club / iron outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-location-pin-white.png,/icons-white,Location pin existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-location-pin-white.svg,/icons-white,Location pin outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-member-card-white.png,/icons-white,Member card existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-member-card-white.svg,/icons-white,Member card outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-member-price-tag-white.png,/icons-white,Member price tag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-member-price-tag-white.svg,/icons-white,Member price tag outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-members-portal-white.png,/icons-white,Members’ portal existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-members-portal-white.svg,/icons-white,Members’ portal outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-minus-white.png,/icons-white,Minus existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-minus-white.svg,/icons-white,Minus outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-monthly-prize-draw-white.png,/icons-white,Monthly prize draw existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-monthly-prize-draw-white.svg,/icons-white,Monthly prize draw outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-pay-later-instalments-white.png,/icons-white,Pay later / instalments existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-pay-later-instalments-white.svg,/icons-white,Pay later / instalments outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-phone-white.png,/icons-white,Phone existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-phone-white.svg,/icons-white,Phone outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-play-video-white.png,/icons-white,Play / video existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-play-video-white.svg,/icons-white,Play / video outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-plus-white.png,/icons-white,Plus existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-plus-white.svg,/icons-white,Plus outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-polo-shirt-white.png,/icons-white,Polo shirt existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-polo-shirt-white.svg,/icons-white,Polo shirt outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-price-match-white.png,/icons-white,Price match existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-price-match-white.svg,/icons-white,Price match outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-push-trolley-white.png,/icons-white,Push trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-push-trolley-white.svg,/icons-white,Push trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-putter-white.png,/icons-white,Putter existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-putter-white.svg,/icons-white,Putter outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-rangefinder-gps-watch-white.png,/icons-white,Rangefinder / GPS watch existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-rangefinder-gps-watch-white.svg,/icons-white,Rangefinder / GPS watch outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-remote-gps-trolley-white.png,/icons-white,Remote / GPS trolley existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-remote-gps-trolley-white.svg,/icons-white,Remote / GPS trolley outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-reply-to-email-white.png,/icons-white,Reply to email existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-reply-to-email-white.svg,/icons-white,Reply to email outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-returns-arrow-white.png,/icons-white,Returns arrow existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-returns-arrow-white.svg,/icons-white,Returns arrow outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-search-white.png,/icons-white,Search existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-search-white.svg,/icons-white,Search outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-secure-checkout-white.png,/icons-white,Secure checkout existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-secure-checkout-white.svg,/icons-white,Secure checkout outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-settings-preferences-white.png,/icons-white,Settings / preferences existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-settings-preferences-white.svg,/icons-white,Settings / preferences outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-share-white.png,/icons-white,Share existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-share-white.svg,/icons-white,Share outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-shield-warranty-white.png,/icons-white,Shield / warranty existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-shield-warranty-white.svg,/icons-white,Shield / warranty outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-stand-bag-white.png,/icons-white,Golf bag / stand bag existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-stand-bag-white.svg,/icons-white,Golf bag / stand bag outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-tees-white.png,/icons-white,Tees existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-tees-white.svg,/icons-white,Tees outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-thumbs-up-recommended-white.png,/icons-white,Thumbs up / recommended existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-thumbs-up-recommended-white.svg,/icons-white,Thumbs up / recommended outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-trade-in-white.png,/icons-white,Trade-in existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-trade-in-white.svg,/icons-white,Trade-in outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-trolley-battery-white.png,/icons-white,Trolley battery existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-trolley-battery-white.svg,/icons-white,Trolley battery outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-uk-based-white.png,/icons-white,UK based existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-uk-based-white.svg,/icons-white,UK based outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-unsubscribe-mail-off-white.png,/icons-white,Unsubscribe / mail off existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-unsubscribe-mail-off-white.svg,/icons-white,Unsubscribe / mail off outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-used-pre-owned-white.png,/icons-white,Used / pre-owned existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-used-pre-owned-white.svg,/icons-white,Used / pre-owned outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-warranty-white.png,/icons-white,Warranty existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-warranty-white.svg,/icons-white,Warranty outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-waterproof-jacket-white.png,/icons-white,Waterproof jacket existing transparent 4x email raster; display at 24 x 24,96 x 96,PNG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-waterproof-jacket-white.svg,/icons-white,Waterproof jacket outline icon; transparent; audited final geometry,24 x 24,SVG,#FFFFFF,"Dark-green footer or dark panel, beside live text.",final
+eg-icon-audit-change-log.txt,/specs,Existing v1.1 icon audit changes and review notes,N/A,TXT,N/A,Developer reference; current icon geometry.,final
+eg-icon-style-tokens.json,/specs,Original construction tokens; unchanged by v1.1 audit,N/A,JSON,N/A,Developer reference; 24-unit icon construction.,final
+eg-ui-badges-spec.png,/specs,Badge specifications,600 x 1136,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6; #FAF7F1; #F1DA01,Developer reference only; not an email image block.,final
+eg-ui-badges-spec.svg,/specs,Badge specifications,600 x 1136,SVG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6; #FAF7F1; #F1DA01,Developer reference only; not an email image block.,final
+eg-ui-buttons-spec.png,/specs,Button and text-link specifications,600 x 1376,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6,Developer reference only; not an email image block.,final
+eg-ui-buttons-spec.svg,/specs,Button and text-link specifications,600 x 1376,SVG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6,Developer reference only; not an email image block.,final
+eg-ui-buttons.css,/specs,Exact previously supplied button and text-link CSS,N/A,CSS,N/A,Inline relevant declarations when building live email components.,final
+eg-ui-dividers-steps-spec.png,/specs,"Divider and step-numeral review, including contrast note",600 x 1200,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6; #B2893F,Developer reference only; not an email image block.,final
+eg-ui-footer-spec.png,/specs,Footer specification,600 x 1200,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6; #B2893F,Developer reference only; not an email image block.,final
+eg-ui-icon-library-spec.png,/specs,Final audited icon review: all categories at 24px and 48px in both colours,600 x 5070,PNG,#003D27; #FFFFFF; #B2893F; #1F2A24; #5E6B63; #E4E0D6,Developer reference only; not an email image block.,final
+eg-ui-icon-library-spec.svg,/specs,Final audited icon review: all categories at 24px and 48px in both colours,600 x 5070,SVG,#003D27; #FFFFFF; #B2893F; #1F2A24; #5E6B63; #E4E0D6,Developer reference only; not an email image block.,final
+eg-ui-member-panel-spec.png,/specs,Membership-panel specification,600 x 1080,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6; #FAF7F1; #B2893F,Developer reference only; not an email image block.,final
+eg-ui-product-cards-spec.png,/specs,Product-card specifications,600 x 2176,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6,Developer reference only; not an email image block.,final
+eg-ui-trade-in-panel-spec.png,/specs,Trade-in panel specification,600 x 1080,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6; #FAF7F1,Developer reference only; not an email image block.,final
+eg-ui-usp-strip-spec.png,/specs,Three-item USP strip specification,600 x 1016,PNG,#003D27; #006747; #FFFFFF; #1F2A24; #5E6B63; #E4E0D6; #FAF7F1,Developer reference only; not an email image block.,final
+source-name-map.csv,/specs,Original-to-handoff filenames and copied-file hashes,N/A,CSV,N/A,Developer inventory and source traceability.,final
+svg-code-backup.txt,/specs,Full original source code for all 134 packaged icon SVG files,N/A,TXT,N/A,Copy/paste backup for the developer; no visible email placement.,final
