@@ -34,7 +34,11 @@
    "subject": "You're in: your free Evolution Golf membership",
    "preview": "5% off member deals, free delivery over £30 and loyalty points. All live now.",
    "when": "Free · straight away",
-   "sender": "⛳ Evolution Golf"
+   "sender": "⛳ Evolution Golf",
+   "photos_file": "f2-free/fe1.photos.html",
+   "photos": [
+    "W1"
+   ]
   },
   {
    "key": "fe2",
@@ -52,7 +56,7 @@
    "template_name": "EG · F2 Free · Free E3 · The plan in use",
    "name": "Free E3 · The plan in use",
    "subject": "What £36 a year actually gets used for",
-   "preview": "Free returns, a monthly prize draw and a bigger trade-in. Then it's up to you.",
+   "preview": "Free returns, a monthly prize draw and member-only deals. Then it's up to you.",
    "when": "Free · day 12 · still on Free",
    "sender": "⛳ Evolution Golf"
   }
@@ -232,7 +236,7 @@
        "from_label": "⛳ Evolution Golf",
        "reply_to_email": "info@evolutiongolf.co.uk",
        "subject_line": "What £36 a year actually gets used for",
-       "preview_text": "Free returns, a monthly prize draw and a bigger trade-in. Then it's up to you.",
+       "preview_text": "Free returns, a monthly prize draw and member-only deals. Then it's up to you.",
        "template_ref": "fe3",
        "smart_sending_enabled": true,
        "transactional": false,
@@ -243,5 +247,27 @@
     }
    ]
   }
- }
+ },
+ "photo_briefs": [
+  {
+   "key": "W1",
+   "emails": "F1 E1 Welcome and F2 Free E1",
+   "title": "Your team or your shop",
+   "where": "Across the top, under the logo",
+   "what": "A real photo of the Evolution Golf team: in the shop, in the fitting bay, or on the course together. It proves the opening line, \"a golf shop run by people who play\".",
+   "alt": "Second choice: a small group of club golfers walking off a tee on a UK course.",
+   "source": "Your own photo if at all possible. Stock undercuts the \"real people\" message.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the welcome headline leads."
+  }
+ ],
+ "photo_rules": [
+  "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
+  "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",
+  "Product in use, not posed: a trolley being walked, shoes on grass. Studio packshots belong in the basket emails.",
+  "Nothing written on the photo: text goes in the email so it stays readable.",
+  "Logos small: a badge on a trolley is fine; a brand name filling the frame isn't, unless it's the brand you want to push."
+ ]
 }

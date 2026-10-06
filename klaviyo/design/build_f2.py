@@ -14,7 +14,7 @@ import json, pathlib, re, sys
 
 import build_f3_b as b
 import build_f1 as f1
-from build_f1 import (name_suffix, G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SANS, SERIF, confirm, data_uri, icon, first_name, intro, p,
+from build_f1 import (hero, name_suffix, G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SANS, SERIF, confirm, data_uri, icon, first_name, intro, p,
                       text_row, link, button, member_note, icon_rows, way_card, Ctx, local_icons, HOSTED, OUT)
 
 PORTAL = "https://members.evolutiongolf.co.uk"
@@ -41,7 +41,7 @@ ANNUAL = [("member-price-tag", "10% off your first order, then 10% off one order
           ("free-returns", "Free returns, 4 a year"),
           ("monthly-prize-draw", "A monthly prize draw entry"),
           ("calendar", "48 hours' early access to new products"),
-          ("trade-in", "+5% trade-in value after 60 days")]
+          ("member-price-tag", "10% off member deals in your portal")]
 
 
 def benefit_list(ctx, items):
@@ -67,7 +67,7 @@ def h2(text):
 
 # ---------------- Free branch ----------------
 def fe1(ctx):
-    body = (intro("Free membership", f"You're in{name_suffix(ctx)}.",
+    body = (hero(ctx, "W1") + intro("Free membership", f"You're in{name_suffix(ctx)}.",
                   "Your free Evolution Golf membership is live. Here's what it gives you, starting today.")
             + benefit_list(ctx, [("members-portal", "Your own member portal"), ("member-price-tag", "5% off member portal deals"),
                                  ("free-delivery-members", "Free delivery on orders over £30"), ("member-card-gold", "Loyalty points on everything you buy")])
@@ -101,26 +101,26 @@ def fe3(ctx):
     rows = [("free-returns", "Free returns",
              "Order two sizes of a shoe, keep the one that fits and send the other back free. Four free returns a year.", ""),
             ("monthly-prize-draw", "A prize draw every month", "You're entered automatically every month, and we draw it at the start of the next one.", ""),
-            ("trade-in", "More for your trade-in",
-             "After 60 days, members get 5% more on any trade-in value. Worth having when your irons are due a change.", link("How trade-in works", TRADE_IN)),
+            ("member-price-tag", "Member-only deals",
+             "10% off the deals in the member portal, where Free members get 5%.", link("See the member benefits", JOIN)),
             ("calendar", "First look at new kit", "48 hours' early access to new products before everyone else.", "")]
     body = (intro("The annual plan, in use", "What £36 a year actually gets used for")
             + icon_rows(ctx, rows)
             + text_row(p("Happy on Free? That's fine. You keep your 5% either way, and this is the last email about upgrading.", 16, margin="0"), "8px 44px 24px")
             + text_row(button("Join for £36 a year", JOIN), "0 44px 32px")
             + footer(ctx))
-    return shell(ctx, body, "Free returns, a monthly prize draw and a bigger trade-in. Then it's up to you.")
+    return shell(ctx, body, "Free returns, a monthly prize draw and member-only deals. Then it's up to you.")
 
 
 # ---------------- Annual branch ----------------
 def pe1(ctx):
-    body = (intro("Annual membership", f"Good call{name_suffix(ctx)}. You're a member.",
+    body = (hero(ctx, "M1") + intro("Annual membership", f"Good call{name_suffix(ctx)}. You're a member.",
                   "Your £36 annual membership is live. Everything below works from today.")
             + benefit_list(ctx, ANNUAL)
             + h2("Three things to do this week")
             + steps([("Use your first-order 10%.", "Your welcome code is saved in the Codes section of your member portal."),
                      ("Check this month's 10%.", "You get 10% off one order every month. It's waiting in your portal too."),
-                     ("Get a trade-in quote.", "Your +5% member bonus starts after 60 days, so a quote now tells you what to expect.")])
+                     ("Look through the member deals.", "Your 10% applies to the deals in your portal, on top of everything above.")])
             + portal_button()
             + text_row(p("Questions? Reply to this email. Alex and the team read every one.", 15, MUTED, "0"), "0 44px 32px")
             + footer(ctx))
@@ -147,22 +147,20 @@ def pe3(ctx):
             + icon_rows(ctx, [
                 ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order. It's in your portal.", link("Open my portal", PORTAL)),
                 ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
-                ("trade-in", "Trade-in bonus in 30 days", "Your +5% trade-in bonus starts at 60 days. Worth getting a quote ready.", link("Get a trade-in quote", TRADE_IN))])
+                ("member-price-tag", "Member-only deals", "Your 10% applies to the deals in your portal too. New ones go up regularly.", link("See member deals", PORTAL))])
             + text_row("", "0 0 12px")
             + footer(ctx))
-    return shell(ctx, body, "Your monthly 10%, this month's prize draw and what's coming at day 60.")
+    return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
 
 
 def pe4(ctx):
-    rows = [("trade-in", "Your trade-in bonus is on",
-             "You've been a member for 60 days, so you now get 5% more on any trade-in value. Clubs or a trolley, we take the value off your next order.",
-             link("Get a trade-in quote", TRADE_IN)),
-            ("member-price-tag", "This month's 10%", "One order this month gets 10% off. The code is waiting in your member portal.", link("Open my portal", PORTAL)),
-            ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", "")]
-    body = (intro("Two months in", "Two months in: your trade-in bonus is on",
-                  "One new benefit from today, and a reminder of the two that come round every month.")
+    rows = [("member-price-tag", "This month's 10%", "One order this month gets 10% off. The code is waiting in your member portal.", link("Open my portal", PORTAL)),
+            ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
+            ("calendar", "Member-only deals", "10% off the deals in your portal, and 48 hours' early access to new products.", link("See member deals", PORTAL))]
+    body = (intro("Two months in", "Two months in: here's what's yours this month",
+                  "The monthly 10%, the prize draw and the member deals. Plus, from today, 5% more on any trade-in.")
             + icon_rows(ctx, rows) + text_row("", "0 0 12px") + footer(ctx))
-    return shell(ctx, body, "5% more on any trade-in from today, plus this month's 10% and prize draw.")
+    return shell(ctx, body, "This month's 10%, the prize draw and member deals. All in your portal.")
 
 
 def pem(ctx):
@@ -192,19 +190,19 @@ def pe5(ctx):
 BR = "⛳ Evolution Golf"
 EMAILS = [
     dict(key="fe1", fn=fe1, name="Free E1 · You're in", timing="Free · straight away", sender=BR,
-         subject="You're in: your free Evolution Golf membership", preview="5% off member deals, free delivery over £30 and loyalty points. All live now.", slots=[]),
+         subject="You're in: your free Evolution Golf membership", preview="5% off member deals, free delivery over £30 and loyalty points. All live now.", slots=["W1"]),
     dict(key="fe2", fn=fe2, name="Free E2 · The honest maths", timing="Free · day 4 · still on Free", sender=BR,
          subject="Is the £36 plan worth it? The honest maths", preview="10% off one order a month pays back the £36 at about £30 an order. The full sum inside.", slots=[]),
     dict(key="fe3", fn=fe3, name="Free E3 · The plan in use", timing="Free · day 12 · still on Free", sender=BR,
-         subject="What £36 a year actually gets used for", preview="Free returns, a monthly prize draw and a bigger trade-in. Then it's up to you.", slots=[]),
+         subject="What £36 a year actually gets used for", preview="Free returns, a monthly prize draw and member-only deals. Then it's up to you.", slots=[]),
     dict(key="pe1", fn=pe1, name="Annual E1 · Welcome", timing="Annual · straight away · smart sending off", sender=BR,
-         subject="Welcome to Evolution Golf membership", preview="10% off your first order and one order every month, free returns and more. All live now.", slots=[]),
+         subject="Welcome to Evolution Golf membership", preview="10% off your first order and one order every month, free returns and more. All live now.", slots=["M1"]),
     dict(key="pe2", fn=pe2, name="Annual E2 · Free returns", timing="Annual · day 3", sender=BR,
          subject="Free returns, and how they work", preview="Order two sizes, keep one, send one back. Free, four times a year.", slots=[]),
     dict(key="pe3", fn=pe3, name="Annual E3 · First month", timing="Annual · day 30", sender=BR,
-         subject="Your first month as a member", preview="Your monthly 10%, this month's prize draw and what's coming at day 60.", slots=[]),
+         subject="Your first month as a member", preview="Your monthly 10%, this month's prize draw and the member deals.", slots=[]),
     dict(key="pe4", fn=pe4, name="Annual E4 · Two months in", timing="Annual · day 60", sender=BR,
-         subject="Two months in: your trade-in bonus is on", preview="5% more on any trade-in from today, plus this month's 10% and prize draw.", slots=[]),
+         subject="Two months in: here's what's yours this month", preview="This month's 10%, the prize draw and member deals. All in your portal.", slots=[]),
     dict(key="pem", fn=pem, name="Annual · Monthly 10% reminder", timing="Annual · months 3 to 10, every 30 days", sender=BR,
          subject="Your 10% for this month is ready", preview="One order this month gets 10% off. Your code is in your member portal.", slots=[]),
     dict(key="pe5", fn=pe5, name="Annual E5 · Renewal reminder", timing="Annual · day 335", sender=BR,

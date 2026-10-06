@@ -49,7 +49,11 @@
    "subject": "Welcome to Evolution Golf membership",
    "preview": "10% off your first order and one order every month, free returns and more. All live now.",
    "when": "Annual · straight away · smart sending off",
-   "sender": "⛳ Evolution Golf"
+   "sender": "⛳ Evolution Golf",
+   "photos_file": "f2-annual/pe1.photos.html",
+   "photos": [
+    "M1"
+   ]
   },
   {
    "key": "pe2",
@@ -67,7 +71,7 @@
    "template_name": "EG · F2 Annual · Annual E3 · First month",
    "name": "Annual E3 · First month",
    "subject": "Your first month as a member",
-   "preview": "Your monthly 10%, this month's prize draw and what's coming at day 60.",
+   "preview": "Your monthly 10%, this month's prize draw and the member deals.",
    "when": "Annual · day 30",
    "sender": "⛳ Evolution Golf"
   },
@@ -76,8 +80,8 @@
    "file": "f2-annual/pe4.html",
    "template_name": "EG · F2 Annual · Annual E4 · Two months in",
    "name": "Annual E4 · Two months in",
-   "subject": "Two months in: your trade-in bonus is on",
-   "preview": "5% more on any trade-in from today, plus this month's 10% and prize draw.",
+   "subject": "Two months in: here's what's yours this month",
+   "preview": "This month's 10%, the prize draw and member deals. All in your portal.",
    "when": "Annual · day 60",
    "sender": "⛳ Evolution Golf"
   },
@@ -236,7 +240,7 @@
        "from_label": "⛳ Evolution Golf",
        "reply_to_email": "info@evolutiongolf.co.uk",
        "subject_line": "Your first month as a member",
-       "preview_text": "Your monthly 10%, this month's prize draw and what's coming at day 60.",
+       "preview_text": "Your monthly 10%, this month's prize draw and the member deals.",
        "template_ref": "pe3",
        "smart_sending_enabled": true,
        "transactional": false,
@@ -271,8 +275,8 @@
        "from_email": "info@evolutiongolf.co.uk",
        "from_label": "⛳ Evolution Golf",
        "reply_to_email": "info@evolutiongolf.co.uk",
-       "subject_line": "Two months in: your trade-in bonus is on",
-       "preview_text": "5% more on any trade-in from today, plus this month's 10% and prize draw.",
+       "subject_line": "Two months in: here's what's yours this month",
+       "preview_text": "This month's 10%, the prize draw and member deals. All in your portal.",
        "template_ref": "pe4",
        "smart_sending_enabled": true,
        "transactional": false,
@@ -607,5 +611,27 @@
     }
    ]
   }
- }
+ },
+ "photo_briefs": [
+  {
+   "key": "M1",
+   "emails": "F2 Annual E1 Welcome",
+   "title": "A member out playing",
+   "where": "Across the top, under the logo",
+   "what": "A golfer on the first tee on a bright morning, ready to play, with a trolley or bag. It says the membership is about playing more, not paperwork.",
+   "alt": "Second choice: a small group laughing on a green after a round.",
+   "source": "Stock is fine. Pick someone who looks like your members, not a model.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the welcome headline leads."
+  }
+ ],
+ "photo_rules": [
+  "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
+  "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",
+  "Product in use, not posed: a trolley being walked, shoes on grass. Studio packshots belong in the basket emails.",
+  "Nothing written on the photo: text goes in the email so it stays readable.",
+  "Logos small: a badge on a trolley is fine; a brand name filling the frame isn't, unless it's the brand you want to push."
+ ]
 }

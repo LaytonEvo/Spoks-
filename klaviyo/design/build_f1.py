@@ -38,7 +38,7 @@ URL = {
 # Photo briefs (Layton, 6 Oct 2026). Heroes show at 600 × 360 in the email; supply at 2× so they're sharp on phones.
 HERO_SIZE = "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo."
 SLOTS = {
-    "W1": dict(emails="E1 Welcome", title="Your team or your shop", where="Across the top, under the logo",
+    "W1": dict(emails="F1 E1 Welcome and F2 Free E1", title="Your team or your shop", where="Across the top, under the logo",
                what="A real photo of the Evolution Golf team: in the shop, in the fitting bay, or on the course together. It proves the opening line, \"a golf shop run by people who play\".",
                alt="Second choice: a small group of club golfers walking off a tee on a UK course.",
                source="Your own photo if at all possible. Stock undercuts the \"real people\" message.",
@@ -52,7 +52,12 @@ SLOTS = {
                what="Golf shoes on wet grass, or a golfer in waterproofs on a grey British day. Matches the \"spiked or spikeless\" and \"staying dry\" sections.",
                alt="", source="Stock is fine.",
                size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the headline leads."),
-    "A1": dict(emails="E3 From Alex", title="Alex", where="Small round photo next to his signature",
+    "M1": dict(emails="F2 Annual E1 Welcome", title="A member out playing", where="Across the top, under the logo",
+               what="A golfer on the first tee on a bright morning, ready to play, with a trolley or bag. It says the membership is about playing more, not paperwork.",
+               alt="Second choice: a small group laughing on a green after a round.",
+               source="Stock is fine. Pick someone who looks like your members, not a model.",
+               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the welcome headline leads."),
+    "A1": dict(emails="F1 E3 From Alex", title="Alex", where="Small round photo next to his signature",
                what="Alex, head and shoulders, plain background, smiling. A face makes \"reply to me\" feel real.",
                alt="", source="Must be his own. If there isn't one, the email works without it.",
                size="Supply 240 × 240 px (square). Shows as a 76 px circle. JPG. Face centred with a little space around it.",

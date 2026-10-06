@@ -218,6 +218,8 @@ if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     packs = [f1_pack(), *f2_packs()]
     add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
+    for _, pk in packs[1:]:
+        add_photos(pk, f2.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
     for pid, pk in packs:
         check(pk)
         (OUT / f"{pid}.json").write_text(json.dumps(pk, indent=1, ensure_ascii=False))

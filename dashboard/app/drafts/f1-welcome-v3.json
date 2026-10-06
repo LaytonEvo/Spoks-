@@ -949,7 +949,7 @@
  "photo_briefs": [
   {
    "key": "W1",
-   "emails": "E1 Welcome",
+   "emails": "F1 E1 Welcome and F2 Free E1",
    "title": "Your team or your shop",
    "where": "Across the top, under the logo",
    "what": "A real photo of the Evolution Golf team: in the shop, in the fitting bay, or on the course together. It proves the opening line, \"a golf shop run by people who play\".",
@@ -988,7 +988,7 @@
   },
   {
    "key": "A1",
-   "emails": "E3 From Alex",
+   "emails": "F1 E3 From Alex",
    "title": "Alex",
    "where": "Small round photo next to his signature",
    "what": "Alex, head and shoulders, plain background, smiling. A face makes \"reply to me\" feel real.",
