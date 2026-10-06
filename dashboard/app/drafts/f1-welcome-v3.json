@@ -84,7 +84,7 @@
    "template_name": "EG · F1 v3 · E4 · Two ways to pay less",
    "name": "E4 · Two ways to pay less",
    "subject": "Two ways to pay less at Evolution Golf",
-   "preview": "Membership and trade-in, explained. Neither is a code.",
+   "preview": "Your monthly 10%, member deals and a monthly prize draw. No codes to chase.",
    "when": "Day 6",
    "sender": "⛳ Evolution Golf"
   }
@@ -798,7 +798,7 @@
        "from_label": "⛳ Evolution Golf",
        "reply_to_email": "info@evolutiongolf.co.uk",
        "subject_line": "Two ways to pay less at Evolution Golf",
-       "preview_text": "Membership and trade-in, explained. Neither is a code.",
+       "preview_text": "Your monthly 10%, member deals and a monthly prize draw. No codes to chase.",
        "template_ref": "e4",
        "smart_sending_enabled": true,
        "transactional": false,
@@ -918,7 +918,7 @@
        "from_label": "⛳ Evolution Golf",
        "reply_to_email": "info@evolutiongolf.co.uk",
        "subject_line": "Two ways to pay less at Evolution Golf",
-       "preview_text": "Membership and trade-in, explained. Neither is a code.",
+       "preview_text": "Your monthly 10%, member deals and a monthly prize draw. No codes to chase.",
        "template_ref": "e4",
        "smart_sending_enabled": true,
        "transactional": false,

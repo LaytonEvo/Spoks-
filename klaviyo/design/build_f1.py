@@ -32,6 +32,7 @@ URL = {
     "clothing": SITE + "/collections/golf-clothing",
     "balls": SITE + "/collections/golf-balls",
     "contact": SITE + "/pages/contact-us",
+    "klarna": SITE + "/pages/klarna",
 }
 
 SLOTS = {
@@ -49,10 +50,10 @@ SLOTS = {
                none="Text signature only (plain-letter style)."),
 }
 
-ICONS = ["monthly-prize-draw", "members-portal", "member-price-tag", "free-delivery", "expert-advice", "custom-fitting", "member-card", "member-card-gold", "free-returns",
+ICONS = ["pay-later-instalments", "monthly-prize-draw", "members-portal", "member-price-tag", "free-delivery", "expert-advice", "custom-fitting", "member-card", "member-card-gold", "free-returns",
          "free-delivery-members", "trade-in", "calendar", "electric-trolley", "used-pre-owned", "golf-shoe",
          "waterproof-jacket", "golf-ball", "reply-to-email", "arrow-right", "check"]
-WHITE_ICONS = ["free-returns", "free-delivery-members", "trade-in", "calendar"]
+WHITE_ICONS = ["free-returns", "free-delivery-members", "trade-in", "calendar", "monthly-prize-draw", "member-price-tag"]
 
 
 class Ctx(b.Ctx):
@@ -169,7 +170,8 @@ def shell(ctx, body, pre, header=True):
 
 # ---------------- emails ----------------
 BENEFITS = [("free-returns", "Free returns, 4 a year"), ("free-delivery-members", "Free shipping over £10"),
-            ("trade-in", "+5% trade-in value after 60 days"), ("calendar", "48 hours' early access to new kit")]
+            ("monthly-prize-draw", "A prize draw entry every month"), ("member-price-tag", "10% off member deals in your portal"),
+            ("calendar", "48 hours' early access to new kit")]
 
 
 def membership_dark(ctx, heading, cta="Join for £36 a year"):
@@ -192,7 +194,7 @@ def e1(ctx):
             + intro("Welcome to Evolution Golf", f"Welcome{name_suffix(ctx)}.",
                     "We're a golf shop run by people who play, and we'd rather help you into the right trolley than the expensive one.")
             + text_row(p("We don't send a stream of codes. If you want to pay less, we do membership instead.", margin="16px 0 20px"))
-            + membership_dark(ctx, "Pay less on every month's order, starting with your first.")
+            + membership_dark(ctx, "10% off one order every month, starting with your first.")
             + text_row(p("Or just have a look round first: " + link("See what's new", URL["new_in"]), 16, margin="0"), "24px 44px 28px")
             + usp3(ctx) + b.trust() + footer(ctx))
     return shell(ctx, body, "10% off your first order with membership, and every month after. No codes to chase.")
@@ -211,9 +213,9 @@ def e2h(ctx):
         ("used-pre-owned", "Approved used clubs",
          "The sensible way into better clubs for less. Every set is checked before it goes on sale " + confirm("grading wording") + ".",
          link("See approved used clubs", URL["used"])),
-        ("trade-in", "Trade in what you've got",
-         "Send us your old clubs or trolley and we'll take the value off your next order.",
-         link("Get a trade-in quote", URL["trade_in"])),
+        ("pay-later-instalments", "Spread the cost",
+         "Big buy? Pay in 3 interest-free instalments with Klarna at checkout. A third today, the rest over the next two months, no fees.",
+         link("How Klarna works", URL["klarna"])),
     ]
     body = (hero(ctx, "W2")
             + intro("Trolleys and clubs", "The big buys, without the guesswork",
@@ -282,15 +284,15 @@ def way_card(ctx, n, name, head, text, cta, href):
 def e4(ctx):
     body = (intro("Paying less at Evolution Golf", "We don't do endless codes. We do these two things.")
             + text_row("", "12px 44px 0")
-            + way_card(ctx, 1, "member-card-gold", "Membership, £36 a year",
+            + way_card(ctx, 1, "member-card-gold", "Membership, 10% off one order every month",
                        "10% off your first order, then 10% off one order every month. Free returns, free shipping over £10 and 48 hours' early access to new kit.",
                        "Join for £36 a year", URL["join"])
-            + way_card(ctx, 2, "trade-in", "Trade in your old kit",
-                       "Send us your old clubs or trolley and we'll take the value off your order. Members get +5% on top after 60 days.",
-                       "Get a trade-in quote", URL["trade_in"])
-            + text_row(p("Both work on your first order. Any questions, just reply.", 16, margin="0"), "12px 44px 28px")
+            + way_card(ctx, 2, "monthly-prize-draw", "Member-only deals and a monthly prize draw",
+                       "Members get 10% off the deals in the member portal, and an entry into a prize draw every month. This month's prize is on the members page.",
+                       "See member deals and this month's prize", URL["join"])
+            + text_row(p("Both start the day you join. Any questions, just reply.", 16, margin="0"), "12px 44px 28px")
             + usp3(ctx) + b.trust() + footer(ctx))
-    return shell(ctx, body, "Membership and trade-in, explained. Neither is a code.")
+    return shell(ctx, body, "Your monthly 10%, member deals and a monthly prize draw. No codes to chase.")
 
 
 SMS1 = "Evolution Golf: welcome, {{ person.first_name|default:'golfer' }}. Members get 10% off their first order and one order a month: https://evolutiongolf.co.uk/pages/members-page"
@@ -309,7 +311,7 @@ EMAILS = [
     dict(key="e3", fn=e3, name="E3 · From Alex", timing="Day 3", sender="Alex at Evolution Golf",
          subject="Got a golf question? Ask me", preview="Reply to this email and a real person who plays will answer.", slots=["A1"]),
     dict(key="e4", fn=e4, name="E4 · Two ways to pay less", timing="Day 6", sender="⛳ Evolution Golf",
-         subject="Two ways to pay less at Evolution Golf", preview="Membership and trade-in, explained. Neither is a code.", slots=[]),
+         subject="Two ways to pay less at Evolution Golf", preview="Your monthly 10%, member deals and a monthly prize draw. No codes to chase.", slots=[]),
 ]
 MODES = ["slots", "now", "none"]
 
