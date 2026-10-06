@@ -147,7 +147,7 @@ def pe3(ctx):
             + icon_rows(ctx, [
                 ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order. It's in your portal.", link("Open my portal", PORTAL)),
                 ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
-                ("member-price-tag", "Member-only deals", "Your 10% applies to the deals in your portal too. New ones go up regularly.", link("See member deals", PORTAL))])
+                ("member-price-tag", "Member-only deals", "Your 10% applies to the deals in your portal too.", link("See member deals", PORTAL))])
             + text_row("", "0 0 12px")
             + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
