@@ -35,20 +35,36 @@ URL = {
     "klarna": SITE + "/pages/klarna",
 }
 
+# Photo briefs (Layton, 6 Oct 2026). Heroes show at 600 × 360 in the email; supply at 2× so they're sharp on phones.
+HERO_SIZE = "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo."
 SLOTS = {
-    "W1": dict(emails="E1", where="Hero, under the header", what="Golfers on a UK course in good light: a fourball walking off a tee, or a wide fairway shot. No products in shot.",
-               size="1200 × 720 px (5:3), JPG, under 250 KB", now="Stock photo to be chosen", now_status="Needed",
-               none="Hero dropped. The welcome headline leads."),
-    "W2": dict(emails="E2 Hardware", where="Hero, under the header", what="A golfer walking with an electric trolley, or a set of irons in a bag, on the course. Brand not readable.",
-               size="1200 × 720 px (5:3), JPG, under 250 KB", now="Stock photo to be chosen", now_status="Needed",
-               none="Hero dropped. The eyebrow and headline lead."),
-    "W3": dict(emails="E2 Everything else", where="Hero, under the header", what="Golf shoes on wet grass, or a golfer in waterproofs on a grey UK day.",
-               size="1200 × 720 px (5:3), JPG, under 250 KB", now="Stock photo to be chosen", now_status="Needed",
-               none="Hero dropped. The eyebrow and headline lead."),
-    "A1": dict(emails="E3", where="Next to Alex's signature (optional)", what="Head-and-shoulders photo of Alex, plain background, smiling.",
-               size="240 × 240 px square, JPG", now="Nothing in the library", now_status="Needed",
-               none="Text signature only (plain-letter style)."),
+    "W1": dict(emails="E1 Welcome", title="Your team or your shop", where="Across the top, under the logo",
+               what="A real photo of the Evolution Golf team: in the shop, in the fitting bay, or on the course together. It proves the opening line, \"a golf shop run by people who play\".",
+               alt="Second choice: a small group of club golfers walking off a tee on a UK course.",
+               source="Your own photo if at all possible. Stock undercuts the \"real people\" message.",
+               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the welcome headline leads."),
+    "W2": dict(emails="E2 Hardware", title="A trolley out on the course", where="Across the top, under the logo",
+               what="A golfer walking a fairway with an electric trolley, trolley clearly in shot. Trolleys are your biggest seller and this email talks about them first.",
+               alt="Second choice: someone being fitted on a launch monitor in your fitting bay.",
+               source="Stock is fine for the trolley shot. A fitting-bay shot works better as your own.",
+               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the headline leads."),
+    "W3": dict(emails="E2 Everything else", title="Shoes and weather", where="Across the top, under the logo",
+               what="Golf shoes on wet grass, or a golfer in waterproofs on a grey British day. Matches the \"spiked or spikeless\" and \"staying dry\" sections.",
+               alt="", source="Stock is fine.",
+               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the headline leads."),
+    "A1": dict(emails="E3 From Alex", title="Alex", where="Small round photo next to his signature",
+               what="Alex, head and shoulders, plain background, smiling. A face makes \"reply to me\" feel real.",
+               alt="", source="Must be his own. If there isn't one, the email works without it.",
+               size="Supply 240 × 240 px (square). Shows as a 76 px circle. JPG. Face centred with a little space around it.",
+               now="Nothing in the library", now_status="Needed", none="Text signature only (plain-letter style)."),
 }
+PHOTO_RULES = [
+    "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
+    "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",
+    "Product in use, not posed: a trolley being walked, shoes on grass. Studio packshots belong in the basket emails.",
+    "Nothing written on the photo: text goes in the email so it stays readable.",
+    "Logos small: a badge on a trolley is fine; a brand name filling the frame isn't, unless it's the brand you want to push.",
+]
 
 ICONS = ["pay-later-instalments", "monthly-prize-draw", "members-portal", "member-price-tag", "free-delivery", "expert-advice", "custom-fitting", "member-card", "member-card-gold", "free-returns",
          "free-delivery-members", "trade-in", "calendar", "electric-trolley", "used-pre-owned", "golf-shoe",
@@ -67,7 +83,7 @@ class Ctx(b.Ctx):
         s = SLOTS[key]
         return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
                 f'<td align="center" height="{h}" style="height:{h}px;background:{SLOTBG};border:2px dashed {GOLD};padding:18px;{style}">'
-                f'<p style="margin:0 0 6px;font:700 12px/16px {SANS};letter-spacing:.14em;color:{GOLD};">IMAGE {key}</p>'
+                f'<p style="margin:0 0 6px;font:700 12px/16px {SANS};letter-spacing:.14em;color:{GOLD};">PHOTO {key} · {s["title"].upper()}</p>'
                 f'<p style="margin:0 0 6px;font:600 15px/21px {SANS};color:{DG};">{s["what"]}</p>'
                 f'<p style="margin:0;font:13px/18px {SANS};color:{MUTED};">{s["size"]}</p></td></tr></table>')
 
@@ -255,7 +271,7 @@ def e3(ctx):
     if ctx.mode == "slots":
         photo = (f'<td width="92" style="padding-right:16px;vertical-align:top;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>'
                  f'<td width="76" height="76" align="center" style="width:76px;height:76px;background:{SLOTBG};border:2px dashed {GOLD};border-radius:50%;'
-                 f'font:700 11px/14px {SANS};letter-spacing:.1em;color:{GOLD};">IMAGE<br>A1</td></tr></table></td>')
+                 f'font:700 11px/14px {SANS};letter-spacing:.1em;color:{GOLD};">PHOTO<br>A1</td></tr></table></td>')
     sig = (f'<table role="presentation" cellpadding="0" cellspacing="0"><tr>{photo}<td style="vertical-align:top;font:16px/24px {SANS};color:{INK};">'
            f'Alex<br><span style="color:{MUTED};">Head of Ecommerce, Evolution Golf</span></td></tr></table>')
     body = (f'<tr><td class="px" style="padding:36px 44px 28px;">'

@@ -335,3 +335,17 @@ table.mini th:first-child, table.mini td:first-child { text-align: left; }
 .flowmap-bar { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
 .flowmap-bar a { color: var(--green); font-weight: 600; }
 iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.photo-chip { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--green); border: 1.5px dashed var(--green); border-radius: 4px; padding: 0 6px; margin-left: 6px; white-space: nowrap; }
+.photo-panel { margin: 0 0 18px; }
+.photo-head { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.photo-head h2 { margin: 0 0 4px; font-size: 18px; }
+.photo-toggle { display: flex; gap: 8px; align-items: center; font-weight: 600; cursor: pointer; }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.photo-card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; background: var(--surface); min-width: 0; }
+.photo-card p { margin: 0 0 8px; }
+.photo-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.photo-top .photo-chip { margin-left: 0; }
+.photo-top h3 { margin: 0; font-size: 15px; }
+.photo-where { font-size: 13px; color: var(--muted); }
+.photo-spec { display: grid; grid-template-columns: 70px 1fr; gap: 4px 10px; margin: 8px 0 0; font-size: 13px; }
+.photo-spec dt { font-weight: 600; } .photo-spec dd { margin: 0; }

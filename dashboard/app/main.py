@@ -290,9 +290,9 @@ def api_draft_approve(pid: str, user=Depends(auth)):
 
 
 @app.get("/drafts/{pid}/email/{key}", response_class=HTMLResponse)
-def draft_email(pid: str, key: str, user=Depends(auth)):
+def draft_email(pid: str, key: str, photos: int = 0, user=Depends(auth)):
     try:
-        html = drafts.email_html(_pack_id(pid), _pack_id(key))
+        html = drafts.email_html(_pack_id(pid), _pack_id(key), photos=bool(photos))
     except (KeyError, FileNotFoundError):
         raise HTTPException(404)
     return HTMLResponse(snapshot.fill_tags(html), headers={"Content-Security-Policy": "script-src 'none'"})

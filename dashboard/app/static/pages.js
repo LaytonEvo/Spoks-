@@ -401,7 +401,7 @@ document.addEventListener("click", async (e) => {
 });
 
 // ---------- new flows to approve: the app creates them in Klaviyo as drafts ----------
-let draftState = { data: null, current: null };
+let draftState = { data: null, current: null, photos: true };
 const DRAFT_BADGE = { ready: ["skip", "Waiting for approval"], creating: ["draft", "Creating in Klaviyo…"], created: ["live", "Created in Klaviyo (switched off)"], failed: ["flag high", "Stopped: see below"] };
 const draftStatus = (p) => (p.running ? "creating" : p.status);
 function draftActions(p, d) {
@@ -451,6 +451,7 @@ async function renderDraft() {
       ${p.error ? `<p class="flag high">${esc(p.error)}</p>` : ""}${draftActions(p, d)}
       ${p.status === "created" && (p.after || []).length ? `<details class="fix-steps"><summary>Before you switch it on</summary><ol>${p.after.map((x) => `<li>${esc(x)}</li>`).join("")}</ol></details>` : ""}
       ${hist ? `<details class="fix-steps"><summary>History</summary><ul class="fix-hist">${hist}</ul></details>` : ""}</div>
+    ${photoPanel(p)}
     <div class="journey-wrap"><div class="journey">${renderSteps(p.steps)}</div>
       <aside class="pane" aria-label="Email preview">${state.pvId ? `
         <div class="pane-head"><div><p class="eyebrow" id="pane-name"></p><h3 id="pane-subject"></h3></div>
@@ -478,3 +479,23 @@ function renderFlowMap() {
     <a href="/flow-map" target="_blank" rel="noopener">Open full screen ↗</a></div>
     <iframe class="flowmap" src="/flow-map" title="Flow map"></iframe>`;
 }
+
+// ---------- photos needed (briefs + where each one sits) ----------
+function photoPanel(p) {
+  const briefs = p.photo_briefs || [];
+  if (!briefs.length) return "";
+  const card = (b) => `<article class="photo-card"><div class="photo-top"><span class="photo-chip">Photo ${esc(b.key)}</span><h3>${esc(b.title)}</h3></div>
+      <p class="photo-where">${esc(b.emails)} · ${esc(b.where)}</p>
+      <p>${esc(b.what)}</p>${b.alt ? `<p class="muted">${esc(b.alt)}</p>` : ""}
+      <dl class="photo-spec"><dt>Source</dt><dd>${esc(b.source)}</dd><dt>Size</dt><dd>${esc(b.size)}</dd><dt>If none</dt><dd>${esc(b.none)}</dd></dl></article>`;
+  return `<section class="panel photo-panel"><div class="photo-head"><div><h2>Photos needed <span class="muted">(${briefs.length})</span></h2>
+      <p class="muted">Every email works without them, so the flow can go live first and the photos drop in later.</p></div>
+      <label class="photo-toggle"><input type="checkbox" id="photo-toggle" ${draftState.photos ? "checked" : ""}> Show photo spots in the email previews</label></div>
+    <div class="photo-grid">${briefs.map(card).join("")}</div>
+    <details class="fix-steps"><summary>What makes a good photo for these emails</summary><ul>${(p.photo_rules || []).map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details></section>`;
+}
+document.addEventListener("change", (e) => {
+  if (e.target.id !== "photo-toggle") return;
+  draftState.photos = e.target.checked;
+  if (state.pvId) { const f = $("#pane-frame"); if (f) f.removeAttribute("src"); showInPane(state.pvId); }
+});

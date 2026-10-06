@@ -46,7 +46,11 @@
    "subject": "Welcome in. Here's how to pay less, no code needed",
    "preview": "10% off your first order with membership, and every month after. No codes to chase.",
    "when": "Straight away",
-   "sender": "⛳ Evolution Golf"
+   "sender": "⛳ Evolution Golf",
+   "photos_file": "f1-welcome-v3/e1.photos.html",
+   "photos": [
+    "W1"
+   ]
   },
   {
    "key": "e2h",
@@ -56,7 +60,11 @@
    "subject": "Trolleys and clubs: how we'd help you choose",
    "preview": "How to choose a trolley, why we fit clubs first, and the used route in.",
    "when": "Day 1 · looked at trolleys or clubs",
-   "sender": "⛳ Evolution Golf"
+   "sender": "⛳ Evolution Golf",
+   "photos_file": "f1-welcome-v3/e2h.photos.html",
+   "photos": [
+    "W2"
+   ]
   },
   {
    "key": "e2e",
@@ -66,7 +74,11 @@
    "subject": "Three things golfers ask us most",
    "preview": "Spiked or spikeless, staying dry, and which ball. Answered straight.",
    "when": "Day 1 · everyone else",
-   "sender": "⛳ Evolution Golf"
+   "sender": "⛳ Evolution Golf",
+   "photos_file": "f1-welcome-v3/e2e.photos.html",
+   "photos": [
+    "W3"
+   ]
   },
   {
    "key": "e3",
@@ -76,7 +88,11 @@
    "subject": "Got a golf question? Ask me",
    "preview": "Reply to this email and a real person who plays will answer.",
    "when": "Day 3",
-   "sender": "Alex at Evolution Golf"
+   "sender": "Alex at Evolution Golf",
+   "photos_file": "f1-welcome-v3/e3.photos.html",
+   "photos": [
+    "A1"
+   ]
   },
   {
    "key": "e4",
@@ -929,5 +945,66 @@
     }
    ]
   }
- }
+ },
+ "photo_briefs": [
+  {
+   "key": "W1",
+   "emails": "E1 Welcome",
+   "title": "Your team or your shop",
+   "where": "Across the top, under the logo",
+   "what": "A real photo of the Evolution Golf team: in the shop, in the fitting bay, or on the course together. It proves the opening line, \"a golf shop run by people who play\".",
+   "alt": "Second choice: a small group of club golfers walking off a tee on a UK course.",
+   "source": "Your own photo if at all possible. Stock undercuts the \"real people\" message.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the welcome headline leads."
+  },
+  {
+   "key": "W2",
+   "emails": "E2 Hardware",
+   "title": "A trolley out on the course",
+   "where": "Across the top, under the logo",
+   "what": "A golfer walking a fairway with an electric trolley, trolley clearly in shot. Trolleys are your biggest seller and this email talks about them first.",
+   "alt": "Second choice: someone being fitted on a launch monitor in your fitting bay.",
+   "source": "Stock is fine for the trolley shot. A fitting-bay shot works better as your own.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the headline leads."
+  },
+  {
+   "key": "W3",
+   "emails": "E2 Everything else",
+   "title": "Shoes and weather",
+   "where": "Across the top, under the logo",
+   "what": "Golf shoes on wet grass, or a golfer in waterproofs on a grey British day. Matches the \"spiked or spikeless\" and \"staying dry\" sections.",
+   "alt": "",
+   "source": "Stock is fine.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the headline leads."
+  },
+  {
+   "key": "A1",
+   "emails": "E3 From Alex",
+   "title": "Alex",
+   "where": "Small round photo next to his signature",
+   "what": "Alex, head and shoulders, plain background, smiling. A face makes \"reply to me\" feel real.",
+   "alt": "",
+   "source": "Must be his own. If there isn't one, the email works without it.",
+   "size": "Supply 240 × 240 px (square). Shows as a 76 px circle. JPG. Face centred with a little space around it.",
+   "now": "Nothing in the library",
+   "now_status": "Needed",
+   "none": "Text signature only (plain-letter style)."
+  }
+ ],
+ "photo_rules": [
+  "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
+  "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",
+  "Product in use, not posed: a trolley being walked, shoes on grass. Studio packshots belong in the basket emails.",
+  "Nothing written on the photo: text goes in the email so it stays readable.",
+  "Logos small: a badge on a trolley is fine; a brand name filling the frame isn't, unless it's the brand you want to push."
+ ]
 }

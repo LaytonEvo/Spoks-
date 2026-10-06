@@ -230,7 +230,7 @@ function msgCard(m) {
   const pick = m.kind === "email" ? ` data-pick="${esc(m.message_id)}"` : "";
   return `<article class="msg${m.message_id === state.pvId && WIDE.matches ? " selected" : ""}"${pick}>
     <div class="msg-top"><span class="chan ${m.kind}">${m.kind.toUpperCase()}</span><span class="msg-name">${esc(m.name)}</span>
-      ${m.status && m.status !== "live" ? pill(m.status) : ""}${m.from_label && m.kind === "email" ? `<span class="msg-from">from ${esc(m.from_label)}</span>` : ""}</div>
+      ${m.status && m.status !== "live" ? pill(m.status) : ""}${(m.photos || []).map((k) => `<span class="photo-chip">Photo ${esc(k)}</span>`).join("")}${m.from_label && m.kind === "email" ? `<span class="msg-from">from ${esc(m.from_label)}</span>` : ""}</div>
     ${body}${m.draft ? "" : metricRow(m) + messageTrend(m) + abTable(m)}${flagList(flags, true)}
     ${m.kind === "email" ? `<div class="msg-actions"><button type="button" class="link-btn" data-preview="${esc(m.message_id)}">Preview email →</button></div>` : ""}
   </article>`;
@@ -243,6 +243,7 @@ function pathName(steps, fallback) {
 }
 function pathSummary(steps) {
   const ms = [...messages(steps)];
+  if (state.draftId && !ms.length) return `<span class="muted num">no emails</span>`;
   if (ms.some((m) => m.draft)) return `<span class="muted num">${ms.length} message${ms.length === 1 ? "" : "s"}</span>`;
   const sends = ms.reduce((a, m) => a + ((mstats(m) || {}).recipients || 0), 0);
   const rev = ms.reduce((a, m) => a + ((mstats(m) || {}).conversion_value || 0), 0);
@@ -365,6 +366,10 @@ function previewNote(m) {
     ? "Klaviyo won’t fill in this template without a real customer, so it shows the default text instead. Product details stay blank, and every version of any conditional section appears."
     : "Rendered with an example basket and the name “Sam”, not a real customer.";
 }
+function previewSrc(m, messageId) {
+  if (!m.preview_url) return `/render/${encodeURIComponent(messageId)}`;
+  return m.preview_url + (draftState.photos && (m.photos || []).length ? "?photos=1" : "");
+}
 function showInPane(messageId) {
   const [, m] = findMessage(messageId);
   if (!m || !$("#pane-frame")) return;
@@ -376,7 +381,7 @@ function showInPane(messageId) {
   document.querySelectorAll("#pane-width button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.w === state.pvWidth)));
   const fr = $("#pane-frame");
   fr.style.width = state.pvWidth + "px";
-  const src = m.preview_url || `/render/${encodeURIComponent(messageId)}`;
+  const src = previewSrc(m, messageId);
   if (fr.getAttribute("src") !== src) fr.src = src;
 }
 function openPreview(messageId) {
@@ -387,7 +392,7 @@ function openPreview(messageId) {
   $("#pv-title").textContent = m.subject || m.name;
   $("#pv-sub").textContent = [m.from_label && `From ${m.from_label}`, m.preview_text].filter(Boolean).join(" · ");
   $("#pv-note").textContent = previewNote(m);
-  $("#pv-frame").src = m.preview_url || `/render/${encodeURIComponent(messageId)}`;
+  $("#pv-frame").src = previewSrc(m, messageId);
   $("#preview").hidden = false;
   $("#pv-close").focus();
 }

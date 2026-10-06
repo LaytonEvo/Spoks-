@@ -46,11 +46,12 @@ def pack(pid):
     return json.loads(p.read_text())
 
 
-def email_html(pid, key):
+def email_html(pid, key, photos=False):
+    """The email as it will send, or (photos=True) with the photo positions and briefs drawn in."""
     t = next((t for t in pack(pid)["templates"] if t["key"] == key), None)
     if not t:
         raise KeyError(key)
-    return (PACKS / "html" / t["file"]).read_text()
+    return (PACKS / "html" / (t.get("photos_file") if photos and t.get("photos_file") else t["file"])).read_text()
 
 
 def _state(pid):
@@ -71,7 +72,7 @@ def _hist(st, who, action, detail=""):
 
 def public(pid):
     pk, st = pack(pid), _state(pid)
-    out = {k: pk.get(k) for k in ("id", "title", "summary", "outline", "after", "replaces")}
+    out = {k: pk.get(k) for k in ("id", "title", "summary", "outline", "after", "replaces", "photo_briefs", "photo_rules")}
     out["flow_name"] = pk["flow"]["name"]
     out["emails"] = [{k: t.get(k) for k in ("key", "name", "subject", "preview", "when", "sender")} for t in pk["templates"]]
     out.update({k: st.get(k) for k in ("status", "segments", "templates", "flow_id", "dropped", "history", "error", "verify")})
@@ -106,13 +107,13 @@ def _journey(pk):
         if msg is not None:
             msg["id"] = f"draft-{pk['id']}-{a['temporary_id']}"
             if msg.get("template_ref"):
-                previews[msg["id"]] = f"/drafts/{pk['id']}/email/{msg['template_ref']}"
+                previews[msg["id"]] = (f"/drafts/{pk['id']}/email/{msg['template_ref']}", by_key[msg["template_ref"]].get("photos") or [])
                 msg.setdefault("name", by_key[msg["template_ref"]]["name"])
         actions[a["id"]] = a
     steps = snapshot._walk(definition["entry_action_id"], actions, {}, set())
     _name_splits(steps, pk.get("split_labels") or {})
     for m in snapshot._iter_messages(steps):
-        m["preview_url"] = previews.get(m["message_id"])
+        m["preview_url"], m["photos"] = previews.get(m["message_id"], (None, []))
         m["draft"] = True
         if m.get("body"):
             m["body"] = re.sub(r"{{\s*person\.first_name[^}]*}}", "Sam", m["body"])

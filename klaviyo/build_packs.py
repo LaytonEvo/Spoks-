@@ -86,6 +86,25 @@ def templates(pid, emails, prefix, html_dir):
     return out
 
 
+def add_photos(pack, emails, slots, rules):
+    """Photo spots: a version of each email with the photo positions drawn in, plus the briefs for the dashboard."""
+    hosted = json.loads(f1.HOSTED.read_text())
+    live = {"logo": f1.b.LIVE["logo"], "roundel": f1.b.LIVE["roundel"]}
+    by_key = {e["key"]: e for e in emails}
+    used = []
+    for t in pack["templates"]:
+        e = by_key[t["key"]]
+        if not e.get("slots"):
+            continue
+        rel = f"{pack['id']}/{t['key']}.photos.html"
+        (OUT / "html" / rel).write_text(e["fn"](f1.Ctx(live, "slots", True, hosted, live=True)))
+        t["photos_file"], t["photos"] = rel, list(e["slots"])
+        used += [k for k in e["slots"] if k not in used]
+    pack["photo_briefs"] = [dict(key=k, **slots[k]) for k in used]
+    pack["photo_rules"] = rules
+    return pack
+
+
 def meta(emails):
     return {e["key"]: e for e in emails}
 
@@ -197,7 +216,9 @@ def check(pk):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    for pid, pk in [f1_pack(), *f2_packs()]:
+    packs = [f1_pack(), *f2_packs()]
+    add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
+    for pid, pk in packs:
         check(pk)
         (OUT / f"{pid}.json").write_text(json.dumps(pk, indent=1, ensure_ascii=False))
         print(pid, len(pk["templates"]), "emails", len(pk["flow"]["definition"]["actions"]), "steps")
