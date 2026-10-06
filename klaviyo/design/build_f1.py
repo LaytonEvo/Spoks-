@@ -221,7 +221,7 @@ def e2h(ctx):
             + intro("Trolleys and clubs", "The big buys, without the guesswork",
                     "No single product pushed at you. Just how we'd help a mate choose.")
             + icon_rows(ctx, rows)
-            + member_note(ctx, "Members get more for their trade-in", "+5% trade-in value after 60 days, and 10% off one order a month.")
+            + member_note(ctx, "10% off one order every month", "Plus member-only deals in your portal and a prize draw every month.")
             + text_row(p("Not sure which way to go? Reply to this email and tell us how you play. A real golfer will answer.", 16, margin="0"), "28px 44px 28px")
             + usp3(ctx) + footer(ctx))
     return shell(ctx, body, "How to choose a trolley, why we fit clubs first, and the used route in.")
