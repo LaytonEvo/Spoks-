@@ -124,18 +124,20 @@ def fe2(ctx):
 
 
 def fe3(ctx):
-    rows = [("arrow-u-up-left", "Free returns",
-             "Order two sizes of a shoe, keep the one that fits and send the other back free. Four free returns a year.", ""),
-            ("trophy", "A prize draw every month", "You're entered automatically every month, and we draw it at the start of the next one.", ""),
+    rows = [("seal-percent", "10% off one order every month",
+             "10% off your first order, then one order every month, on anything across the site.", ""),
             ("tag", "Member-only deals",
              "Exclusive member deals in the portal, plus instant daily deals you won't see anywhere else on the site.", link("See the member benefits", JOIN)),
-            ("clock", "First look at new kit", "48 hours' early access to new products before everyone else.", "")]
+            ("trophy", "A prize draw every month", "You're entered automatically every month, and we draw it at the start of the next one.", ""),
+            ("clock", "First look at new kit", "48 hours' early access to new products before everyone else.", ""),
+            ("arrow-u-up-left", "Free returns",
+             "Order two sizes of a shoe, keep the one that fits and send the other back free. Four free returns a year.", "")]
     body = (intro("The annual plan, in use", "What £36 a year actually gets used for")
             + ph_rows(rows)
             + text_row(p("Happy on Free? That's fine. You keep your 5% either way, and this is the last email about upgrading.", 16, margin="0"), "28px 48px 0")
             + text_row(button("Become a member, £36 a year", JOIN), "24px 48px 0")
             + text_row("", "0 0 40px") + footer(ctx))
-    return shell(ctx, body, "Free returns, a monthly prize draw and member-only deals. Then it's up to you.")
+    return shell(ctx, body, "10% off one order every month, member-only deals and a monthly prize draw. Then it's up to you.")
 
 
 # ---------------- Annual branch ----------------
@@ -245,7 +247,7 @@ EMAILS = [
     dict(key="fe2", fn=fe2, name="Free E2 · The honest maths", timing="Free · day 4 · still on Free", sender=BR,
          subject="Is the £36 plan worth it? The honest maths", preview="10% off one order a month pays back the £36 at about £30 an order. The full sum inside.", slots=[]),
     dict(key="fe3", fn=fe3, name="Free E3 · The plan in use", timing="Free · day 12 · still on Free", sender=BR,
-         subject="What £36 a year actually gets used for", preview="Free returns, a monthly prize draw and member-only deals. Then it's up to you.", slots=[]),
+         subject="What £36 a year actually gets used for", preview="10% off one order every month, member-only deals and a monthly prize draw. Then it's up to you.", slots=[]),
     dict(key="pe1", fn=pe1, name="Annual E1 · Welcome", timing="Annual · straight away · smart sending off", sender=BR,
          subject="Welcome to Evolution Golf membership", preview="10% off your first order and one order every month, free returns and more. All live now.", slots=["M1"]),
     dict(key="pe2", fn=pe2, name="Annual E2 · Member deals", timing="Annual · day 3", sender=BR,

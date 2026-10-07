@@ -56,7 +56,7 @@
    "template_name": "EG · F2 Free · Free E3 · The plan in use",
    "name": "Free E3 · The plan in use",
    "subject": "What £36 a year actually gets used for",
-   "preview": "Free returns, a monthly prize draw and member-only deals. Then it's up to you.",
+   "preview": "10% off one order every month, member-only deals and a monthly prize draw. Then it's up to you.",
    "when": "Free · day 12 · still on Free",
    "sender": "⛳ Evolution Golf"
   }
@@ -236,7 +236,7 @@
        "from_label": "⛳ Evolution Golf",
        "reply_to_email": "info@evolutiongolf.co.uk",
        "subject_line": "What £36 a year actually gets used for",
-       "preview_text": "Free returns, a monthly prize draw and member-only deals. Then it's up to you.",
+       "preview_text": "10% off one order every month, member-only deals and a monthly prize draw. Then it's up to you.",
        "template_ref": "fe3",
        "smart_sending_enabled": true,
        "transactional": false,

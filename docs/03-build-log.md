@@ -98,3 +98,4 @@
 - 7 Oct: F2 Annual E3/E4 (Layton): Phosphor icons moved beside the matching section headings (10% / prize draw / daily deals); bottom icon row removed from those two. Recorded as an exception in klaviyo/design/README.md.
 - 7 Oct: members' edition for all F2 emails (Layton): header logo | MEMBERS, eyebrows prefixed 'Members ·', footer 'You're receiving this as an Evolution Golf member.' + 'Manage my membership' (portal). shell(members=True) / footer(line, extra) in build_f3_b.py.
 - 7 Oct: F2 Free E3 converted to icons beside section headings (returns arrow-u-up-left, trophy, tag, clock; new icons Klaviyo 380442467/472); bottom row removed. Members' edition already on all F2 emails; one-button rule already met elsewhere.
+- 7 Oct: F2 Free E3 reordered (Layton): leads with 10% off one order every month (new section), then member-only deals, prize draw, early access, free returns last; preview text updated. F2 doc updated.
