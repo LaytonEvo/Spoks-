@@ -103,3 +103,13 @@
 - 7 Oct: small member card trial (Layton): 150px card beside the 'Your 10% code is waiting' line + button in F2 Annual E3 only (portal_cta(card=True)); stacks on phones. Roll out to the other follow-ups after Layton approves.
 - 7 Oct: E3 card trial moved (Layton): 80px member card now sits beside the 'Members · One month in' eyebrow as a badge (intro(card=True)); removed from the closing button section.
 - 7 Oct: member card badge approved (Layton) and rolled out to all Annual follow-ups: E2, E3, E4 and the monthly 10% reminder. E1 and E5 keep the large card; Free emails get none (annual card).
+- 7 Oct: **F3 Checkout abandonment (two groups) built** as pack `f3-checkout` (7 emails, 27 steps), editorial design, Layton's defaults
+  (no code; delivery days CONFIRM; E3 Everything else kept; £800 example trolley-only). Builder `klaviyo/design/build_f3.py`.
+  Trigger Checkout Started $value ≥ 30; filter no order since start + no bounce 30d. 45 min → split on Checkout Started (last 1 day)
+  Collections containing a trolley / club / used-club collection (names checked against Shopify + a live event) → Hardware (15 more
+  min) / Everything else. Annual members (MemberTier = AnnualMember; Free members get the non-member path) get E2m (members' edition
+  + card badge). Members on Everything else stop after the SMS (E3 there is a membership nudge). E2 Hardware: trolley checks / club
+  fitting blocks via `{% if "…" in event.Collections %}`, fallback line when neither; tested with Django for trolley/clubs/shoes baskets.
+  Deviations from the doc: one primary button per email (E2 non-member: membership button, basket as a link); SMS "no fees" →
+  "interest-free"; E1 Hardware delivery "Free UK delivery on orders over £50" (+ CONFIRM on days). Dashboard: packs can carry
+  `preview_file` (example basket) shown instead of the raw template; metric triggers labelled. Re-entry 7 days set in the editor.

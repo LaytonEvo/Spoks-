@@ -15,6 +15,7 @@ ROOT = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "design"))
 import build_f1 as f1  # noqa: E402
 import build_f2 as f2  # noqa: E402
+import build_f3 as f3  # noqa: E402
 
 OUT = ROOT.parent / "dashboard" / "app" / "drafts"
 FROM = "info@evolutiongolf.co.uk"
@@ -81,8 +82,13 @@ def templates(pid, emails, prefix, html_dir):
         dest = OUT / "html" / pid / f"{e['key']}.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(src.read_text())
-        out.append({"key": e["key"], "file": f"{pid}/{e['key']}.html", "template_name": f"{prefix} · {e['name']}",
-                    "name": e["name"], "subject": e["subject"], "preview": e["preview"], "when": e["timing"], "sender": e["sender"]})
+        t = {"key": e["key"], "file": f"{pid}/{e['key']}.html", "template_name": f"{prefix} · {e['name']}",
+             "name": e["name"], "subject": e["subject"], "preview": e["preview"], "when": e["timing"], "sender": e["sender"]}
+        prev = html_dir / f"{e['key']}.preview.html"  # an example-basket version for the dashboard (never sent)
+        if prev.exists():
+            (OUT / "html" / pid / prev.name).write_text(prev.read_text())
+            t["preview_file"] = f"{pid}/{prev.name}"
+        out.append(t)
     return out
 
 
@@ -207,6 +213,54 @@ def f2_packs():
     return [("f2-free", free), ("f2-annual", annual)]
 
 
+def f3_pack():
+    pid, m = "f3-checkout", meta(f3.EMAILS)
+    E = lambda tid, key, nxt, sender=BRAND: email(tid, key, f"F3 {m[key]['name']}", m[key]["subject"], m[key]["preview"], nxt, sender)
+    hw = any_of(*[metric("SwrKKw", "greater-than-or-equal", 1, last(1),
+                         [{"property": "Collections", "filter": {"type": "string", "operator": "contains", "value": c}}]) for c in f3.HARDWARE])
+    annual = all_of(tier("equals", "AnnualMember"))
+    S = lambda tid, nxt: sms(tid, "F3 SMS 1 · Basket still saved", f3.SMS1, nxt)
+    actions = [wait("w45", 45, "minutes", "hw"), split("hw", hw, "w15", "e1e"),
+               # Hardware
+               wait("w15", 15, "minutes", "e1h"), E("e1h", "e1h", "h1"), wait("h1", 1, "days", "mh", at="09:30"),
+               split("mh", annual, "e2mh", "e2h"),
+               E("e2mh", "e2m", "h2m"), wait("h2m", 1, "days", "smshm", at="18:00"), S("smshm", "h3m"),
+               wait("h3m", 1, "days", "e3hm", at="09:30"), E("e3hm", "e3h", None, ALEX),
+               E("e2h", "e2h", "h2"), wait("h2", 1, "days", "smsh", at="18:00"), S("smsh", "h3"),
+               wait("h3", 1, "days", "e3h", at="09:30"), E("e3h", "e3h", None, ALEX),
+               # Everything else
+               E("e1e", "e1e", "x1"), wait("x1", 1, "days", "me", at="09:30"), split("me", annual, "e2me", "e2e"),
+               E("e2me", "e2m", "x2m"), wait("x2m", 1, "days", "smsem", at="18:00"), S("smsem", None),
+               E("e2e", "e2e", "x2"), wait("x2", 1, "days", "smse", at="18:00"), S("smse", "x3"),
+               wait("x3", 1, "days", "e3e", at="17:30"), E("e3e", "e3e", None)]
+    return pid, {
+        "id": pid, "title": "F3 Checkout abandonment (two groups)",
+        "summary": "Anyone who starts a checkout worth £30 or more and doesn't order. Hardware (trolleys, clubs, used clubs) and "
+                   "Everything else get their own emails; annual members get a members' version of email 2. No discount codes.",
+        "replaces": "Replaces the live checkout flow and the September test draft “EG · F3 Checkout abandonment · Trolleys” (UXsJ3d), "
+                    "which you can delete once this is created.",
+        "outline": ["Starts: Checkout Started worth £30 or more. Leaves the moment they order.",
+                    "45 minutes later: Hardware if the checkout has a trolley, club or used club; otherwise Everything else",
+                    "Hardware: E1 at 1 hour · next day 09:30 E2 (members: Your 10% can go on this) · day 2 18:00 text · day 3 09:30 E3 from Alex",
+                    "Everything else: E1 at 45 minutes · next day 09:30 E2 (members: Your 10% can go on this) · day 2 18:00 text · "
+                    "day 3 17:30 E3 last nudge (non-members only)"],
+        "after": ["Set re-entry to 7 days in the flow settings (the API can't), so someone who abandons twice in a week isn't emailed twice.",
+                  "Confirm the delivery time in E1 Hardware (marked CONFIRM: “usually 3 to 5 working days”) and edit it in the editor.",
+                  "Send yourself a test of E2 Hardware with a trolley in the basket and one with clubs, to check the right blocks show.",
+                  "When happy, switch it on and switch off the live checkout flow."],
+        "split_labels": {"hw": {"label": "Checkout has a trolley, club or used club", "yes": "Hardware", "no": "Everything else"},
+                         "mh": {"label": "Annual member?", "yes": "Member", "no": "Not a member"},
+                         "me": {"label": "Annual member?", "yes": "Member", "no": "Not a member"}},
+        "templates": templates(pid, f3.EMAILS, "EG · F3", ROOT / "design" / "f3"),
+        "flow": {"name": "EG · F3 Checkout abandonment", "definition": {
+            "triggers": [{"type": "metric", "id": "SwrKKw", "trigger_filter": {"condition_groups": [{"conditions": [
+                {"type": "metric-property", "metric_id": "SwrKKw", "field": "$value",
+                 "filter": {"type": "numeric", "operator": "greater-than-or-equal", "value": 30}}]}]}}],
+            "profile_filter": all_of(metric("T9sNn9", "equals", 0, FS), NO_BOUNCE),
+            "entry_action_id": "w45", "actions": actions}},
+    }
+
+
 def check(pk):
     acts = {a["temporary_id"]: a for a in pk["flow"]["definition"]["actions"]}
     keys = {t["key"] for t in pk["templates"]}
@@ -221,7 +275,7 @@ def check(pk):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    packs = [f1_pack(), *f2_packs()]
+    packs = [f1_pack(), *f2_packs(), f3_pack()]
     add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
     for _, pk in packs[1:]:
         add_photos(pk, f2.EMAILS, f1.SLOTS, f1.PHOTO_RULES)

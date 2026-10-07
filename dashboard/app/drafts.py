@@ -51,7 +51,9 @@ def email_html(pid, key, photos=False):
     t = next((t for t in pack(pid)["templates"] if t["key"] == key), None)
     if not t:
         raise KeyError(key)
-    return (PACKS / "html" / (t.get("photos_file") if photos and t.get("photos_file") else t["file"])).read_text()
+    if photos and t.get("photos_file"):
+        return (PACKS / "html" / t["photos_file"]).read_text()
+    return (PACKS / "html" / (t.get("preview_file") or t["file"])).read_text()  # preview_file: same email with an example basket
 
 
 def _state(pid):
@@ -120,7 +122,11 @@ def _journey(pk):
     trig = (definition.get("triggers") or [{}])[0]
     seg_names = {s["key"]: s["name"] for s in pk.get("segments", [])}
     who = AUDIENCES.get(trig.get("id")) or seg_names.get(trig.get("ref")) or trig.get("id")
-    trigger = f"When someone joins the {trig.get('type')} “{who}”"
+    if trig.get("type") == "metric":
+        cond = snapshot._filter_label(trig.get("trigger_filter"), {})
+        trigger = f"When someone does “{snapshot._metric(trig.get('id'), {})}”" + (f" ({cond.replace('$value greater-than-or-equal ', 'worth £').replace('$value', 'value')} or more)" if cond else "")
+    else:
+        trigger = f"When someone joins the {trig.get('type')} “{who}”"
     return {"steps": steps, "trigger": trigger, "flow_filter": snapshot._filter_label(definition.get("profile_filter"), {})}
 
 
