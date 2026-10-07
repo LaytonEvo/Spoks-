@@ -49,6 +49,11 @@ No cream, beige, warm off-white, mint, brass or gold.
 
 Numbered steps (1, 2, 3 in serif green, hairline rows) are kept for instructions; they are not benefit lists.
 
+## Members' edition
+Every email that goes only to members (all of F2; later the member versions in other flows): header logo | MEMBERS
+(small spaced capitals after a thin rule), eyebrows start "Members ·", footer reads "You're receiving this as an Evolution
+Golf member." with a "Manage my membership" link. `shell(..., members=True)`.
+
 ## Icons
 Phosphor Light only (from @phosphor-icons/core), rendered as 48px transparent PNGs in brand green, hosted in Klaviyo,
 shown at 24px. One three-item row per email at most, above the footer (F2: 10% off one order a month · Instant daily

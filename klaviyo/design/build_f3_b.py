@@ -110,7 +110,7 @@ class Ctx:
         return (f'<img class="full" src="{self.img[key]}" width="{w}" alt="" style="width:{w}px;max-width:100%;height:auto;{style}">{tag}')
 
 
-def shell(ctx, body, preheader, bg=WHITE, header=True):
+def shell(ctx, body, preheader, bg=WHITE, header=True, members=False):
     # White canvas always. Klaviyo strips <link> tags, so the fonts load with @import; Gmail and Outlook fall back to
     # Georgia (headlines) and Arial (body), which the layout is built to read well in.
     fonts = ("<style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Inter:wght@400;500;600&display=swap');</style>"
@@ -118,6 +118,16 @@ def shell(ctx, body, preheader, bg=WHITE, header=True):
     head = (f'<tr><td align="center" bgcolor="{G}" style="background:{G};padding:22px 40px;text-align:center;">'
             f'<a href="https://evolutiongolf.co.uk/" style="display:inline-block;"><img src="{ctx.img["logo"]}" width="170" alt="Evolution Golf" '
             f'style="width:170px;height:auto;margin:0 auto;"></a></td></tr>') if header else ""
+    if header and members:
+        # Members' edition (Layton, 7 Oct 2026): logo, a thin vertical rule, then MEMBERS in small spaced capitals.
+        head = (f'<tr><td align="center" bgcolor="{G}" style="background:{G};padding:22px 40px;text-align:center;">'
+                f'<table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>'
+                f'<td valign="middle"><a href="https://evolutiongolf.co.uk/" style="display:inline-block;"><img src="{ctx.img["logo"]}" width="150" '
+                f'alt="Evolution Golf" style="width:150px;height:auto;display:block;"></a></td>'
+                f'<td valign="middle" style="padding:0 0 0 16px;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>'
+                f'<td width="1" height="22" bgcolor="{ON_DARK}" style="width:1px;height:22px;background:{ON_DARK};font-size:0;line-height:0;">&nbsp;</td></tr></table></td>'
+                f'<td valign="middle" style="padding:0 0 0 16px;font:500 12px/16px {SANS};letter-spacing:.32em;color:{WHITE};white-space:nowrap;">MEMBERS</td>'
+                f'</tr></table></td></tr>')
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only">
 <title>Evolution Golf</title>{fonts}
@@ -207,13 +217,14 @@ def usp(items=None, pad="28px 48px 0"):
             f'<table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>{cells}</tr></table></td></tr></table></td></tr>')
 
 
-def footer(ctx, reason="you started a checkout at evolutiongolf.co.uk"):
+def footer(ctx, reason="you started a checkout at evolutiongolf.co.uk", line=None, extra=None):
     a = f'style="color:{WHITE};text-decoration:none;"'
     return (f'<tr><td align="center" bgcolor="{G}" style="background:{G};padding:32px 48px;text-align:center;">'
             f'<img src="{ctx.img["logo"]}" width="130" alt="Evolution Golf" style="width:130px;height:auto;margin:0 auto 14px;">'
             f'<p style="margin:0;font:12px/20px {SANS};color:{ON_DARK};">Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL</p>'
             f'<p style="margin:8px 0;font:500 12px/20px {SANS};color:{WHITE};">' + " · ".join(f'<a href="{u}" {a}>{n}</a>' for n, u in SOCIAL.items()) + '</p>'
-            f'<p class="foot" style="margin:0;font:12px/20px {SANS};color:{ON_DARK};">You\'re receiving this because {reason}.<br>'
+            f'<p class="foot" style="margin:0;font:12px/20px {SANS};color:{ON_DARK};">{line or "You&#39;re receiving this because " + reason + "."}<br>'
+            + (f'<a href="{extra[1]}" style="color:{ON_DARK};">{extra[0]}</a> · ' if extra else "")
             + unsub(ctx, ON_DARK) + '</p></td></tr>')
 
 

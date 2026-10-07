@@ -15,7 +15,7 @@ import json, pathlib, re, sys
 import build_f3_b as b
 import build_f1 as f1
 from build_f1 import (hero, name_suffix, G, DG, GOLD, CREAM, INK, HEAD, MUTED, LINE, WHITE, SANS, SERIF, confirm, data_uri, icon, first_name, intro, p,
-                      text_row, link, button, member_note, icon_rows, benefits_table, h3, Ctx, local_icons, HOSTED, OUT)
+                      text_row, link, button, member_note, icon_rows, benefits_table, h3, Ctx, local_icons, HOSTED, OUT)  # intro is redefined below for the Members eyebrow
 
 PORTAL = "https://members.evolutiongolf.co.uk"
 JOIN = f1.URL["join"]
@@ -25,11 +25,16 @@ REASON = "you joined Evolution Golf membership"
 
 
 def footer(ctx):
-    return f1.footer(ctx, REASON)
+    return f1.footer(ctx, REASON, line="You&#39;re receiving this as an Evolution Golf member.", extra=("Manage my membership", PORTAL))
 
 
 def shell(ctx, body, pre):
-    return f1.shell(ctx, body, pre)
+    return f1.shell(ctx, body, pre, members=True)
+
+
+def intro(eyebrow, headline, text=""):
+    """Every member email's eyebrow starts "Members ·"."""
+    return f1.intro(f"Members · {eyebrow}", headline, text)
 
 
 def portal_button(label="Open my member portal"):
@@ -84,7 +89,7 @@ def h2(text):
 
 # ---------------- Free branch ----------------
 def fe1(ctx):
-    body = (hero(ctx, "W1") + intro("Free membership", f"You're in{name_suffix(ctx)}.",
+    body = (hero(ctx, "W1") + intro("Welcome", f"You're in{name_suffix(ctx)}.",
                   "Your free Evolution Golf membership is live. Here's what it gives you, starting today.")
             + benefit_list(ctx, [("Your own member portal", "Log in to see this month's member deals."),
                                  ("5% off member portal deals", "Applied when you're logged in."),
@@ -133,7 +138,7 @@ def fe3(ctx):
 
 # ---------------- Annual branch ----------------
 def pe1(ctx):
-    body = (hero(ctx, "M1") + intro("Annual membership", f"Good call{name_suffix(ctx)}. You're a member.",
+    body = (hero(ctx, "M1") + intro("Welcome", f"Good call{name_suffix(ctx)}. You're a member.",
                   "Your £36 annual membership is live. Everything below works from today.")
             + benefit_list(ctx, ANNUAL)
             + h2("Three things to do this week")
@@ -147,7 +152,7 @@ def pe1(ctx):
 
 
 def pe2(ctx):
-    body = (intro("Member deals", "Your member deals, and where to find them",
+    body = (intro("Your deals", "Your member deals, and where to find them",
                   "As a member you get deals that nobody else on the site can see. Here's where they are.")
             + steps([("Log in to your member portal.", "That's where the deals are."),
                      ("Check the instant daily deals.", "New ones every day, and you won't see them anywhere else on the site."),

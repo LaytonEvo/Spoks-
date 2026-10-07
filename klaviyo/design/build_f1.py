@@ -211,16 +211,16 @@ def icon_rows(ctx, rows):
     return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>', "12px 48px 0")
 
 
-def footer(ctx, reason="you joined the Evolution Golf mailing list"):
-    return b.footer(ctx, reason)
+def footer(ctx, reason="you joined the Evolution Golf mailing list", line=None, extra=None):
+    return b.footer(ctx, reason, line, extra)
 
 
 def intro(eyebrow, headline, text=""):
     return b.intro(eyebrow, headline, text)
 
 
-def shell(ctx, body, pre, header=True):
-    return b.shell(ctx, body, pre, header=header)
+def shell(ctx, body, pre, header=True, members=False):
+    return b.shell(ctx, body, pre, header=header, members=members)
 
 
 # ---------------- emails ----------------
