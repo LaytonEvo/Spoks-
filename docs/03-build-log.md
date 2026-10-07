@@ -101,3 +101,4 @@
 - 7 Oct: F2 Free E3 reordered (Layton): leads with 10% off one order every month (new section), then member-only deals, prize draw, early access, free returns last; preview text updated. F2 doc updated.
 - 7 Oct: annual member card (Layton's artwork) flattened onto white, 640×430 shown at 320×215, Klaviyo image 380529477. Placed: F1 E1 + E4 (top of membership section, incl. E1 test B), F2 Free E2 (before 'What the £36 plan adds') + E3 (under intro), F2 Annual E1 (under the headline) + E5 (renewal). Never in Free welcome. F3 non-member E2 gets it when F3 is built.
 - 7 Oct: small member card trial (Layton): 150px card beside the 'Your 10% code is waiting' line + button in F2 Annual E3 only (portal_cta(card=True)); stacks on phones. Roll out to the other follow-ups after Layton approves.
+- 7 Oct: E3 card trial moved (Layton): 80px member card now sits beside the 'Members · One month in' eyebrow as a badge (intro(card=True)); removed from the closing button section.

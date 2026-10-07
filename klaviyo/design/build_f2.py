@@ -32,9 +32,18 @@ def shell(ctx, body, pre):
     return f1.shell(ctx, body, pre, members=True)
 
 
-def intro(eyebrow, headline, text=""):
-    """Every member email's eyebrow starts "Members ·"."""
-    return f1.intro(f"Members · {eyebrow}", headline, text)
+def intro(eyebrow, headline, text="", card=False):
+    """Every member email's eyebrow starts "Members ·". card=True (Layton, 7 Oct 2026, trial on Annual E3): a small
+    member card (80px) sits beside the eyebrow like a badge."""
+    if not card:
+        return f1.intro(f"Members · {eyebrow}", headline, text)
+    html = f1.intro(f"Members · {eyebrow}", headline, text)
+    old = html[html.index("<p style=\"margin:0 0 14px;"):html.index("</p>") + 4]
+    badge = (f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;"><tr>'
+             f'<td valign="middle" style="padding:0 14px 0 0;"><img src="{CARD}" width="80" height="54" alt="Your Evolution Golf annual member card" '
+             f'style="width:80px;height:auto;display:block;"></td>'
+             f'<td valign="middle">{old.replace("margin:0 0 14px;", "margin:0;")}</td></tr></table>')
+    return html.replace(old, badge)
 
 
 def portal_button(label="Open my member portal"):
@@ -208,12 +217,12 @@ PRIZE_LINK = link("See this month's prize", JOIN)  # the prize is shown on the m
 
 def pe3(ctx):
     body = (intro("One month in", "Your first month as a member",
-                  "A quick reminder of what's there for you, now you've had a month.")
+                  "A quick reminder of what's there for you, now you've had a month.", card=True)
             + ph_rows([
                 ("seal-percent", "This month's 10%", "A new month means a new 10% off one order, on anything across the site.", ""),
                 ("trophy", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
                 ("tag", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", "")])
-            + portal_cta("Your 10% code is waiting.", card=True)
+            + portal_cta("Your 10% code is waiting.")
             + text_row("", "0 0 40px") + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
 
