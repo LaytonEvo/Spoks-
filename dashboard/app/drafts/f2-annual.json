@@ -1,13 +1,13 @@
 {
  "id": "f2-annual",
  "title": "F2 Membership · Annual (£36)",
- "summary": "New £36 annual members (tagged AnnualMember): welcome, free returns, first month, two months in (trade-in bonus), a short monthly reminder that their 10% is ready, and the renewal reminder we promise in the welcome emails.",
+ "summary": "New £36 annual members (tagged AnnualMember): welcome, member deals, first month, two months in (trade-in bonus), a short monthly reminder that their 10% is ready, and the renewal reminder we promise in the welcome emails.",
  "replaces": "Replaces the old Club Access, Pro and Annual welcomes for new joiners (those old tiers aren't sold any more).",
  "outline": [
   "Starts: someone is tagged MemberTier = AnnualMember (a new segment, “EG · Members · Annual”, is created for this).",
   "Leaves if they stop being an annual member.",
   "Day 0: welcome (always sends)",
-  "Day 3, 09:30: free returns",
+  "Day 3, 09:30: member deals",
   "Day 30, 09:30: first month",
   "Day 60, 09:30: two months in (trade-in bonus on, plus this month's 10%)",
   "Days 90 to 300, every 30 days: \"your 10% for this month is ready\"",
@@ -58,10 +58,10 @@
   {
    "key": "pe2",
    "file": "f2-annual/pe2.html",
-   "template_name": "EG · F2 Annual · Annual E2 · Free returns",
-   "name": "Annual E2 · Free returns",
-   "subject": "Free returns, and how they work",
-   "preview": "Order two sizes, keep one, send one back. Free, four times a year.",
+   "template_name": "EG · F2 Annual · Annual E2 · Member deals",
+   "name": "Annual E2 · Member deals",
+   "subject": "Your member deals, and where to find them",
+   "preview": "Instant daily deals and exclusive member deals. Only in your portal.",
    "when": "Annual · day 3",
    "sender": "⛳ Evolution Golf"
   },
@@ -203,13 +203,13 @@
        "from_email": "info@evolutiongolf.co.uk",
        "from_label": "⛳ Evolution Golf",
        "reply_to_email": "info@evolutiongolf.co.uk",
-       "subject_line": "Free returns, and how they work",
-       "preview_text": "Order two sizes, keep one, send one back. Free, four times a year.",
+       "subject_line": "Your member deals, and where to find them",
+       "preview_text": "Instant daily deals and exclusive member deals. Only in your portal.",
        "template_ref": "pe2",
        "smart_sending_enabled": true,
        "transactional": false,
        "add_tracking_params": true,
-       "name": "F2 Annual E2 · Free returns"
+       "name": "F2 Annual E2 · Member deals"
       }
      }
     },

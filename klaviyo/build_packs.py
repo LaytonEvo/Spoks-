@@ -176,11 +176,11 @@ def f2_packs():
     }
     annual = {
         "id": "f2-annual", "title": "F2 Membership · Annual (£36)",
-        "summary": "New £36 annual members (tagged AnnualMember): welcome, free returns, first month, two months in (trade-in bonus), "
+        "summary": "New £36 annual members (tagged AnnualMember): welcome, member deals, first month, two months in (trade-in bonus), "
                    "a short monthly reminder that their 10% is ready, and the renewal reminder we promise in the welcome emails.",
         "replaces": "Replaces the old Club Access, Pro and Annual welcomes for new joiners (those old tiers aren't sold any more).",
         "outline": ["Starts: someone is tagged MemberTier = AnnualMember (a new segment, “EG · Members · Annual”, is created for this).",
-                    "Leaves if they stop being an annual member.", "Day 0: welcome (always sends)", "Day 3, 09:30: free returns",
+                    "Leaves if they stop being an annual member.", "Day 0: welcome (always sends)", "Day 3, 09:30: member deals",
                     "Day 30, 09:30: first month", "Day 60, 09:30: two months in (trade-in bonus on, plus this month's 10%)",
                     "Days 90 to 300, every 30 days: \"your 10% for this month is ready\"", "Day 335, 09:30: renewal reminder"],
         "after": ["Send yourself a test of each email.", "Switch on in Klaviyo."],

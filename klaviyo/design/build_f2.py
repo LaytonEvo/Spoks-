@@ -129,17 +129,19 @@ def pe1(ctx):
 
 
 def pe2(ctx):
-    body = (intro("Free returns", "Free returns, and how they work",
-                  "You get four free returns a year. Order two sizes, keep the one that fits, send the other back.")
-            + steps([("Log in to your member portal.", "That's where returns start."),
-                     ("Fill in the returns request form.", "Tell us what's coming back and why."),
-                     ("Send it back.", "As a member, the return is free. You've got four a year, so don't save them for an emergency.")])
-            + text_row(button("Start a return in my portal", PORTAL), "8px 44px 24px")
-            + member_note(ctx, "Your monthly 10% is ready", "One order a month gets 10% off. The code is in your member portal.",
+    body = (intro("Member deals", "Your member deals, and where to find them",
+                  "As a member you get deals that nobody else on the site can see. Here's where they are.")
+            + steps([("Log in to your member portal.", "That's where the deals are."),
+                     ("Check the instant daily deals.", "New ones every day, and you won't see them anywhere else on the site."),
+                     ("Look through the exclusive member deals.", "Only members can see these, and they're in your portal too.")])
+            + text_row(button("See today's deals", PORTAL), "8px 44px 24px")
+            + member_note(ctx, "Your monthly 10% is ready",
+                          "One order a month gets 10% off, on anything across the site. The code is in your member portal.",
                           "Open my portal", PORTAL)
-            + text_row("", "0 0 32px")
+            + text_row(p("Need to send something back? Members get four free returns a year. Start one from your portal.", 15, MUTED, "0"),
+                       "24px 44px 32px")
             + footer(ctx))
-    return shell(ctx, body, "Order two sizes, keep one, send one back. Free, four times a year.")
+    return shell(ctx, body, "Instant daily deals and exclusive member deals. Only in your portal.")
 
 
 def pe3(ctx):
@@ -198,8 +200,8 @@ EMAILS = [
          subject="What £36 a year actually gets used for", preview="Free returns, a monthly prize draw and member-only deals. Then it's up to you.", slots=[]),
     dict(key="pe1", fn=pe1, name="Annual E1 · Welcome", timing="Annual · straight away · smart sending off", sender=BR,
          subject="Welcome to Evolution Golf membership", preview="10% off your first order and one order every month, free returns and more. All live now.", slots=["M1"]),
-    dict(key="pe2", fn=pe2, name="Annual E2 · Free returns", timing="Annual · day 3", sender=BR,
-         subject="Free returns, and how they work", preview="Order two sizes, keep one, send one back. Free, four times a year.", slots=[]),
+    dict(key="pe2", fn=pe2, name="Annual E2 · Member deals", timing="Annual · day 3", sender=BR,
+         subject="Your member deals, and where to find them", preview="Instant daily deals and exclusive member deals. Only in your portal.", slots=[]),
     dict(key="pe3", fn=pe3, name="Annual E3 · First month", timing="Annual · day 30", sender=BR,
          subject="Your first month as a member", preview="Your monthly 10%, this month's prize draw and the member deals.", slots=[]),
     dict(key="pe4", fn=pe4, name="Annual E4 · Two months in", timing="Annual · day 60", sender=BR,
