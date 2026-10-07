@@ -246,10 +246,10 @@ def build(img_dir):
     frames = {f"{e['key']}|{m}": e["fn"](Ctx(prev, "none", True, icons)) for e in EMAILS for m in f1.MODES}
     (OUT / "f2-preview.html").write_text(page(frames, images))
     hosted = json.loads(HOSTED.read_text())
-    live = {"logo": b.LIVE["logo"], "roundel": b.LIVE["roundel"]}
+    live = {"logo": b.LIVE["logo"], "roundel": b.LIVE["roundel"], **f1.PHOTOS}
     (OUT / "f2").mkdir(exist_ok=True)
     for e in EMAILS:
-        (OUT / "f2" / f"{e['key']}.html").write_text(e["fn"](Ctx(live, "none", True, hosted, live=True)))
+        (OUT / "f2" / f"{e['key']}.html").write_text(e["fn"](Ctx(live, "now", True, hosted, live=True)))
     print("f2-preview.html", (OUT / "f2-preview.html").stat().st_size // 1024, "KB")
 
 

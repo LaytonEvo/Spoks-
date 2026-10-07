@@ -42,16 +42,16 @@ SLOTS = {
                what="A real photo of the Evolution Golf team: in the shop, in the fitting bay, or on the course together. It proves the opening line, \"a golf shop run by people who play\".",
                alt="Second choice: a small group of club golfers walking off a tee on a UK course.",
                source="Your own photo if at all possible. Stock undercuts the \"real people\" message.",
-               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the welcome headline leads."),
+               size=HERO_SIZE, now="Supplied 7 Oct (in the Klaviyo library)", now_status="Have", none="Without it, the welcome headline leads."),
     "W2": dict(emails="E2 Hardware", title="A trolley out on the course", where="Across the top, under the logo",
                what="A golfer walking a fairway with an electric trolley, trolley clearly in shot. Trolleys are your biggest seller and this email talks about them first.",
                alt="Second choice: someone being fitted on a launch monitor in your fitting bay.",
                source="Stock is fine for the trolley shot. A fitting-bay shot works better as your own.",
-               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the headline leads."),
+               size=HERO_SIZE, now="Supplied 7 Oct (in the Klaviyo library)", now_status="Have", none="Without it, the headline leads."),
     "W3": dict(emails="E2 Everything else", title="Shoes and weather", where="Across the top, under the logo",
                what="Golf shoes on wet grass, or a golfer in waterproofs on a grey British day. Matches the \"spiked or spikeless\" and \"staying dry\" sections.",
                alt="", source="Stock is fine.",
-               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the headline leads."),
+               size=HERO_SIZE, now="Supplied 7 Oct (in the Klaviyo library)", now_status="Have", none="Without it, the headline leads."),
     "M1": dict(emails="F2 Annual E1 Welcome", title="A member out playing", where="Across the top, under the logo",
                what="A golfer on the first tee on a bright morning, ready to play, with a trolley or bag. It says the membership is about playing more, not paperwork.",
                alt="Second choice: a small group laughing on a green after a round.",
@@ -61,8 +61,16 @@ SLOTS = {
                what="Alex, head and shoulders, plain background, smiling. A face makes \"reply to me\" feel real.",
                alt="", source="Must be his own. If there isn't one, the email works without it.",
                size="Supply 240 × 240 px (square). Shows as a 76 px circle. JPG. Face centred with a little space around it.",
-               now="Nothing in the library", now_status="Needed", none="Text signature only (plain-letter style)."),
+               now="Supplied 7 Oct (in the Klaviyo library)", now_status="Have", none="Text signature only (plain-letter style)."),
 }
+# Photos supplied by Layton, 7 Oct 2026 (cropped to 1200 x 720 / 240 x 240, hosted in the Klaviyo library).
+PHOTOS = {"W1": "https://cdn.klaviyomail.com/company/SiyYRR/images/7d745e06-9b49-42df-92bb-4c6f3c48ac4e.jpeg",
+          "W2": "https://cdn.klaviyomail.com/company/SiyYRR/images/e978ee24-82ca-4326-b2e0-dd366ca6d729.jpeg",
+          "W3": "https://cdn.klaviyomail.com/company/SiyYRR/images/5bffdf31-4a7a-4327-81e7-30b16012080a.jpeg",
+          "A1": "https://cdn.klaviyomail.com/company/SiyYRR/images/50596254-d610-4268-a459-f77bfb2dae1b.jpeg"}
+PHOTO_ALT = {"W1": "A golf course on a sunny day", "W2": "A golfer walking the course with an electric trolley",
+             "W3": "A golfer's shoes on the fairway mid-swing", "A1": "Alex"}
+PHOTO_PREVIEW = {"W1": "eg-w1.jpg", "W2": "eg-w2.jpg", "W3": "eg-w3.jpg", "A1": "eg-a1.jpg"}  # in <img dir>/photos_out
 PHOTO_RULES = [
     "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
     "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",
@@ -84,7 +92,10 @@ class Ctx(b.Ctx):
 
     def slot(self, key, w, h, style="", caption=True):
         if self.mode != "slots":
-            return ""  # no stock photos chosen yet: "now" and "none" are the same
+            if self.mode == "now" and key in self.img:
+                return (f'<img class="full" src="{self.img[key]}" width="{w}" height="{h}" alt="{PHOTO_ALT.get(key, "")}" '
+                        f'style="width:{w}px;max-width:100%;height:auto;display:block;">')
+            return ""
         s = SLOTS[key]
         return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
                 f'<td align="center" height="{h}" style="height:{h}px;background:{SLOTBG};border:2px dashed {GOLD};padding:18px;{style}">'
@@ -280,6 +291,9 @@ def e2e(ctx):
 def e3(ctx):
     pp = f'margin:0 0 16px;font:16px/25px {SANS};color:{INK};'
     photo = ""
+    if ctx.mode == "now" and "A1" in ctx.img:
+        photo = (f'<td width="92" style="padding-right:16px;vertical-align:top;"><img src="{ctx.img["A1"]}" width="76" height="76" alt="Alex" '
+                 f'style="width:76px;height:76px;border-radius:50%;display:block;"></td>')
     if ctx.mode == "slots":
         photo = (f'<td width="92" style="padding-right:16px;vertical-align:top;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>'
                  f'<td width="76" height="76" align="center" style="width:76px;height:76px;background:{SLOTBG};border:2px dashed {GOLD};border-radius:50%;'
@@ -386,14 +400,16 @@ def page(frames, images):
 def build(img_dir):
     icons = local_icons()
     images = {k: data_uri(img_dir / f) for k, f in {"logo": "p-logo-white.png", "roundel": "p-roundel.png"}.items()}
+    images.update({k: data_uri(img_dir.parent / "photos_out" / f) for k, f in PHOTO_PREVIEW.items()
+                   if (img_dir.parent / "photos_out" / f).exists()})
     prev = {k: f"__IMG_{k}__" for k in images}
     frames = {f"{e['key']}|{m}": e["fn"](Ctx(prev, m, True, icons)) for e in EMAILS for m in MODES}
     (OUT / "f1-preview.html").write_text(page(frames, images))
     if HOSTED.exists():
         hosted = json.loads(HOSTED.read_text())
-        live = {"logo": b.LIVE["logo"], "roundel": b.LIVE["roundel"]}
+        live = {"logo": b.LIVE["logo"], "roundel": b.LIVE["roundel"], **PHOTOS}
         for e in EMAILS:
-            (OUT / "f1" / f"{e['key']}.html").write_text(e["fn"](Ctx(live, "none", True, hosted, live=True)))
+            (OUT / "f1" / f"{e['key']}.html").write_text(e["fn"](Ctx(live, "now", True, hosted, live=True)))
         (OUT / "f1" / "e1b.html").write_text(button_variant((OUT / "f1" / "e1.html").read_text()))
         print("live files written")
     print("f1-preview.html", (OUT / "f1-preview.html").stat().st_size // 1024, "KB")
