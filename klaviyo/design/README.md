@@ -74,4 +74,4 @@ Personalisation: first name, or nothing when it's missing. UK English.
 
 ## Delivery wording
 Members: "Free delivery over £10" ("Normally £50 for non-members"). Trust line: "Free delivery over £50".
-Free tier: "over £30" (members page; not yet re-confirmed).
+Free tier: no delivery benefit, standard "over £50" (Layton, 7 Oct 2026).

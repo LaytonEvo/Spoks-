@@ -158,7 +158,6 @@ def checks(ctx):
 
 
 FREE_ROWS = [("5% off everything", "On anything across the site, this order included."),
-             ("Free delivery over £30", "Instead of £50."),
              ("Loyalty points", "On everything you buy."),
              ("Your own member portal", "With member deals you won't see anywhere else.")]
 
@@ -259,8 +258,8 @@ def e3lo(ctx):
     body = (intro("Still in your basket", "Your basket's still here", "We'll stop reminding you after this one.")
             + basket(ctx, big=False) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
             + is_free(ctx, member_note(ctx, "Your 5% can go on this", "As a Free member you get 5% off everything on the site.", "Open my portal", f2.PORTAL),
-                      member_note(ctx, "Join free first", "Free members get 5% off everything (this basket included), free delivery over £30, "
-                                  "loyalty points on everything they buy, and member deals in the portal you won't see anywhere else.", "Join free"))
+                      member_note(ctx, "Join free first", "Free members get 5% off everything (this basket included), loyalty points on everything they buy, "
+                                  "and member deals in the portal you won't see anywhere else.", "Join free"))
             + close(ctx))
     return f1.shell(ctx, body, "Your basket's saved, and 5% can come off it with Free membership.")
 
