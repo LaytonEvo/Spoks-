@@ -134,3 +134,4 @@
   Membership: non-members credit offer (card) + Free option; Free = upgrade note; annual = thanks (tier conditional in template). 'How we work'
   shown to all (template can't see order count). Reviews to everyone (no gating), Trustpilot link from Layton. Django-checked.
   Shared fix: member_note no longer adds a full stop after headings ending in ?/!.
+- 7 Oct: F9 images (Layton): P9 their own product photo (automatic, line_items.0 main Shopify image, 240px) under the headline in E1 both paths; photo spots C1 trolley battery on charge, C2 club care (1200×720), X1 trolley with accessories (1200×600) in Hardware E2, each only for matching orders; briefs on the dashboard (Show photo spots). add_photos now uses f3.Ctx; F9 pack included.

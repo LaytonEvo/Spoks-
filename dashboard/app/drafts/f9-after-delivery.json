@@ -83,7 +83,11 @@
    "preview": "Getting set up, and who to call if anything's not right.",
    "when": "Hardware · 3 days after dispatch, 09:30",
    "sender": "⛳ Evolution Golf",
-   "preview_file": "f9-after-delivery/e1h.preview.html"
+   "preview_file": "f9-after-delivery/e1h.preview.html",
+   "photos_file": "f9-after-delivery/e1h.photos.html",
+   "photos": [
+    "P9"
+   ]
   },
   {
    "key": "e1hn",
@@ -94,7 +98,11 @@
    "preview": "Getting set up, and who to call if anything's not right.",
    "when": "Hardware, members or older orders · 3 days after dispatch, 09:30",
    "sender": "⛳ Evolution Golf",
-   "preview_file": "f9-after-delivery/e1hn.preview.html"
+   "preview_file": "f9-after-delivery/e1hn.preview.html",
+   "photos_file": "f9-after-delivery/e1hn.photos.html",
+   "photos": [
+    "P9"
+   ]
   },
   {
    "key": "e2h",
@@ -105,7 +113,13 @@
    "preview": "A few minutes now keeps it going for years.",
    "when": "Hardware · 4 days after Email 1, 17:30",
    "sender": "⛳ Evolution Golf",
-   "preview_file": "f9-after-delivery/e2h.preview.html"
+   "preview_file": "f9-after-delivery/e2h.preview.html",
+   "photos_file": "f9-after-delivery/e2h.photos.html",
+   "photos": [
+    "C1",
+    "C2",
+    "X1"
+   ]
   },
   {
    "key": "e1e",
@@ -116,7 +130,11 @@
    "preview": "Thanks for shopping with us. Here's how to reach us if you need anything.",
    "when": "Everything else · 3 days after dispatch, 09:30",
    "sender": "⛳ Evolution Golf",
-   "preview_file": "f9-after-delivery/e1e.preview.html"
+   "preview_file": "f9-after-delivery/e1e.preview.html",
+   "photos_file": "f9-after-delivery/e1e.photos.html",
+   "photos": [
+    "P9"
+   ]
   },
   {
    "key": "e1en",
@@ -127,7 +145,11 @@
    "preview": "Thanks for shopping with us. Here's how to reach us if you need anything.",
    "when": "Everything else, members or older orders · 3 days after dispatch, 09:30",
    "sender": "⛳ Evolution Golf",
-   "preview_file": "f9-after-delivery/e1en.preview.html"
+   "preview_file": "f9-after-delivery/e1en.preview.html",
+   "photos_file": "f9-after-delivery/e1en.photos.html",
+   "photos": [
+    "P9"
+   ]
   },
   {
    "key": "rem",
@@ -3496,7 +3518,60 @@
    ]
   }
  },
- "photo_briefs": [],
+ "photo_briefs": [
+  {
+   "key": "P9",
+   "emails": "F9 Email 1 (both paths)",
+   "title": "Their own product",
+   "where": "Under the headline, centred",
+   "what": "The main Shopify photo of the first item in their order, pulled in automatically. Nothing to supply.",
+   "alt": "",
+   "source": "Automatic from Shopify. Main product photos need a plain white background and no badges (the M1 DHC's main photo says \"FREE GIFT\").",
+   "size": "Shows at 240 × 240 px. Shopify main photos should be square, at least 800 px.",
+   "now": "Automatic",
+   "now_status": "Have",
+   "none": "Always there if the product has a photo."
+  },
+  {
+   "key": "C1",
+   "emails": "F9 Hardware Email 2 (trolley orders)",
+   "title": "Trolley battery on charge",
+   "where": "Across the top of the trolley care section",
+   "what": "A lithium trolley battery on charge indoors, plugged in on a hard floor or bench. Matches the first tip: charge after every round, unplug when full.",
+   "alt": "",
+   "source": "Your own shot in the shop works well; Motocaddy press images are the alternative.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the care tips lead."
+  },
+  {
+   "key": "C2",
+   "emails": "F9 Hardware Email 2 (club orders)",
+   "title": "Looking after clubs",
+   "where": "Across the top of the club care section",
+   "what": "Close-up hands cleaning a club face with a brush and towel, or a fresh grip going on.",
+   "alt": "",
+   "source": "Stock is fine; your own workshop shot is better.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the care tips lead."
+  },
+  {
+   "key": "X1",
+   "emails": "F9 Hardware Email 2 (trolley orders)",
+   "title": "Trolley with accessories fitted",
+   "where": "Top of the \"Goes well with it\" section",
+   "what": "A Motocaddy trolley out on the course with accessories fitted (umbrella holder, cup holder, scorecard holder), so people see what they'd add.",
+   "alt": "",
+   "source": "Motocaddy press images are likely to have this.",
+   "size": "Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.",
+   "now": "Nothing chosen yet",
+   "now_status": "Needed",
+   "none": "Without it, the accessory links lead."
+  }
+ ],
  "photo_rules": [
   "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
   "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",

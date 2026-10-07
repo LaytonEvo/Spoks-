@@ -85,6 +85,20 @@ def membership(ctx, offer):
     return tier(ctx, annual, free, none)
 
 
+def product_photo(ctx):
+    """P9: their own product's main Shopify photo, under the headline (skipped if the product has no photo)."""
+    src = "{{ event.extra.line_items.0.product.images.0.src }}" if ctx.live else "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/2026M1DHCThumbnail.png"
+    img = (f'<tr><td class="px" align="center" bgcolor="{WHITE}" style="padding:28px 48px 0;text-align:center;">'
+           f'<img src="{src}" width="240" height="240" alt="{product(ctx)}" style="width:240px;height:240px;display:block;margin:0 auto;"></td></tr>')
+    return ("{% if event.extra.line_items.0.product.images.0.src %}" + img + "{% endif %}") if ctx.live else img
+
+
+def hero(ctx, key, h=360):
+    """A photo spot (C1, C2, X1): the photo once supplied, a labelled placeholder in the photo-spots view, nothing otherwise."""
+    s = ctx.slot(key, 600, h)
+    return f'<tr><td bgcolor="{WHITE}" style="padding:24px 0 0;">{s}</td></tr>' if s else ""
+
+
 def first_order(ctx):
     """'How we work', as a plain line for everyone (a template can't see someone's order count; and one panel per email)."""
     return text_row(p(f"<strong style=\"font-weight:600;color:{HEAD};\">How we work:</strong> we're real people who play, free UK delivery is "
@@ -117,6 +131,7 @@ def e1h(ctx, offer=True):
                      "grip size), get in touch and our team will help you sort it.", margin="0"), "28px 48px 0")
     body = (intro("Your order", f"It should be with you by now{name(ctx)}",
                   "A few things that make the first round go better. If anything's unclear, our team is a phone call away.")
+            + product_photo(ctx)
             + ctx.when(has(TROLLEYS), trolley, "the order has a trolley")
             + ctx.when(has(CLUBS + f3.USED), clubs, "the order has clubs")
             + text_row(p(f"Questions? Call us on {PHONE} or " + link("get in touch", URL["contact"]) + ".", 15, margin="0"), "24px 48px 0")
@@ -152,8 +167,9 @@ def e2h(ctx):
                  + link("Grips", COL("golf-grips")) + " &nbsp;·&nbsp; " + link("Headcovers", COL("headcovers")) + " &nbsp;·&nbsp; "
                  + link("Golf balls", COL("golf-balls")))
     body = (intro("Looking after it", "Keep it going for years")
-            + ctx.when(has(TROLLEYS), text_row(h3("Your trolley") + bullets(CARE_TROLLEY), "20px 48px 0"), "the order has a trolley")
-            + ctx.when(has(CLUBS + f3.USED), text_row(h3("Your clubs") + bullets(CARE_CLUBS), "28px 48px 0"), "the order has clubs")
+            + ctx.when(has(TROLLEYS), hero(ctx, "C1") + text_row(h3("Your trolley") + bullets(CARE_TROLLEY), "20px 48px 0"), "the order has a trolley")
+            + ctx.when(has(CLUBS + f3.USED), hero(ctx, "C2") + text_row(h3("Your clubs") + bullets(CARE_CLUBS), "28px 48px 0"), "the order has clubs")
+            + ctx.when(has(TROLLEYS), hero(ctx, "X1", 300), "the order has a trolley")
             + text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="border-top:3px solid {G};padding:28px 0 0;">'
                        + b.eyebrow("Goes well with it") + h3("A few things that go with it", "0 0 16px")
                        + (("{% if " + has(TROLLEYS) + " %}") if ctx.live else "") + acc_trolley + (("{% endif %}") if ctx.live else "")
@@ -177,6 +193,7 @@ def e1e(ctx, offer=True):
     body = (intro("Your order", "Thanks for shopping with us",
                   f"Your order should be with you by now. We're a golf shop run by people who play, so if anything's not right, or you've a "
                   f"question about what you bought, reply to this email or call us on {PHONE}.")
+            + product_photo(ctx)
             + ctx.when(has(SHOES), text_row(h3("New shoes?") + bullets(CARE_SHOES), "12px 48px 0"), "the order has golf shoes")
             + membership(ctx, offer) + first_order(ctx) + text_row("", "0 0 8px") + f3.close(ctx).replace(f3.REASON, REASON))
     return f1.shell(ctx, body, "Thanks for shopping with us. Here's how to reach us if you need anything.")
@@ -231,17 +248,17 @@ def rve(ctx):
 BR, ALEX = "⛳ Evolution Golf", "Alex at Evolution Golf"
 EMAILS = [
     dict(key="e1h", fn=lambda c: e1h(c, True), name="E1 Hardware · Getting set up (with credit offer)", timing="Hardware · 3 days after dispatch, 09:30",
-         sender=BR, subject="Your new kit should be with you. A few things first", preview="Getting set up, and who to call if anything's not right.", slots=[]),
+         sender=BR, subject="Your new kit should be with you. A few things first", preview="Getting set up, and who to call if anything's not right.", slots=["P9"]),
     dict(key="e1hn", fn=lambda c: e1h(c, False), name="E1 Hardware · Getting set up", timing="Hardware, members or older orders · 3 days after dispatch, 09:30",
-         sender=BR, subject="Your new kit should be with you. A few things first", preview="Getting set up, and who to call if anything's not right.", slots=[]),
+         sender=BR, subject="Your new kit should be with you. A few things first", preview="Getting set up, and who to call if anything's not right.", slots=["P9"]),
     dict(key="e2h", fn=e2h, name="E2 Hardware · Looking after it", timing="Hardware · 4 days after Email 1, 17:30", sender=BR,
-         subject="Looking after your new kit", preview="A few minutes now keeps it going for years.", slots=[]),
+         subject="Looking after your new kit", preview="A few minutes now keeps it going for years.", slots=["C1", "C2", "X1"]),
     dict(key="e1e", fn=lambda c: e1e(c, True), name="E1 Everything else · Thanks (with credit offer)", timing="Everything else · 3 days after dispatch, 09:30",
          sender=BR, subject="Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
-         preview="Thanks for shopping with us. Here's how to reach us if you need anything.", slots=[]),
+         preview="Thanks for shopping with us. Here's how to reach us if you need anything.", slots=["P9"]),
     dict(key="e1en", fn=lambda c: e1e(c, False), name="E1 Everything else · Thanks", timing="Everything else, members or older orders · 3 days after dispatch, 09:30",
          sender=BR, subject="Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
-         preview="Thanks for shopping with us. Here's how to reach us if you need anything.", slots=[]),
+         preview="Thanks for shopping with us. Here's how to reach us if you need anything.", slots=["P9"]),
     dict(key="rem", fn=rem, name="Membership reminder · 10% back", timing="Non-members, order still inside 14 days · 10 days after dispatch, 09:30",
          sender=BR, subject="Your 10% back offer ends soon",
          preview="Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.", slots=[]),

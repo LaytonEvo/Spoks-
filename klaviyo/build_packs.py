@@ -104,7 +104,7 @@ def add_photos(pack, emails, slots, rules):
         if not e.get("slots"):
             continue
         rel = f"{pack['id']}/{t['key']}.photos.html"
-        (OUT / "html" / rel).write_text(e["fn"](f1.Ctx(live, "slots", True, hosted, live=True)))
+        (OUT / "html" / rel).write_text(e["fn"](f3.Ctx(live, "slots", True, hosted, live=True)))  # f3.Ctx: f1's plus conditional sections
         t["photos_file"], t["photos"] = rel, list(e["slots"])
         used += [k for k in e["slots"] if k not in used]
     pack["photo_briefs"] = [dict(key=k, **slots[k]) for k in used]
@@ -341,8 +341,9 @@ if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack()]
     add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
-    for _, pk in packs[1:]:
+    for _, pk in packs[1:3]:
         add_photos(pk, f2.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
+    add_photos(packs[4][1], f9.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
     for pid, pk in packs:
         check(pk)
         (OUT / f"{pid}.json").write_text(json.dumps(pk, indent=1, ensure_ascii=False))
