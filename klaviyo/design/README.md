@@ -50,9 +50,9 @@ No cream, beige, warm off-white, mint, brass or gold.
 Numbered steps (1, 2, 3 in serif green, hairline rows) are kept for instructions; they are not benefit lists.
 
 ## Icons
-None in the current emails. If ever used: Phosphor Light only, transparent PNG at 2×, hosted in Klaviyo, 20–24px,
-green on white or white on green, one row max (footer socials or a three-item trust row). Never next to benefits,
-copy, headlines or buttons. No inline SVG.
+Phosphor Light only (from @phosphor-icons/core), rendered as 48px transparent PNGs in brand green, hosted in Klaviyo,
+shown at 24px. One three-item row per email at most, above the footer (F2: 10% off one order a month · Instant daily
+deals · Monthly prize draw, in the emails without a photo). Never next to benefits, copy, headlines or buttons. No inline SVG.
 
 ## Build
 Tables and inline CSS; media queries are progressive enhancement. Explicit `bgcolor` on cells for dark mode.

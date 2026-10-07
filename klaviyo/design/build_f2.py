@@ -46,6 +46,24 @@ ANNUAL = [("10% off monthly", "Your first order, then one order every month afte
           ("Early access", "48 hours on new products before everyone else.")]
 
 
+# Icon row (Layton, 7 Oct 2026): Phosphor Light icons, rendered as 48px transparent PNGs in brand green and hosted in
+# Klaviyo. Design rule: one three-item row per email, never next to copy, headlines or buttons, so it sits above the footer.
+PH_ICONS = {"seal-percent": "https://cdn.klaviyomail.com/company/SiyYRR/images/dafe9b01-ed19-48c3-9fba-b99fb479e11d.png",
+            "tag": "https://cdn.klaviyomail.com/company/SiyYRR/images/e562e48c-d737-4094-9968-7b77fc3cc9b1.png",
+            "trophy": "https://cdn.klaviyomail.com/company/SiyYRR/images/a29ce19b-81ee-40bb-9771-99db73608069.png"}
+MEMBER_ROW = [("seal-percent", "10% off one order a month"), ("tag", "Instant daily deals"), ("trophy", "Monthly prize draw")]
+
+
+def icon_row(items=MEMBER_ROW):
+    cells = "".join(
+        f'<td class="usp-c" width="33%" align="center" valign="top" style="width:33%;padding:0 10px;{"border-left:1px solid " + LINE + ";" if i else ""}">'
+        f'<img src="{PH_ICONS[n]}" width="24" height="24" alt="" style="width:24px;height:24px;display:block;margin:0 auto 8px;">'
+        f'<p style="margin:0;font:13px/19px {SANS};color:{MUTED};">{label}</p></td>' for i, (n, label) in enumerate(items))
+    return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid {LINE};border-bottom:1px solid {LINE};">'
+                    f'<tr><td style="padding:20px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>{cells}</tr></table></td></tr></table>',
+                    "32px 48px 40px")
+
+
 def benefit_list(ctx, items, pad="20px 48px 0"):
     return text_row(benefits_table(items).replace("margin:0 0 28px;", "margin:0;"), pad)
 
@@ -93,8 +111,8 @@ def fe2(ctx):
             + benefit_list(ctx, ANNUAL)
             + text_row(p("If you only buy from us once or twice a year, stay on Free. You keep your 5% either way. "
                          "If you buy most months, the plan pays for itself.", 16, margin="0"), "16px 48px 24px")
-            + text_row(button("Compare the two plans", JOIN), "24px 48px 40px")
-            + footer(ctx))
+            + text_row(button("Compare the two plans", JOIN), "24px 48px 0")
+            + icon_row() + footer(ctx))
     return shell(ctx, body, "10% off one order a month pays back the £36 at about £30 an order. The full sum inside.")
 
 
@@ -108,8 +126,8 @@ def fe3(ctx):
     body = (intro("The annual plan, in use", "What £36 a year actually gets used for")
             + icon_rows(ctx, rows)
             + text_row(p("Happy on Free? That's fine. You keep your 5% either way, and this is the last email about upgrading.", 16, margin="0"), "28px 48px 0")
-            + text_row(button("Become a member, £36 a year", JOIN), "24px 48px 40px")
-            + footer(ctx))
+            + text_row(button("Become a member, £36 a year", JOIN), "24px 48px 0")
+            + icon_row() + footer(ctx))
     return shell(ctx, body, "Free returns, a monthly prize draw and member-only deals. Then it's up to you.")
 
 
@@ -139,8 +157,8 @@ def pe2(ctx):
                           "One order a month gets 10% off, on anything across the site. The code is in your member portal.",
                           "Open my portal", PORTAL)
             + text_row(p("Need to send something back? Members get four free returns a year. Start one from your portal.", 15, MUTED, "0"),
-                       "24px 48px 32px")
-            + footer(ctx))
+                       "24px 48px 0")
+            + icon_row() + footer(ctx))
     return shell(ctx, body, "Instant daily deals and exclusive member deals. Only in your portal.")
 
 
@@ -151,8 +169,7 @@ def pe3(ctx):
                 ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order. It's in your portal.", link("Open my portal", PORTAL)),
                 ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
                 ("members-portal", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", link("See today's deals", PORTAL))])
-            + text_row("", "0 0 40px")
-            + footer(ctx))
+            + icon_row() + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
 
 
@@ -162,7 +179,7 @@ def pe4(ctx):
             ("members-portal", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", link("See today's deals", PORTAL))]
     body = (intro("Two months in", "Two months in: here's what's yours this month",
                   "The monthly 10%, the prize draw and the member deals. Plus, from today, 5% more on any trade-in.")
-            + icon_rows(ctx, rows) + text_row("", "0 0 40px") + footer(ctx))
+            + icon_rows(ctx, rows) + icon_row() + footer(ctx))
     return shell(ctx, body, "This month's 10%, the prize draw and member deals. All in your portal.")
 
 
@@ -175,7 +192,7 @@ def pem(ctx):
             + text_row(button("Open my member portal", PORTAL), "28px 48px 0")
             + member_note(ctx, "You're in this month's prize draw", "Every member is entered automatically. We draw it at the start of next month.",
                           "See member benefits", JOIN)
-            + text_row("", "0 0 40px") + footer(ctx))
+            + icon_row() + footer(ctx))
     return shell(ctx, body, "One order this month gets 10% off. Your code is in your member portal.")
 
 
@@ -186,7 +203,7 @@ def pe5(ctx):
             + text_row(p("Happy with it? You don't need to do anything. Want to stop? You can cancel any time from your member portal "
                          "before it renews.", 16, margin="0"), "16px 48px 24px")
             + portal_button("Manage my membership")
-            + footer(ctx))
+            + icon_row() + footer(ctx))
     return shell(ctx, body, "A reminder before your £36 annual membership renews. Nothing to do if you're staying.")
 
 

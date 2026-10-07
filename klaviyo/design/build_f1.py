@@ -56,7 +56,7 @@ SLOTS = {
                what="A golfer on the first tee on a bright morning, ready to play, with a trolley or bag. It says the membership is about playing more, not paperwork.",
                alt="Second choice: a small group laughing on a green after a round.",
                source="Stock is fine. Pick someone who looks like your members, not a model.",
-               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the welcome headline leads."),
+               size="Supplied as a wide 1024 × 338 panorama; shows as a 600 × 200 banner.", now="Supplied 7 Oct (in the Klaviyo library)", now_status="Have", none="Without it, the welcome headline leads."),
     "A1": dict(emails="F1 E3 From Alex", title="Alex", where="Small round photo next to his signature",
                what="Alex, head and shoulders, plain background, smiling. A face makes \"reply to me\" feel real.",
                alt="", source="Must be his own. If there isn't one, the email works without it.",
@@ -67,10 +67,13 @@ SLOTS = {
 PHOTOS = {"W1": "https://cdn.klaviyomail.com/company/SiyYRR/images/7d745e06-9b49-42df-92bb-4c6f3c48ac4e.jpeg",
           "W2": "https://cdn.klaviyomail.com/company/SiyYRR/images/e978ee24-82ca-4326-b2e0-dd366ca6d729.jpeg",
           "W3": "https://cdn.klaviyomail.com/company/SiyYRR/images/5bffdf31-4a7a-4327-81e7-30b16012080a.jpeg",
-          "A1": "https://cdn.klaviyomail.com/company/SiyYRR/images/50596254-d610-4268-a459-f77bfb2dae1b.jpeg"}
+          "A1": "https://cdn.klaviyomail.com/company/SiyYRR/images/50596254-d610-4268-a459-f77bfb2dae1b.jpeg",
+          "M1": "https://cdn.klaviyomail.com/company/SiyYRR/images/9ef9537c-b4e6-4871-981b-a0db1c224456.jpeg"}
+PHOTO_SIZE = {"M1": (600, 200)}  # supplied as a 1024 x 338 panorama: shown as a wide 3:1 banner rather than blown up to 5:3
 PHOTO_ALT = {"W1": "A golf course on a sunny day", "W2": "A golfer walking the course with an electric trolley",
-             "W3": "A golfer's shoes on the fairway mid-swing", "A1": "Alex"}
-PHOTO_PREVIEW = {"W1": "eg-w1.jpg", "W2": "eg-w2.jpg", "W3": "eg-w3.jpg", "A1": "eg-a1.jpg"}  # in <img dir>/photos_out
+             "W3": "A golfer's shoes on the fairway mid-swing", "A1": "Alex",
+             "M1": "A golfer with a trolley on the first tee on a misty morning"}
+PHOTO_PREVIEW = {"W1": "eg-w1.jpg", "W2": "eg-w2.jpg", "W3": "eg-w3.jpg", "A1": "eg-a1.jpg", "M1": "eg-m1.jpg"}  # in <img dir>/photos_out
 PHOTO_RULES = [
     "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
     "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",
@@ -91,6 +94,8 @@ class Ctx(b.Ctx):
         self.icons = icons
 
     def slot(self, key, w, h, style="", caption=True):
+        if key in self.img and key in PHOTO_SIZE:
+            w, h = PHOTO_SIZE[key]
         if self.mode == "slots" and key in self.img:  # photo supplied: show it, labelled
             return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="position:relative;">'
                     f'<img class="full" src="{self.img[key]}" width="{w}" height="{h}" alt="{PHOTO_ALT.get(key, "")}" '
