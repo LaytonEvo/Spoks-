@@ -15,7 +15,7 @@ import json, pathlib, re, sys
 import build_f3_b as b
 import build_f1 as f1
 from build_f1 import (hero, name_suffix, G, DG, GOLD, CREAM, INK, HEAD, MUTED, LINE, WHITE, SANS, SERIF, confirm, data_uri, icon, first_name, intro, p,
-                      text_row, link, button, member_note, icon_rows, benefits_table, h3, Ctx, local_icons, HOSTED, OUT, member_card)  # intro is redefined below for the Members eyebrow
+                      text_row, link, button, member_note, icon_rows, benefits_table, h3, Ctx, local_icons, HOSTED, OUT, member_card, CARD)  # intro is redefined below for the Members eyebrow
 
 PORTAL = "https://members.evolutiongolf.co.uk"
 JOIN = f1.URL["join"]
@@ -187,8 +187,17 @@ def ph_rows(rows):
     return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>', "12px 48px 0")
 
 
-def portal_cta(lead):
-    """One clear next step under the sections: a short lead line, then the one primary button."""
+def portal_cta(lead, card=False):
+    """One clear next step under the sections: a short lead line, then the one primary button.
+    card=True (Layton, 7 Oct 2026, trial on Annual E3): a small member card (150px) to the left, stacking on phones."""
+    if card:
+        text = (p(f'<strong style="font-weight:600;color:{HEAD};">{lead}</strong> It\'s in your member portal, with today\'s deals.', margin="0 0 20px")
+                + button("Open my member portal", PORTAL))
+        return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
+                        f'<td class="stack stack-gap" width="150" valign="middle" style="width:150px;padding:0 24px 0 0;">'
+                        f'<img src="{CARD}" width="150" height="101" alt="Your Evolution Golf annual member card" '
+                        f'style="width:150px;height:auto;display:block;"></td>'
+                        f'<td class="stack" valign="middle" style="padding:0;">{text}</td></tr></table>', "28px 48px 0")
     return (text_row(p(f'<strong style="font-weight:600;color:{HEAD};">{lead}</strong> It\'s in your member portal, with today\'s deals.',
                        margin="0"), "28px 48px 0")
             + text_row(button("Open my member portal", PORTAL), "20px 48px 0"))
@@ -204,7 +213,7 @@ def pe3(ctx):
                 ("seal-percent", "This month's 10%", "A new month means a new 10% off one order, on anything across the site.", ""),
                 ("trophy", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
                 ("tag", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", "")])
-            + portal_cta("Your 10% code is waiting.")
+            + portal_cta("Your 10% code is waiting.", card=True)
             + text_row("", "0 0 40px") + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
 
