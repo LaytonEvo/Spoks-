@@ -120,3 +120,4 @@
   trolley checks, club fitting, Motocaddy warranty, YouTube link and size help are conditional sections. E3: Alex for £300+, last nudge under
   £300, none for members. Templates checked with Django (no brackets in conditions). No discount codes. Delivery-days CONFIRM removed (claim dropped).
   F2 Free updated for site-wide 5%; Free E2 maths now compares with Free (one £60 order a month covers £36). F2 + F3 docs updated.
+- 7 Oct: confirmed (Layton): annual members don't keep Free's 5% on other orders. F2 Free E2 sum ('one £60 order a month covers the £36') stands as written.
