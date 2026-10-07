@@ -45,8 +45,5 @@ Spoks store id: `2745819a-e9db-41a1-8f76-442730a6a213` (workspace "Evolution Gol
 
 - New Spoks flows are named `EG · F<n> <Flow> · <Path>`; tags prefixed `eg_`.
 - FALLBACK steps: `… – FALLBACK (disabled: Layton to choose)`.
-- Brand: #006747 green, #003D27 dark green, #F1DA01 yellow (max one element per email). **Look (Layton, 1 Oct 2026):** website font Noto Sans Display (fallback Arial) for headings and body, green accents (no gold), pale-green #EAF3EE panels instead of cream; no Fraunces/cream (reads as a generic AI design).
-- **Email design system: option B "On the course"** (chosen 29 Sep 2026; builder `klaviyo/design/build_f3_b.py`, rules `klaviyo/design/README.md`).
-- **White backgrounds rule:** the email canvas (outer background and card) is always white (#FFFFFF), never cream. Any image with a white
-  or transparent background (product shots, packshots, cut-outs) is flattened onto pure white (#FFFFFF), never cream or grey. Pale green (#EAF3EE, formerly cream)
-  is only allowed as a fill for a small contained panel (USP strip, trade-in panel, member note), never behind an image.
+- **Email design system: editorial** (Layton, 7 Oct 2026; replaces design B and the 1 Oct Noto Sans/pale-green look). Source of truth: `docs/source/evolution-golf-welcome-mockup.html` + `docs/source/evolution-golf-email-design-prompt.md`; rules in `klaviyo/design/README.md`. Brand green #0F3B2A (header, footer, buttons, rules, links), Fraunces 400 headlines (Georgia fallback), Inter body (Arial fallback), benefits tables (no icons), one primary button per email, at most one stone #F1F3F1 panel, radius 0–2px, no cream/beige/mint/gold. Members: "Free delivery over £10" ("Normally £50 for non-members").
+- **White backgrounds rule:** the email canvas is always white (#FFFFFF). Any image with a white or transparent background (product shots, packshots, cut-outs) is flattened onto pure white. Stone (#F1F3F1) is the only tint, for one small panel per email, never behind an image.

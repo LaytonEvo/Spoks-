@@ -1,17 +1,63 @@
-# Evolution Golf email design system
+# Evolution Golf email design system: editorial
 
-Chosen: **option B "On the course"** (29 Sep 2026). Builder: `build_f3_b.py` (+ `f3_b_template.html` for the review page).
-Preview: https://claude.ai/artifact/9KL6Zw1qgmFaJMxWe5pt2u
+Chosen 7 Oct 2026 (Layton): reference mockup `evolution-golf-welcome-mockup.html`, rules from
+`docs/source/evolution-golf-email-design-prompt.md`. Replaces design B "On the course" and the 1 Oct Noto Sans / pale-green look.
+Shared code: `build_f3_b.py` (tokens, shell, header, button, intro, trust line, rating, footer) and `build_f1.py`
+(benefits table, feature section, secondary panel, topic rows). F2 reuses both.
 
-## Rules
+Premium, modern, friendly independent golf retailer. Editorial and restrained: serif headlines, white space,
+thin rules instead of boxes, brand green as an accent and for the header and footer.
 
-1. **White canvas.** The email's outer background and card are always `#FFFFFF`. No cream page background.
-2. **White image backgrounds.** Any image that has a white or transparent background (Shopify product photos, packshots,
-   cut-outs, folded/side shots) is shown on pure `#FFFFFF`. When preparing a stop-gap or composite, flatten onto white,
-   never cream (`#FAF7F1`) or grey, so the image edge disappears into the email.
-3. **Cream is for small panels only** (USP strip, trade-in panel, member note). Never place an image on cream.
-4. **Accent is the logo gold** `#B2893F` for eyebrows, numerals and rules. Dark green `#003D27` header, panels and footer; green `#006747` buttons.
-5. **Type:** Fraunces headings, Inter body; Gmail/Outlook fall back to Georgia/Arial, so every layout must read well in both.
-6. **Product photos (slot P1)** come from each product's main Shopify image: square, at least 800 px, white or transparent
-   background, no badges ("FREE GIFT", sale roundels).
-7. **Every image slot has a no-image fallback** so an email never ships with a gap (see the image brief on the preview page).
+## Tokens
+| | |
+|---|---|
+| Brand green `#0F3B2A` | header, footer, primary button, 3px section rule, links |
+| Secondary green `#24563F` | eyebrow labels |
+| Ink `#161816` | headlines, bold labels |
+| Body `#2E322F` | paragraphs |
+| Muted `#626862` | secondary text, fine print, benefit descriptions |
+| Hairline `#DDE1DD` | dividers, table rules |
+| Stone `#F1F3F1` | the only tint: at most one small secondary panel per email |
+| Paper `#FFFFFF` | canvas (always white; product cut-outs flattened onto white) |
+| Trustpilot `#00B67A` | stars only |
+
+No cream, beige, warm off-white, mint, brass or gold.
+
+## Type
+- Headlines: Fraunces 400 (Georgia fallback). H1 38/42 (32 on mobile), H3 28/34. Sentence case, never bold.
+- Body: Inter 400/500/600 (Arial fallback). Body 16px / 1.65, benefit rows 14.5px, fine print 12.5px.
+- Eyebrows: Inter 600 11px, uppercase, 0.14em, secondary green.
+- Fonts load with `@import` (Klaviyo strips `<link>`); Gmail and Outlook use the fallbacks.
+
+## Layout
+600px wide, 48px side padding (24px mobile), 28–44px between sections. Radius 0–2px. No shadows, no gradients.
+
+## Components, in order
+1. Header: green bar, white logo centred, 22px padding.
+2. Hero photo: full bleed 600 × 360 (supply 1200 × 720), no text on it. Slot placeholders (W1, W2, M1, A1…) until supplied.
+3. Intro: eyebrow, serif H1, one or two short paragraphs.
+4. Feature section: 3px green top rule, eyebrow, serif H3, muted lede, benefits table.
+5. Benefits table: bold ink label (44%) | muted description, 1px hairlines incl. above the first row. No icons, numbers,
+   bullets or ticks. Stacks on mobile.
+6. Primary button: green, white Inter 500 15px, 15 × 30 padding, 2px radius, specific action copy. One per email;
+   anything else is a text link.
+7. Fine print: muted 12.5px under the button.
+8. Secondary panel (optional, max one): stone strip, short line left, bold green link right.
+9. Trust line: Free delivery over £50 | Advice from golfers | Custom fitting, between hairlines. No icons, no tint.
+10. Rating: five green stars, "4.8 out of 5 on Trustpilot from 611 reviews" from `TRUSTPILOT` in `build_f3_b.py`.
+11. Footer: green, logo centred, address, socials, compliance text and unsubscribe / manage preferences at 72% white.
+
+Numbered steps (1, 2, 3 in serif green, hairline rows) are kept for instructions; they are not benefit lists.
+
+## Icons
+None in the current emails. If ever used: Phosphor Light only, transparent PNG at 2×, hosted in Klaviyo, 20–24px,
+green on white or white on green, one row max (footer socials or a three-item trust row). Never next to benefits,
+copy, headlines or buttons. No inline SVG.
+
+## Build
+Tables and inline CSS; media queries are progressive enhancement. Explicit `bgcolor` on cells for dark mode.
+Personalisation: first name, or nothing when it's missing. UK English.
+
+## Delivery wording
+Members: "Free delivery over £10" ("Normally £50 for non-members"). Trust line: "Free delivery over £50".
+Free tier: "over £30" (members page; not yet re-confirmed).

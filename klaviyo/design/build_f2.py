@@ -14,8 +14,8 @@ import json, pathlib, re, sys
 
 import build_f3_b as b
 import build_f1 as f1
-from build_f1 import (hero, name_suffix, G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SANS, SERIF, confirm, data_uri, icon, first_name, intro, p,
-                      text_row, link, button, member_note, icon_rows, way_card, Ctx, local_icons, HOSTED, OUT)
+from build_f1 import (hero, name_suffix, G, DG, GOLD, CREAM, INK, HEAD, MUTED, LINE, WHITE, SANS, SERIF, confirm, data_uri, icon, first_name, intro, p,
+                      text_row, link, button, member_note, icon_rows, benefits_table, h3, Ctx, local_icons, HOSTED, OUT)
 
 PORTAL = "https://members.evolutiongolf.co.uk"
 JOIN = f1.URL["join"]
@@ -33,45 +33,45 @@ def shell(ctx, body, pre):
 
 
 def portal_button(label="Open my member portal"):
-    return text_row(button(label, PORTAL), "8px 44px 32px")
+    return text_row(button(label, PORTAL), "28px 48px 40px")
 
 
-ANNUAL = [("member-price-tag", "10% off your first order, then 10% off one order every month"),
-          ("free-delivery-members", "Free delivery on orders over £10"),
-          ("free-returns", "Free returns, 4 a year"),
-          ("monthly-prize-draw", "A monthly prize draw entry"),
-          ("calendar", "48 hours' early access to new products"),
-          ("members-portal", "Instant daily deals you won't see anywhere else on the site"),
-          ("member-price-tag", "Exclusive member deals in your portal")]
+# Benefits table rows (editorial system, 7 Oct 2026). Members: free delivery over £10, £50 for non-members.
+ANNUAL = [("10% off monthly", "Your first order, then one order every month after, on anything across the site."),
+          ("Free delivery over £10", "Normally £50 for non-members."),
+          ("Four free returns a year", "Start a return from your member portal."),
+          ("Instant daily deals", "New every day, and you won't see them anywhere else on the site."),
+          ("Exclusive member deals", "Only members can see them. They're in your portal."),
+          ("Monthly prize draw", "Entered automatically every month."),
+          ("Early access", "48 hours on new products before everyone else.")]
 
 
-def benefit_list(ctx, items):
-    rows = "".join(f'<tr><td width="40" valign="middle" style="width:40px;padding:7px 0;">{icon(ctx, n, 24)}</td>'
-                   f'<td valign="middle" style="padding:7px 0;font:16px/23px {SANS};color:{INK};">{t}</td></tr>' for n, t in items)
-    return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid {LINE};'
-                    f'border-bottom:1px solid {LINE};margin:4px 0;"><tr><td style="padding:10px 0;"><table role="presentation" cellpadding="0" cellspacing="0">{rows}</table></td></tr></table>',
-                    "16px 44px 8px")
+def benefit_list(ctx, items, pad="20px 48px 0"):
+    return text_row(benefits_table(items).replace("margin:0 0 28px;", "margin:0;"), pad)
 
 
 def steps(items):
     rows = ""
     for i, (head, text) in enumerate(items, 1):
-        rows += (f'<tr><td width="44" style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:700 30px/30px {SERIF};color:{GOLD};">{i}</td>'
-                 f'<td style="padding:16px 0;border-top:1px solid {LINE};vertical-align:top;font:16px/24px {SANS};color:{INK};">'
-                 f'<strong style="font-weight:600;color:{DG};">{head}</strong> {text}</td></tr>')
-    return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{rows}</table>', "12px 44px 12px")
+        last = f"border-bottom:1px solid {LINE};" if i == len(items) else ""
+        rows += (f'<tr><td width="40" valign="top" style="width:40px;padding:14px 0;border-top:1px solid {LINE};{last}font:400 24px/26px {SERIF};color:{G};">{i}</td>'
+                 f'<td valign="top" style="padding:14px 0;border-top:1px solid {LINE};{last}font:15px/25px {SANS};color:{INK};">'
+                 f'<strong style="font-weight:600;color:{HEAD};">{head}</strong> {text}</td></tr>')
+    return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{rows}</table>', "16px 48px 0")
 
 
 def h2(text):
-    return text_row(f'<p style="margin:0;font:700 22px/29px {SERIF};color:{DG};">{text}</p>', "24px 44px 0")
+    return text_row(h3(text, "0"), "36px 48px 0")
 
 
 # ---------------- Free branch ----------------
 def fe1(ctx):
     body = (hero(ctx, "W1") + intro("Free membership", f"You're in{name_suffix(ctx)}.",
                   "Your free Evolution Golf membership is live. Here's what it gives you, starting today.")
-            + benefit_list(ctx, [("members-portal", "Your own member portal"), ("member-price-tag", "5% off member portal deals"),
-                                 ("free-delivery-members", "Free delivery on orders over £30"), ("member-card-gold", "Loyalty points on everything you buy")])
+            + benefit_list(ctx, [("Your own member portal", "Log in to see this month's member deals."),
+                                 ("5% off member portal deals", "Applied when you're logged in."),
+                                 ("Free delivery", "On orders over £30."),
+                                 ("Loyalty points", "On everything you buy.")])
             + h2("Two things worth doing this week")
             + steps([("Log in to your portal.", "Check your details and see this month's member deals."),
                      ("Have a look at the deals.", "Your 5% is applied to member portal deals when you're logged in.")])
@@ -81,19 +81,19 @@ def fe1(ctx):
 
 
 def fe2(ctx):
-    maths = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:{CREAM};border-radius:8px;padding:24px;">'
-             f'<p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">The sum</p>'
-             f'<p style="margin:0 0 10px;font:700 22px/29px {SERIF};color:{DG};">£36 a year pays for itself at £30 an order.</p>'
-             f'<p style="margin:0;font:15px/23px {SANS};color:{INK};">10% off one £30 order a month is £3. Twelve months of that is £36. '
+    maths = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="{CREAM}" style="background:{CREAM};padding:24px;">'
+             f'<p style="margin:0 0 10px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">The sum</p>'
+             f'<p style="margin:0 0 10px;font:400 24px/30px {SERIF};color:{HEAD};">£36 a year pays for itself at £30 an order.</p>'
+             f'<p style="margin:0;font:15px/24px {SANS};color:{INK};">10% off one £30 order a month is £3. Twelve months of that is £36. '
              f'Your first order gets 10% off too. Spend more than £30 an order and you\'re ahead.</p></td></tr></table>')
     body = (intro("Free or £36 a year?", "Is the annual membership worth it? Here's the honest maths.",
                   "You get 5% off member deals on Free. The £36 plan doubles that and adds a few things Free doesn't have.")
-            + text_row(maths, "20px 44px 8px")
+            + text_row(maths, "20px 48px 8px")
             + h2("What the £36 plan adds")
             + benefit_list(ctx, ANNUAL)
             + text_row(p("If you only buy from us once or twice a year, stay on Free. You keep your 5% either way. "
-                         "If you buy most months, the plan pays for itself.", 16, margin="0"), "16px 44px 24px")
-            + text_row(button("Compare the two plans", JOIN), "0 44px 32px")
+                         "If you buy most months, the plan pays for itself.", 16, margin="0"), "16px 48px 24px")
+            + text_row(button("Compare the two plans", JOIN), "24px 48px 40px")
             + footer(ctx))
     return shell(ctx, body, "10% off one order a month pays back the £36 at about £30 an order. The full sum inside.")
 
@@ -107,8 +107,8 @@ def fe3(ctx):
             ("calendar", "First look at new kit", "48 hours' early access to new products before everyone else.", "")]
     body = (intro("The annual plan, in use", "What £36 a year actually gets used for")
             + icon_rows(ctx, rows)
-            + text_row(p("Happy on Free? That's fine. You keep your 5% either way, and this is the last email about upgrading.", 16, margin="0"), "8px 44px 24px")
-            + text_row(button("Join for £36 a year", JOIN), "0 44px 32px")
+            + text_row(p("Happy on Free? That's fine. You keep your 5% either way, and this is the last email about upgrading.", 16, margin="0"), "28px 48px 0")
+            + text_row(button("Become a member, £36 a year", JOIN), "24px 48px 40px")
             + footer(ctx))
     return shell(ctx, body, "Free returns, a monthly prize draw and member-only deals. Then it's up to you.")
 
@@ -123,7 +123,7 @@ def pe1(ctx):
                      ("Check this month's 10%.", "10% off one order every month, on anything across the site. The code is in your portal."),
                      ("Check the instant daily deals.", "They're in your portal, and you won't see them anywhere else on the site.")])
             + portal_button()
-            + text_row(p("Questions? Reply to this email. Alex and the team read every one.", 15, MUTED, "0"), "0 44px 32px")
+            + text_row(p("Questions? Reply to this email. Alex and the team read every one.", 15, MUTED, "0"), "0 48px 32px")
             + footer(ctx))
     return shell(ctx, body, "10% off your first order and one order every month, free returns and more. All live now.")
 
@@ -134,12 +134,12 @@ def pe2(ctx):
             + steps([("Log in to your member portal.", "That's where the deals are."),
                      ("Check the instant daily deals.", "New ones every day, and you won't see them anywhere else on the site."),
                      ("Look through the exclusive member deals.", "Only members can see these, and they're in your portal too.")])
-            + text_row(button("See today's deals", PORTAL), "8px 44px 24px")
+            + text_row(button("See today's deals", PORTAL), "28px 48px 0")
             + member_note(ctx, "Your monthly 10% is ready",
                           "One order a month gets 10% off, on anything across the site. The code is in your member portal.",
                           "Open my portal", PORTAL)
             + text_row(p("Need to send something back? Members get four free returns a year. Start one from your portal.", 15, MUTED, "0"),
-                       "24px 44px 32px")
+                       "24px 48px 32px")
             + footer(ctx))
     return shell(ctx, body, "Instant daily deals and exclusive member deals. Only in your portal.")
 
@@ -151,7 +151,7 @@ def pe3(ctx):
                 ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order. It's in your portal.", link("Open my portal", PORTAL)),
                 ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
                 ("members-portal", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", link("See today's deals", PORTAL))])
-            + text_row("", "0 0 12px")
+            + text_row("", "0 0 40px")
             + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
 
@@ -162,7 +162,7 @@ def pe4(ctx):
             ("members-portal", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", link("See today's deals", PORTAL))]
     body = (intro("Two months in", "Two months in: here's what's yours this month",
                   "The monthly 10%, the prize draw and the member deals. Plus, from today, 5% more on any trade-in.")
-            + icon_rows(ctx, rows) + text_row("", "0 0 12px") + footer(ctx))
+            + icon_rows(ctx, rows) + text_row("", "0 0 40px") + footer(ctx))
     return shell(ctx, body, "This month's 10%, the prize draw and member deals. All in your portal.")
 
 
@@ -172,10 +172,10 @@ def pem(ctx):
             + steps([("Open your member portal.", "The code is in the Codes section."),
                      ("Use it on one order this month.", "Anything you need: balls, a glove, or something bigger."),
                      ("Next month there's another.", "A new month brings a new 10%.")])
-            + text_row(button("Open my member portal", PORTAL), "8px 44px 24px")
+            + text_row(button("Open my member portal", PORTAL), "28px 48px 0")
             + member_note(ctx, "You're in this month's prize draw", "Every member is entered automatically. We draw it at the start of next month.",
                           "See member benefits", JOIN)
-            + text_row("", "0 0 32px") + footer(ctx))
+            + text_row("", "0 0 40px") + footer(ctx))
     return shell(ctx, body, "One order this month gets 10% off. Your code is in your member portal.")
 
 
@@ -184,7 +184,7 @@ def pe5(ctx):
                   "We said we'd remind you before your £36 annual membership renews, so here it is.")
             + benefit_list(ctx, ANNUAL)
             + text_row(p("Happy with it? You don't need to do anything. Want to stop? You can cancel any time from your member portal "
-                         "before it renews.", 16, margin="0"), "16px 44px 24px")
+                         "before it renews.", 16, margin="0"), "16px 48px 24px")
             + portal_button("Manage my membership")
             + footer(ctx))
     return shell(ctx, body, "A reminder before your £36 annual membership renews. Nothing to do if you're staying.")

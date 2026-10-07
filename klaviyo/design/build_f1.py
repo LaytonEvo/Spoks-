@@ -11,7 +11,7 @@ Run: python3 klaviyo/design/build_f1.py <scratch img dir>
 import json, pathlib, re, sys
 
 import build_f3_b as b
-from build_f3_b import ON_DARK, G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SLOTBG, SERIF, SANS, confirm, unsub, data_uri
+from build_f3_b import ON_DARK, G, DG, GOLD, CREAM, INK, HEAD, MUTED, LINE, WHITE, SLOTBG, SERIF, SANS, confirm, unsub, data_uri, eyebrow
 
 OUT = pathlib.Path(__file__).parent
 ICON_DIR = OUT / "assets" / "icons-png"
@@ -112,71 +112,85 @@ def hero(ctx, key):
     return f'<tr><td style="padding:0;">{s}</td></tr>' if s else ""
 
 
-def p(text, size=17, color=INK, margin="0 0 16px"):
-    return f'<p style="margin:{margin};font:{size}px/{size + 9}px {SANS};color:{color};">{text}</p>'
+def p(text, size=16, color=INK, margin="0 0 16px"):
+    return f'<p style="margin:{margin};font:{size}px/{round(size * 1.65)}px {SANS};color:{color};">{text}</p>'
 
 
-def text_row(html, pad="0 44px"):
-    return f'<tr><td class="px" style="padding:{pad};">{html}</td></tr>'
+def text_row(html, pad="0 48px"):
+    return f'<tr><td class="px" bgcolor="{WHITE}" style="padding:{pad};">{html}</td></tr>'
 
 
 def link(label, href, color=G):
-    return (f'<a href="{href}" style="font:600 16px/24px {SANS};color:{color};text-decoration:underline;'
-            f'text-underline-offset:3px;">{label}</a><span style="font:600 16px/24px {SANS};color:{color};">&nbsp;→</span>')
+    return (f'<a href="{href}" style="font:600 15px/24px {SANS};color:{color};text-decoration:underline;'
+            f'text-underline-offset:3px;">{label}</a>')
 
 
 def button(label, href, bg=G, fg=WHITE, align="left"):
-    # Spec: 48px tall, 6px radius, Inter 600 16/24, 24px side padding, intrinsic width.
-    return (f'<table role="presentation" cellpadding="0" cellspacing="0" align="{align}"><tr>'
-            f'<td bgcolor="{bg}" style="background:{bg};border-radius:6px;">'
-            f'<a href="{href}" style="display:inline-block;padding:12px 24px;font:600 16px/24px {SANS};color:{fg};'
-            f'text-decoration:none;border-radius:6px;">{label}</a></td></tr></table>')
+    return b.button(label, href, bg, fg)
 
 
 def usp3(ctx):
-    """Three-item USP strip (spec: cream, 8px radius, 20px padding, 186/1/186/1/186)."""
-    items = [("free-delivery", "Free delivery over £50"), ("expert-advice", "Advice from golfers"), ("custom-fitting", "Custom fitting")]
-    cells = []
-    for name, label in items:
-        cells.append(f'<td class="usp-c" width="186" align="center" valign="top" style="width:186px;">'
-                     f'<table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td align="center">{icon(ctx, name)}</td></tr></table>'
-                     f'<p style="margin:8px 0 0;font:600 14px/20px {SANS};color:{DG};">{label}</p></td>')
-    div = f'<td width="1" style="width:1px;background:{LINE};font-size:0;line-height:0;">&nbsp;</td>'
-    return (f'<tr><td class="px" style="padding:8px 20px 28px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
-            f'<tr><td style="background:{CREAM};border-radius:8px;padding:20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
-            + div.join(cells) + '</tr></table></td></tr></table></td></tr>')
+    """Trust line (Free delivery over £50 | Advice from golfers | Custom fitting)."""
+    return b.usp()
 
 
 def member_note(ctx, heading, body, label="See what membership includes", href=URL["join"]):
-    """Light membership panel (spec: cream, 40px gold-detail card icon, Fraunces 22/28, body 14/20, link)."""
-    return (f'<tr><td class="px" style="padding:12px 20px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
-            f'<tr><td style="background:{CREAM};border-radius:8px;padding:24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
-            f'<td width="40" valign="middle" style="width:40px;">{icon(ctx, "member-card-gold", 40)}</td><td width="24" style="width:24px;"></td>'
-            f'<td valign="middle"><p style="margin:0 0 8px;font:700 22px/28px {SERIF};color:{DG};">{heading}</p>'
-            f'<p style="margin:0 0 12px;font:14px/20px {SANS};color:{MUTED};">{body}</p>{link(label, href)}</td>'
+    """The one secondary panel: stone strip, a short line on the left, a bold green link on the right."""
+    return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:32px 48px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+            f'<tr><td bgcolor="{CREAM}" style="background:{CREAM};padding:22px 24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
+            f'<td class="panel-l" valign="middle" style="font:15px/23px {SANS};color:{INK};"><strong style="font-weight:600;color:{HEAD};">{heading}.</strong> {body}</td>'
+            f'<td class="panel-r" valign="middle" align="right" style="padding-left:16px;white-space:nowrap;">'
+            f'<a href="{href}" style="font:600 15px/23px {SANS};color:{G};text-decoration:underline;text-underline-offset:3px;">{label}</a></td>'
             f'</tr></table></td></tr></table></td></tr>')
 
 
-def icon_rows(ctx, rows):
-    """Icon + heading + text rows separated by hairlines."""
+def panel(text, label, href):
+    """Secondary panel with a plain line (no bold heading)."""
+    return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:32px 48px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+            f'<tr><td bgcolor="{CREAM}" style="background:{CREAM};padding:22px 24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
+            f'<td class="panel-l" valign="middle" style="font:15px/23px {SANS};color:{INK};">{text}</td>'
+            f'<td class="panel-r" valign="middle" align="right" style="padding-left:16px;white-space:nowrap;">'
+            f'<a href="{href}" style="font:600 15px/23px {SANS};color:{G};text-decoration:underline;text-underline-offset:3px;">{label}</a></td>'
+            f'</tr></table></td></tr></table></td></tr>')
+
+
+def benefits_table(rows):
+    """Two columns: bold ink label (44%) and muted description, 1px hairlines, a hairline above the first row. Stacks on mobile."""
     out = ""
-    for name, head, text, extra in rows:
-        out += (f'<tr><td width="48" valign="top" style="width:48px;padding:20px 0;border-top:1px solid {LINE};">{icon(ctx, name, 32)}</td>'
-                f'<td valign="top" style="padding:20px 0;border-top:1px solid {LINE};">'
-                f'<p style="margin:0 0 6px;font:700 20px/27px {SERIF};color:{DG};">{head}</p>'
-                f'<p style="margin:0 0 {10 if extra else 0}px;font:16px/24px {SANS};color:{INK};">{text}</p>{extra}</td></tr>')
-    return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>', "8px 44px 20px")
+    for i, (label, desc) in enumerate(rows):
+        top = f"border-top:1px solid {LINE};" if i == 0 else ""
+        out += (f'<tr><td class="stack lbl" width="44%" valign="top" style="width:44%;padding:13px 16px 13px 0;{top}border-bottom:1px solid {LINE};'
+                f'font:600 14.5px/21px {SANS};color:{HEAD};">{label}</td>'
+                f'<td class="stack nb" valign="top" style="padding:13px 0;{top}border-bottom:1px solid {LINE};font:14.5px/21px {SANS};color:{MUTED};">{desc}</td></tr>')
+    return f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">{out}</table>'
+
+
+def h3(text, margin="0 0 10px"):
+    return f'<h3 style="margin:{margin};font:400 28px/34px {SERIF};color:{HEAD};">{text}</h3>'
+
+
+def feature(eyebrow_text, heading, lede, rows, cta=None, href=None, fine="", pad="28px 48px 0"):
+    """Feature section: 3px brand-green top rule (not a box), eyebrow, serif H3, muted lede, benefits table, button, fine print."""
+    btn = button(cta, href) if cta else ""
+    fp = f'<p style="margin:16px 0 0;font:12.5px/19px {SANS};color:{MUTED};">{fine}</p>' if fine else ""
+    ld = f'<p style="margin:0 0 24px;font:15px/23px {SANS};color:{MUTED};">{lede}</p>' if lede else ""
+    return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:{pad};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+            f'<tr><td style="border-top:3px solid {G};padding:32px 0 0;">' + eyebrow(eyebrow_text) + h3(heading) + ld
+            + (benefits_table(rows) if rows else "") + btn + fp + '</td></tr></table></td></tr>')
+
+
+def icon_rows(ctx, rows):
+    """Topic rows (the old icon rows, now without icons): bold label, text and an optional link, split by hairlines."""
+    out = ""
+    for i, (_name, head, text, extra) in enumerate(rows):
+        out += (f'<tr><td valign="top" style="padding:20px 0;border-top:1px solid {LINE};{"border-bottom:1px solid " + LINE + ";" if i == len(rows) - 1 else ""}">'
+                f'<p style="margin:0 0 6px;font:600 16px/24px {SANS};color:{HEAD};">{head}</p>'
+                f'<p style="margin:0 0 {8 if extra else 0}px;font:15px/25px {SANS};color:{INK};">{text}</p>{extra}</td></tr>')
+    return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>', "12px 48px 0")
 
 
 def footer(ctx, reason="you joined the Evolution Golf mailing list"):
-    a = f'style="color:{WHITE};text-decoration:none;"'
-    dot = f'<span style="color:{ON_DARK};">&nbsp;·&nbsp;</span>'
-    return (f'<tr><td align="center" bgcolor="{DG}" style="background:{DG};padding:32px 24px 28px;">'
-            f'<img src="{ctx.img["roundel"]}" width="44" height="44" alt="Evolution Golf" style="width:44px;height:44px;margin:0 auto 16px;">'
-            f'<p style="margin:0 0 12px;font:13px/20px {SANS};color:#CFE0D6;">Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL</p>'
-            f'<p style="margin:0 0 18px;font:600 13px/20px {SANS};">' + dot.join(f'<a href="{u}" {a}>{n}</a>' for n, u in b.SOCIAL.items()) + '</p>'
-            f'<p class="foot" style="margin:0;font:12px/18px {SANS};color:#A9C2B5;">You\'re receiving this because {reason}.<br>'
-            + unsub(ctx, "#CFE0D6") + '</p></td></tr>')
+    return b.footer(ctx, reason)
 
 
 def intro(eyebrow, headline, text=""):
@@ -184,39 +198,32 @@ def intro(eyebrow, headline, text=""):
 
 
 def shell(ctx, body, pre, header=True):
-    html = b.shell(ctx, body, pre, header=header)
-    return html.replace(".full{width:100%!important;height:auto!important}",
-                        ".full{width:100%!important;height:auto!important} .usp-c{padding:0 4px!important}")
+    return b.shell(ctx, body, pre, header=header)
 
 
 # ---------------- emails ----------------
-BENEFITS = [("free-returns", "Free returns, 4 a year"), ("free-delivery-members", "Free shipping over £10"),
-            ("monthly-prize-draw", "A prize draw entry every month"), ("member-price-tag", "Instant daily deals and exclusive member deals"),
-            ("calendar", "48 hours' early access to new kit")]
+# Benefits table (Layton, 7 Oct 2026): members get free delivery over £10; £50 for non-members.
+BENEFITS = [("10% off monthly", "Your first order, then one order every month after."),
+            ("Free delivery over £10", "Normally £50 for non-members."),
+            ("Four free returns a year", "Start a return from your member portal."),
+            ("Daily member deals", "Instant daily deals and exclusive member deals in your portal, plus 48 hours' early access to new kit."),
+            ("Monthly prize draw", "Entered automatically every month.")]
+FINE = ("Renews at £36 a year. We'll remind you before it does, and you can cancel any time from your account. "
+        "Member discounts can't be combined with other codes.")
 
 
-def membership_dark(ctx, heading, cta="Join for £36 a year"):
-    lis = "".join(f'<tr><td width="34" valign="middle" style="width:34px;padding:5px 0;">{icon(ctx, n, 24, white=True)}</td>'
-                  f'<td valign="middle" style="padding:5px 0;font:15px/22px {SANS};color:{WHITE};">{t}</td></tr>' for n, t in BENEFITS)
-    return (f'<tr><td class="px" style="padding:8px 44px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="{DG}" style="background:{DG};border-radius:8px;">'
-            f'<tr><td style="padding:28px 28px 30px;">'
-            f'<p style="margin:0 0 8px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{ON_DARK};">Evolution Golf Membership · £36 a year</p>'
-            f'<p style="margin:0 0 12px;font:700 22px/29px {SERIF};color:{WHITE};">{heading}</p>'
-            f'<p style="margin:0 0 14px;font:15px/23px {SANS};color:#E3ECE7;">10% off your first order, then 10% off one order every month after. Plus:</p>'
-            f'<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">{lis}</table>'
-            f'<p style="margin:0 0 20px;font:13px/19px {SANS};color:#A9C2B5;">Renews at £36 a year. We\'ll remind you before it does, and you can cancel any time from your account. '
-            f'Member discounts can\'t be combined with other codes.</p>'
-            + button(cta, URL["join"], bg=WHITE, fg=DG) +
-            f'</td></tr></table></td></tr>')
+def membership_dark(ctx, heading, cta="Become a member, £36 a year"):
+    """Kept name: now the white feature section with the green top rule."""
+    return feature("Membership · £36 a year", heading, "Here's everything that comes with it.", BENEFITS, cta, URL["join"], FINE)
 
 
 def e1(ctx):
     body = (hero(ctx, "W1")
             + intro("Welcome to Evolution Golf", f"Welcome{name_suffix(ctx)}.",
                     "We're a golf shop run by people who play, and we'd rather help you into the right trolley than the expensive one.")
-            + text_row(p("We don't send a stream of codes. If you want to pay less, we do membership instead.", margin="16px 0 20px"))
+            + text_row(p("We don't send a stream of codes. If you want to pay less, we do membership instead.", margin="0 0 8px"))
             + membership_dark(ctx, "10% off one order every month, starting with your first.")
-            + text_row(p("Or just have a look round first: " + link("See what's new", URL["new_in"]), 16, margin="0"), "24px 44px 28px")
+            + panel("Not ready yet? Have a look round first.", "See what's new", URL["new_in"])
             + usp3(ctx) + b.trust() + footer(ctx))
     return shell(ctx, body, "10% off your first order with membership, and every month after. No codes to chase.")
 
@@ -243,7 +250,7 @@ def e2h(ctx):
                     "No single product pushed at you. Just how we'd help a mate choose.")
             + icon_rows(ctx, rows)
             + member_note(ctx, "10% off one order every month", "Plus instant daily deals in your portal and a prize draw every month.")
-            + text_row(p("Not sure which way to go? Reply to this email and tell us how you play. A real golfer will answer.", 16, margin="0"), "28px 44px 28px")
+            + text_row(p("Not sure which way to go? Reply to this email and tell us how you play. A real golfer will answer.", 16, margin="0"), "28px 48px 28px")
             + usp3(ctx) + footer(ctx))
     return shell(ctx, body, "How to choose a trolley, why we fit clubs first, and the used route in.")
 
@@ -265,7 +272,7 @@ def e2e(ctx):
                     "Straight answers from people who play.")
             + icon_rows(ctx, rows)
             + member_note(ctx, "10% off one order every month", "Membership is £36 a year and the first 10% comes off your first order.")
-            + text_row(button("See what's new", URL["new_in"]), "28px 44px 32px")
+            + text_row(button("See what's new", URL["new_in"]), "28px 48px 32px")
             + usp3(ctx) + footer(ctx))
     return shell(ctx, body, "Spiked or spikeless, staying dry, and which ball. Answered straight.")
 
@@ -279,39 +286,29 @@ def e3(ctx):
                  f'font:700 11px/14px {SANS};letter-spacing:.1em;color:{GOLD};">PHOTO<br>A1</td></tr></table></td>')
     sig = (f'<table role="presentation" cellpadding="0" cellspacing="0"><tr>{photo}<td style="vertical-align:top;font:16px/24px {SANS};color:{INK};">'
            f'Alex<br><span style="color:{MUTED};">Head of Ecommerce, Evolution Golf</span></td></tr></table>')
-    body = (f'<tr><td class="px" style="padding:36px 44px 28px;">'
+    body = (f'<tr><td class="px" bgcolor="#FFFFFF" style="padding:44px 48px 28px;">'
             f'<p style="{pp}">Hi {first_name(ctx)},</p>'
             f'<p style="{pp}">Alex here, I run the online side at Evolution Golf. Quick one: if you\'re weighing up a trolley, some clubs or anything else, '
             f'reply to this email and tell me what you play and what you\'re trying to fix. I\'ll give you an honest answer, even if it\'s "don\'t buy that".</p>'
             f'<p style="{pp}">No product list in this one. Just the offer of a proper conversation.</p>'
             f'{sig}<p style="margin:22px 0 0;font:15px/22px {SANS};color:{MUTED};">Rather talk? Call us on <a href="tel:03301227089" style="color:{G};">0330 122 7089</a> '
             f'or use our <a href="{URL["contact"]}" style="color:{G};">contact page</a>.</p></td></tr>'
-            f'<tr><td class="px foot-light" style="padding:18px 44px 24px;border-top:1px solid {LINE};font:12px/18px {SANS};color:{MUTED};">'
+            f'<tr><td class="px foot-light" style="padding:18px 48px 24px;border-top:1px solid {LINE};font:12px/18px {SANS};color:{MUTED};">'
             f'Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL<br>'
             + unsub(ctx, MUTED) + '</td></tr>')
     return shell(ctx, body, "Reply to this email and a real person who plays will answer.", header=False)
 
 
-def way_card(ctx, n, name, head, text, cta, href):
-    return (f'<tr><td class="px" style="padding:0 44px 16px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid {LINE};border-radius:8px;">'
-            f'<tr><td style="padding:24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
-            f'<td width="56" valign="top" style="width:56px;">{icon(ctx, name, 40)}</td><td valign="top">'
-            f'<p style="margin:0 0 4px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">Way {n}</p>'
-            f'<p style="margin:0 0 8px;font:700 22px/28px {SERIF};color:{DG};">{head}</p>'
-            f'<p style="margin:0 0 16px;font:16px/24px {SANS};color:{INK};">{text}</p>'
-            + button(cta, href) + '</td></tr></table></td></tr></table></td></tr>')
-
-
 def e4(ctx):
     body = (intro("Paying less at Evolution Golf", "We don't do endless codes. We do these two things.")
-            + text_row("", "12px 44px 0")
-            + way_card(ctx, 1, "member-card-gold", "Membership, 10% off one order every month",
-                       "10% off your first order, then 10% off one order every month. Free returns, free shipping over £10 and 48 hours' early access to new kit.",
-                       "Join for £36 a year", URL["join"])
-            + way_card(ctx, 2, "monthly-prize-draw", "Member-only deals and a monthly prize draw",
-                       "Members get instant daily deals and exclusive member deals in the portal that you won't see anywhere else on the site, plus an entry into a prize draw every month. This month's prize is on the members page.",
-                       "See member deals and this month's prize", URL["join"])
-            + text_row(p("Both start the day you join. Any questions, just reply.", 16, margin="0"), "12px 44px 28px")
+            + feature("Way 1", "Membership: 10% off one order every month",
+                      "10% off your first order, then 10% off one order every month. Free returns, free delivery over £10 and 48 hours' early access to new kit.",
+                      None, "Become a member, £36 a year", URL["join"], pad="12px 48px 0")
+            + feature("Way 2", "Member-only deals and a monthly prize draw",
+                      "Members get instant daily deals and exclusive member deals in the portal that you won't see anywhere else on the site, plus an entry into a prize draw every month. This month's prize is on the members page.",
+                      None, pad="36px 48px 0")
+            + text_row(link("See member deals and this month's prize", URL["join"]), "0 48px 0")
+            + text_row(p("Both start the day you join. Any questions, just reply.", margin="0"), "28px 48px 0")
             + usp3(ctx) + b.trust() + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, member deals and a monthly prize draw. No codes to chase.")
 

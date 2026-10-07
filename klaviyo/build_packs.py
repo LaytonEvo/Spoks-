@@ -131,8 +131,8 @@ def f1_pack():
                     E("e4" + g, "e4", None)]
     return pid, {
         "id": pid, "title": "F1 Welcome (v3, new look)",
-        "summary": "New subscribers who haven't bought. Same flow as v2, in the new look: your website's font "
-                   "(Noto Sans Display), green headings and pale-green boxes instead of cream.",
+        "summary": "New subscribers who haven't bought. Same flow as v2, in the new look "
+                   "(editorial design, 7 Oct): serif headlines, thin rules, benefits tables, one button per email.",
         "replaces": "Once this is created, delete the earlier drafts “EG · F1 Welcome” (TQe2j4) and “EG · F1 Welcome v2” (STnrqk).",
         "outline": ["Starts: someone joins “1.0 Main Mailing List”. Leaves if they buy or start a checkout.",
                     "Members are skipped (they get F2).", "Email 1 straight away · text 1 an hour later",

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Welcome Email Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0F3B2A; --green-2:#24563F;
+    --ink:#161816; --body:#2E322F; --muted:#626862; --line:#DDE1DD;
+    --stone:#F1F3F1; --paper:#FFFFFF; --canvas:#E4E6E3;
+    --serif:"Fraunces", Georgia, "Times New Roman", serif;
+    --sans:"Inter", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--canvas);font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .page{max-width:640px;margin:0 auto;padding:32px 16px 64px}
+  .label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+  .email{background:var(--paper);box-shadow:0 1px 2px rgba(0,0,0,.06),0 8px 30px rgba(0,0,0,.06)}
+  a{color:inherit}
+
+  .hdr{padding:22px 40px;display:flex;justify-content:center;background:var(--green)}
+  .wordmark{font-weight:500;letter-spacing:.32em;font-size:13px;display:flex;align-items:center;gap:10px;color:#fff}
+  .mark{width:22px;height:22px;border:1.5px solid currentColor;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:0;font-weight:600}
+
+  .photo{aspect-ratio:5/3;display:flex;align-items:flex-end;padding:20px;color:#fff;
+    background:linear-gradient(165deg,#5d7563 0%,#2f4a3a 55%,#1b2c22 100%)}
+  .photo span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+
+  .body{padding:44px 48px 8px}
+  .eyebrow,.body .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green-2);font-weight:600;margin:0 0 14px}
+  h2{font-family:var(--serif);font-weight:400;font-size:38px;line-height:1.1;letter-spacing:-.01em;margin:0 0 20px}
+  .body p{font-size:16px;line-height:1.65;margin:0 0 16px;color:var(--body)}
+
+  .member{margin:28px 48px 0;border-top:3px solid var(--green);padding:32px 0 0}
+  .member h3{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.2;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:15px;line-height:1.55;margin:0 0 24px}
+  .benefits{width:100%;border-collapse:collapse;margin:0 0 28px}
+  .benefits td{padding:13px 0;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.45;vertical-align:top}
+  .benefits tr:first-child td{border-top:1px solid var(--line)}
+  .benefits td:first-child{font-weight:600;color:var(--ink);width:44%;padding-right:16px}
+  .benefits td:last-child{color:var(--muted)}
+  .btn{display:inline-block;background:var(--green);color:#fff;text-decoration:none;font-weight:500;font-size:15px;padding:15px 30px;border-radius:2px}
+  .fine{font-size:12.5px;color:var(--muted);line-height:1.55;margin:16px 0 0}
+
+  .browse{margin:32px 48px 0;padding:22px 24px;background:var(--stone);font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .browse a{color:var(--green);font-weight:600;text-underline-offset:3px}
+
+  .trust{margin:28px 48px 0;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    display:flex;flex-wrap:wrap;justify-content:center;gap:6px 0;font-size:13px;color:var(--muted)}
+  .trust span{padding:0 14px}
+  .trust span+span{border-left:1px solid var(--line)}
+  .rating{text-align:center;padding:20px 48px 40px;font-size:13px;color:var(--muted)}
+  .stars{color:#00B67A;letter-spacing:2px;font-size:15px;display:block;margin-bottom:4px}
+  .rating b{color:var(--ink)}
+
+  .ftr{background:var(--green);color:rgba(255,255,255,.72);padding:32px 48px;text-align:center;font-size:12px;line-height:1.7}
+  .ftr .wordmark{justify-content:center;margin-bottom:14px;font-size:11px}
+  .ftr .social{color:#fff;font-weight:500;margin:8px 0}
+
+  @media (max-width:520px){
+    .hdr{padding:18px 24px}
+    .body{padding:32px 24px 4px}
+    h2{font-size:32px}
+    .member,.browse,.trust{margin-left:24px;margin-right:24px}
+    .benefits td{display:block;width:auto!important;padding:0}
+    .benefits td:first-child{padding-top:12px}
+    .benefits td:last-child{padding-bottom:12px}
+    .benefits tr:first-child td:last-child{border-top:0}
+    .benefits td:first-child{border-bottom:0}
+    .rating{padding:20px 24px 32px}
+    .ftr{padding:28px 24px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <p class="label">F1 E1 · Welcome · revised</p>
+  <div class="email">
+    <div class="hdr"><div class="wordmark"><span class="mark">EG</span>EVOLUTION GOLF</div></div>
+    <div class="photo"><span>Photo W1 · Team in the shop or fitting bay · full width</span></div>
+    <div class="body">
+      <p class="eyebrow">Welcome to Evolution Golf</p>
+      <h2>Welcome, Sam.</h2>
+      <p>We're a golf shop run by people who play, and we'd rather help you into the right trolley than the expensive one.</p>
+      <p>We don't send a stream of codes. If you want to pay less, we do membership instead.</p>
+    </div>
+    <div class="member">
+      <p class="eyebrow">Membership · £36 a year</p>
+      <h3>10% off one order every month, starting with your first.</h3>
+      <p class="lede">Here's everything that comes with it.</p>
+      <table class="benefits" role="presentation">
+        <tr><td>10% off monthly</td><td>Your first order, then one order every month after.</td></tr>
+        <tr><td>Free delivery over £10</td><td>Normally £50 for non-members.</td></tr>
+        <tr><td>Four free returns a year</td><td>No questions, no restocking fee.</td></tr>
+        <tr><td>Daily member deals</td><td>Plus 48 hours' early access to new kit.</td></tr>
+        <tr><td>Monthly prize draw</td><td>Entered automatically every month.</td></tr>
+      </table>
+      <a class="btn" href="#">Become a member, £36 a year</a>
+      <p class="fine">Renews at £36 a year. We'll remind you before it does, and you can cancel any time from your account. Member discounts can't be combined with other codes.</p>
+    </div>
+    <div class="browse"><span>Not ready yet? Have a look round first.</span><a href="#">See what's new</a></div>
+    <div class="trust"><span>Free delivery over £50</span><span>Advice from golfers</span><span>Custom fitting</span></div>
+    <div class="rating"><span class="stars">★★★★★</span><b>4.8 out of 5</b> on Trustpilot from 611 reviews</div>
+    <div class="ftr">
+      <div class="wordmark"><span class="mark">EG</span>EVOLUTION GOLF</div>
+      Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL
+      <div class="social">Instagram · Facebook · YouTube</div>
+      You're receiving this because you joined the Evolution Golf mailing list.<br>
+      <a href="#">Unsubscribe</a> · <a href="#">Manage preferences</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -15,13 +15,18 @@ IMG_DIR = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else None
 OUT = pathlib.Path(__file__).parent
 KL = "https://d3k81ch9hvuctc.cloudfront.net/company/SiyYRR/images/"
 
-# Layton, 1 Oct 2026: off the "Fraunces + cream" look. Website font (Noto Sans Display), green accents, pale-green panels.
-# GOLD is kept as a name for the accent colour (now brand green); ON_DARK is the accent on dark-green panels.
+# Editorial system (Layton, 7 Oct 2026, from evolution-golf-welcome-mockup.html): refined serif headlines, white space,
+# thin rules instead of boxes, brand green for the header, footer, buttons and links only. Names kept for the older builders:
+# G/DG = brand green, GOLD = secondary green (eyebrows), CREAM = stone (the one tint), INK = body text, HEAD = headlines.
 G, DG, GOLD, CREAM, INK, MUTED, LINE, WHITE, SLOTBG = (
-    "#006747", "#003D27", "#006747", "#EAF3EE", "#1F2A24", "#5E6B63", "#DCE5E0", "#FFFFFF", "#EEF2EF")
-ON_DARK = "#A8D5BD"
-SERIF = "'Noto Sans Display',Arial,Helvetica,sans-serif"  # headings (the name is historical)
-SANS = "'Noto Sans Display',Arial,Helvetica,sans-serif"
+    "#0F3B2A", "#0F3B2A", "#24563F", "#F1F3F1", "#2E322F", "#626862", "#DDE1DD", "#FFFFFF", "#F1F3F1")
+HEAD = "#161816"
+STARS = "#00B67A"  # Trustpilot green, stars only
+ON_DARK = "#BCC8C3"  # white at 72% on brand green, written as a solid colour for Outlook
+SERIF = "Fraunces,Georgia,'Times New Roman',serif"
+SANS = "Inter,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"
+# The one place the Trustpilot figures live: every email reads them from here. Re-check quarterly.
+TRUSTPILOT = {"score": "4.8", "count": "611", "url": "https://uk.trustpilot.com/review/evolutiongolf.co.uk"}
 
 # ---- image slots: the brief for each position ----
 SLOTS = {
@@ -106,34 +111,37 @@ class Ctx:
 
 
 def shell(ctx, body, preheader, bg=WHITE, header=True):
-    # Rule: the email canvas is always white, so white-background product shots sit seamlessly.
-    # Klaviyo strips <link> tags, so the website font is loaded with @import; Gmail and Outlook fall back to Arial.
-    fonts = ("<style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@400;600;700&display=swap');</style>"
+    # White canvas always. Klaviyo strips <link> tags, so the fonts load with @import; Gmail and Outlook fall back to
+    # Georgia (headlines) and Arial (body), which the layout is built to read well in.
+    fonts = ("<style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Inter:wght@400;500;600&display=swap');</style>"
              if ctx.web_fonts else "")
-    head = (f'<tr><td align="center" bgcolor="{DG}" style="background:{DG};padding:20px 32px;text-align:center;">'
-            f'<a href="https://evolutiongolf.co.uk/" style="display:inline-block;"><img src="{ctx.img["logo"]}" width="190" alt="Evolution Golf" '
-            f'style="width:190px;height:auto;margin:0 auto;"></a></td></tr>') if header else ""
+    head = (f'<tr><td align="center" bgcolor="{G}" style="background:{G};padding:22px 40px;text-align:center;">'
+            f'<a href="https://evolutiongolf.co.uk/" style="display:inline-block;"><img src="{ctx.img["logo"]}" width="170" alt="Evolution Golf" '
+            f'style="width:170px;height:auto;margin:0 auto;"></a></td></tr>') if header else ""
     return f"""<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>Evolution Golf</title>{fonts}
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only">
+<title>Evolution Golf</title>{fonts}
 <style>
 body{{margin:0;padding:0;background:{bg};-webkit-text-size-adjust:100%}} img{{border:0;display:block}} a{{color:{G}}}
-.foot a{{color:#CFE0D6!important}} .foot-light a{{color:{MUTED}!important}}
+.foot a{{color:{ON_DARK}!important}} .foot-light a{{color:{MUTED}!important}}
 @media (max-width:620px){{
- .card{{width:100%!important}} .px{{padding-left:22px!important;padding-right:22px!important}}
+ .card{{width:100%!important}} .px{{padding-left:24px!important;padding-right:24px!important}}
  .stack{{display:block!important;width:100%!important;box-sizing:border-box}} .nb{{border-top:0!important;padding-top:0!important}}
- .h1{{font-size:28px!important;line-height:34px!important}} .full{{width:100%!important;height:auto!important}}
+ .lbl{{padding-bottom:2px!important;border-bottom:0!important}} .h1{{font-size:32px!important;line-height:36px!important}} .full{{width:100%!important;height:auto!important}}
+ .panel-l,.panel-r{{display:block!important;width:100%!important;text-align:left!important}} .panel-r{{padding-top:8px!important}}
 }}
 </style></head><body style="margin:0;padding:0;background:{bg};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">{preheader}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:{bg};"><tr><td align="center" style="padding:24px 10px;">
-<table role="presentation" class="card" width="600" cellpadding="0" cellspacing="0" style="width:600px;background:{WHITE};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="{bg}" style="background:{bg};"><tr><td align="center" bgcolor="{bg}" style="padding:24px 0;">
+<table role="presentation" class="card" width="600" cellpadding="0" cellspacing="0" bgcolor="{WHITE}" style="width:600px;background:{WHITE};">
 {head}{body}
 </table></td></tr></table></body></html>"""
 
 
 def button(label, href="{{ event.extra.checkout_url }}", bg=G, fg=WHITE):
-    return (f'<table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" bgcolor="{bg}">'
-            f'<a href="{href}" style="display:block;padding:16px 28px;font:600 16px/20px {SANS};color:{fg};text-decoration:none;">{label}</a>'
+    """The one primary button: brand green, Inter 500 15px, 15 x 30 padding, 2px radius."""
+    return (f'<table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="{bg}" style="background:{bg};border-radius:2px;">'
+            f'<a href="{href}" style="display:inline-block;padding:15px 30px;font:500 15px/20px {SANS};color:{fg};text-decoration:none;border-radius:2px;">{label}</a>'
             f'</td></tr></table>')
 
 
@@ -150,11 +158,14 @@ def hero_block(ctx, key):
     return f'<tr><td style="padding:0;">{s}</td></tr>' if s else ""
 
 
-def intro(eyebrow, headline, text=""):
-    t = f'<p style="margin:0;font:17px/26px {SANS};color:{INK};">{text}</p>' if text else ""
-    return (f'<tr><td class="px" style="padding:36px 44px 0;">'
-            f'<p style="margin:0 0 10px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">{eyebrow}</p>'
-            f'<h1 class="h1" style="margin:0 0 12px;font:700 34px/40px {SERIF};color:{DG};">{headline}</h1>{t}</td></tr>')
+def eyebrow(text, margin="0 0 14px"):
+    return f'<p style="margin:{margin};font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">{text}</p>'
+
+
+def intro(eyebrow_text, headline, text=""):
+    t = f'<p style="margin:0 0 16px;font:16px/26px {SANS};color:{INK};">{text}</p>' if text else ""
+    return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:44px 48px 0;">' + eyebrow(eyebrow_text)
+            + f'<h1 class="h1" style="margin:0 0 20px;font:400 38px/42px {SERIF};letter-spacing:-.01em;color:{HEAD};">{headline}</h1>{t}</td></tr>')
 
 
 def product_card(ctx, big=True):
@@ -176,26 +187,34 @@ def product_card(ctx, big=True):
 
 
 def trust():
-    return (f'<tr><td class="px" style="padding:0 44px 32px;"><p style="margin:0;font:14px/20px {SANS};color:{INK};">'
-            f'Rated <strong style="font-weight:600;">4.8 out of 5</strong> on <a href="https://uk.trustpilot.com/review/evolutiongolf.co.uk" style="color:{G};font-weight:600;">Trustpilot</a> from 611 reviews</p></td></tr>')
+    """Rating: five Trustpilot-green stars, then the score (figures from TRUSTPILOT)."""
+    t = TRUSTPILOT
+    return (f'<tr><td class="px" align="center" bgcolor="{WHITE}" style="padding:20px 48px 40px;text-align:center;">'
+            f'<p style="margin:0 0 4px;font:15px/18px {SANS};letter-spacing:2px;color:{STARS};">&#9733;&#9733;&#9733;&#9733;&#9733;</p>'
+            f'<p style="margin:0;font:13px/20px {SANS};color:{MUTED};"><strong style="font-weight:600;color:{HEAD};">{t["score"]} out of 5</strong> on '
+            f'<a href="{t["url"]}" style="color:{MUTED};">Trustpilot</a> from {t["count"]} reviews</p></td></tr>')
 
 
-def usp():
-    sep = f'<span style="color:{GOLD};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>'
-    items = ["Free UK delivery", "Expert advice from people who play", "Trade-in on clubs and trolleys", "Custom fitting centre"]
-    return (f'<tr><td class="px" align="center" style="background:{CREAM};padding:14px 32px;font:600 12px/20px {SANS};'
-            f'letter-spacing:.03em;color:{DG};">{sep.join(items)}</td></tr>')
+TRUST_ITEMS = ["Free delivery over £50", "Advice from golfers", "Custom fitting"]
 
 
-def footer(ctx):
+def usp(items=None, pad="28px 48px 0"):
+    """Trust line: small muted items split by vertical hairlines, between two hairlines. No icons, no tint."""
+    cells = "".join(f'<td align="center" style="padding:0 14px;{"border-left:1px solid " + LINE + ";" if i else ""}'
+                    f'font:13px/20px {SANS};color:{MUTED};white-space:nowrap;">{x}</td>' for i, x in enumerate(items or TRUST_ITEMS))
+    return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:{pad};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+            f'style="border-top:1px solid {LINE};border-bottom:1px solid {LINE};"><tr><td align="center" style="padding:18px 0;">'
+            f'<table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr>{cells}</tr></table></td></tr></table></td></tr>')
+
+
+def footer(ctx, reason="you started a checkout at evolutiongolf.co.uk"):
     a = f'style="color:{WHITE};text-decoration:none;"'
-    dot = f'<span style="color:{GOLD};">&nbsp;·&nbsp;</span>'
-    return (f'<tr><td align="center" bgcolor="{DG}" style="background:{DG};padding:32px 24px 28px;">'
-            f'<img src="{ctx.img["roundel"]}" width="44" height="44" alt="Evolution Golf" style="width:44px;height:44px;margin:0 auto 16px;">'
-            f'<p style="margin:0 0 12px;font:13px/20px {SANS};color:#CFE0D6;">Evolution Golf, Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL</p>'
-            f'<p style="margin:0 0 18px;font:600 13px/20px {SANS};">' + dot.join(f'<a href="{u}" {a}>{n}</a>' for n, u in SOCIAL.items()) + '</p>'
-            f'<p class="foot" style="margin:0;font:12px/18px {SANS};color:#A9C2B5;">You\'re receiving this because you started a checkout at evolutiongolf.co.uk.<br>'
-            + unsub(ctx, "#CFE0D6") + '</p></td></tr>')
+    return (f'<tr><td align="center" bgcolor="{G}" style="background:{G};padding:32px 48px;text-align:center;">'
+            f'<img src="{ctx.img["logo"]}" width="130" alt="Evolution Golf" style="width:130px;height:auto;margin:0 auto 14px;">'
+            f'<p style="margin:0;font:12px/20px {SANS};color:{ON_DARK};">Unit 3, Parvenah Park, Embankment Way, Ringwood, BH24 1WL</p>'
+            f'<p style="margin:8px 0;font:500 12px/20px {SANS};color:{WHITE};">' + " · ".join(f'<a href="{u}" {a}>{n}</a>' for n, u in SOCIAL.items()) + '</p>'
+            f'<p class="foot" style="margin:0;font:12px/20px {SANS};color:{ON_DARK};">You\'re receiving this because {reason}.<br>'
+            + unsub(ctx, ON_DARK) + '</p></td></tr>')
 
 
 def ruled_rows(items, ctx):
