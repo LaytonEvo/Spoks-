@@ -120,7 +120,7 @@ def pe1(ctx):
             + benefit_list(ctx, ANNUAL)
             + h2("Three things to do this week")
             + steps([("Use your first-order 10%.", "Your welcome code is saved in the Codes section of your member portal."),
-                     ("Check this month's 10%.", "You get 10% off one order every month. It's waiting in your portal too."),
+                     ("Check this month's 10%.", "10% off one order every month, on anything across the site. The code is in your portal."),
                      ("Check the instant daily deals.", "They're in your portal, and you won't see them anywhere else on the site.")])
             + portal_button()
             + text_row(p("Questions? Reply to this email. Alex and the team read every one.", 15, MUTED, "0"), "0 44px 32px")
