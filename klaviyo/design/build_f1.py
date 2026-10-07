@@ -91,6 +91,12 @@ class Ctx(b.Ctx):
         self.icons = icons
 
     def slot(self, key, w, h, style="", caption=True):
+        if self.mode == "slots" and key in self.img:  # photo supplied: show it, labelled
+            return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="position:relative;">'
+                    f'<img class="full" src="{self.img[key]}" width="{w}" height="{h}" alt="{PHOTO_ALT.get(key, "")}" '
+                    f'style="width:{w}px;max-width:100%;height:auto;display:block;"></td></tr>'
+                    f'<tr><td style="background:{GOLD};padding:6px 12px;font:700 11px/16px {SANS};letter-spacing:.12em;color:{WHITE};">'
+                    f'PHOTO {key} · {SLOTS[key]["title"].upper()} · SUPPLIED</td></tr></table>')
         if self.mode != "slots":
             if self.mode == "now" and key in self.img:
                 return (f'<img class="full" src="{self.img[key]}" width="{w}" height="{h}" alt="{PHOTO_ALT.get(key, "")}" '
@@ -291,10 +297,10 @@ def e2e(ctx):
 def e3(ctx):
     pp = f'margin:0 0 16px;font:16px/25px {SANS};color:{INK};'
     photo = ""
-    if ctx.mode == "now" and "A1" in ctx.img:
+    if ctx.mode in ("now", "slots") and "A1" in ctx.img:
         photo = (f'<td width="92" style="padding-right:16px;vertical-align:top;"><img src="{ctx.img["A1"]}" width="76" height="76" alt="Alex" '
                  f'style="width:76px;height:76px;border-radius:50%;display:block;"></td>')
-    if ctx.mode == "slots":
+    if ctx.mode == "slots" and not photo:
         photo = (f'<td width="92" style="padding-right:16px;vertical-align:top;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>'
                  f'<td width="76" height="76" align="center" style="width:76px;height:76px;background:{SLOTBG};border:2px dashed {GOLD};border-radius:50%;'
                  f'font:700 11px/14px {SANS};letter-spacing:.1em;color:{GOLD};">PHOTO<br>A1</td></tr></table></td>')

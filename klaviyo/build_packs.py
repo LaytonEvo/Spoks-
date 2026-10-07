@@ -89,7 +89,7 @@ def templates(pid, emails, prefix, html_dir):
 def add_photos(pack, emails, slots, rules):
     """Photo spots: a version of each email with the photo positions drawn in, plus the briefs for the dashboard."""
     hosted = json.loads(f1.HOSTED.read_text())
-    live = {"logo": f1.b.LIVE["logo"], "roundel": f1.b.LIVE["roundel"]}
+    live = {"logo": f1.b.LIVE["logo"], "roundel": f1.b.LIVE["roundel"], **f1.PHOTOS}
     by_key = {e["key"]: e for e in emails}
     used = []
     for t in pack["templates"]:
