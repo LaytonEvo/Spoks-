@@ -1,13 +1,13 @@
-"""F3 Checkout abandonment, two groups (Layton, 1 Oct 2026), in the editorial design (7 Oct 2026).
+"""F3 Checkout abandonment, in the editorial design.
 
-Copy: the F3 copy doc (https://claude.ai/code/artifact/e9605082-60e3-48ae-83e0-4b7011c79bf3), with Layton's defaults of 7 Oct:
-no optional code; delivery days marked CONFIRM; Email 3 Everything else kept; the £800 example for trolley baskets only.
-  Hardware (trolley, club or used club in the basket): E1 basket saved (1 h), E2 how to be sure (next day 09:30), SMS (day 2 18:00),
-  E3 from Alex (day 3 09:30).
-  Everything else: E1 basket saved (45 min), E2 members pay less (next day 09:30), SMS (day 2 18:00), E3 last nudge (day 3 17:30).
-  Annual members get E2m "Your 10% can go on this" instead of either E2 (members' edition, card badge).
-Inside E2 Hardware, the trolley checks and the club-fitting block only show when the basket holds that kind of item
-(Klaviyo tags on the event's Collections). Writes klaviyo/design/f3/<key>.html (live, Klaviyo tags) and <key>.preview.html
+Structure (Layton, 7 Oct 2026): three paths from Email 1, each email 1 hour / next day 09:30 / day 2 18:00 (text) / day 3.
+  Annual members: E1m "your 10% can go on this order" (members' edition), E2m quick checks + reminder, text. No E3.
+  Non-members, basket £300+: E1 "join now and 10% comes off this basket" (shows their basket total; never claims the fee pays
+    for itself), E2 quick checks + membership, text, E3 from Alex.
+  Non-members, under £300: the Free membership (5% off everything on the site) is the offer; E1, E2, text, E3 last nudge.
+    Free members on these paths see "your 5% can go on this" / "upgrade to 10%" instead of "join free".
+Trolley checks, club fitting, the Motocaddy warranty and the YouTube review link show only when the basket has that kind of
+item (Klaviyo tags on the event's Collections). No discount codes (member and Free-member savings come from membership). Writes klaviyo/design/f3/<key>.html (live, Klaviyo tags) and <key>.preview.html
 (an example basket, for the dashboard).
 
 Run: python3 klaviyo/design/build_f3.py
@@ -18,7 +18,7 @@ import build_f3_b as b
 import build_f1 as f1
 import build_f2 as f2
 from build_f1 import (G, CREAM, INK, HEAD, MUTED, LINE, WHITE, SANS, SERIF, confirm, unsub, intro, p, text_row, link, button,
-                      member_note, feature, BENEFITS, FINE, URL, PHOTOS)
+                      member_note, panel, feature, benefits_table, BENEFITS, FINE, URL, PHOTOS)
 
 OUT = pathlib.Path(__file__).parent / "f3"
 REASON = "you started a checkout at evolutiongolf.co.uk"
@@ -38,6 +38,11 @@ HARDWARE = TROLLEYS + CLUBS + USED
 
 def has(names):
     return " or ".join(f'"{n}" in event.Collections' for n in names)
+
+
+def has_none(names):
+    """Klaviyo (like Django) allows no brackets in conditions, so "none of these" is spelled out."""
+    return " and ".join(f'"{n}" not in event.Collections' for n in names)
 
 
 SAMPLE = {"title": "Motocaddy 2026 M1 DHC Standard Lithium Electric Golf Trolley", "qty": "1", "price": "£799.00",
@@ -100,42 +105,35 @@ def product_name(ctx):
     return "{{ event.extra.line_items.0.product.title }}" if ctx.live else SAMPLE["title"]
 
 
-# ---------------- E1 ----------------
-def e1h(ctx):
+# ---------------- shared pieces ----------------
+def value(ctx):
+    """The basket total as Klaviyo has it (the example basket in previews)."""
+    return "£{{ event|lookup:'$value'|floatformat:2 }}" if ctx.live else "£799.00"
+
+
+def is_free(ctx, yes, no):
+    """Free members see `yes`, everyone else `no` (previews show `no`, then `yes` with a note)."""
+    if ctx.live:
+        return "{% if person|lookup:'MemberTier' == 'Free' %}" + yes + "{% else %}" + no + "{% endif %}"
+    note = (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:20px 48px 0;"><span style="display:inline-block;border:1px dashed {MUTED};'
+            f'padding:1px 6px;font:600 10px/16px {SANS};letter-spacing:.06em;color:{MUTED};">FREE MEMBERS SEE THIS INSTEAD</span></td></tr>')
+    return no + note + yes
+
+
+def youtube(ctx):
     yt = ("https://www.youtube.com/results?search_query={{ event.extra.line_items.0.product.title|urlencode }}+review"
           if ctx.live else "https://www.youtube.com/results?search_query=Motocaddy+M1+DHC+review")
-    rows = [("Delivery", "Free UK delivery on orders over £50. " + confirm("usually 3 to 5 working days?"), None),
+    return (f"Watch independent reviews of the {product_name(ctx)} on YouTube, or reply to this email and we'll help you choose.<br>"
+            + link("Watch reviews on YouTube", yt))
+
+
+def basket_facts(ctx, member=False):
+    rows = [("Delivery", "Free delivery over £10, as a member." if member else "Free UK delivery on orders over £50.", None),
             ("Warranty", "2 years on the trolley.", "event.extra.line_items.0.product.vendor == 'Motocaddy'"),
             ("Paying for it", "Pay in 3 interest-free instalments with Klarna at checkout.", None),
-            ("Right model?", f"Watch independent reviews of the {product_name(ctx)} on YouTube, or reply to this email and we'll help you choose.<br>"
-                             + link("Watch reviews on YouTube", yt), None)]
-    body = (intro("Your basket is saved", "Still deciding? Fair enough. It's a big buy.", "Your basket is exactly where you left it.")
-            + basket(ctx) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
-            + facts(ctx, "The things people usually want to know before they commit", rows) + close(ctx))
-    return f1.shell(ctx, body, "Pay in 3 with Klarna, and free UK delivery over £50. Pick up where you left off.")
-
-
-def e1e(ctx):
-    rows = [("Delivery", "Free UK delivery on orders over £50. Members get it from £10.", None),
-            ("Paying for it", "Pay in 3 interest-free instalments with Klarna at checkout.", None),
-            ("Not sure on size or fit?", "Reply to this email and we'll help.", None)]
-    body = (intro("Your basket is saved", "Still want these? They're right where you left them.")
-            + basket(ctx) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
-            + facts(ctx, "Good to know", rows) + close(ctx))
-    return f1.shell(ctx, body, "Pick up where you left off. Free UK delivery on orders over £50.")
-
-
-# ---------------- E2 ----------------
-def e2m(ctx):
-    """Annual members, both groups: members' edition with the card badge."""
-    body = (f2.intro("Your basket", "Your 10% can go on this",
-                     "You're an Evolution Golf member, so if you haven't used this month's 10% yet, it can go on this order. "
-                     "Your code is in the Codes section of your member portal; use it at checkout.", card=True)
-            + text_row(p("Your free returns apply too. Any question about what's in your basket, just reply.", margin="0"), "0 48px 0")
-            + basket(ctx, big=False) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
-            + text_row(p("Need your code? " + link("Open my member portal", f2.PORTAL), 15, margin="0"), "20px 48px 40px")
-            + footer(ctx))
-    return f1.shell(ctx, body, "Use this month's code at checkout. Anything else we can answer?", members=True)
+            ("Right model?", youtube(ctx), has(HARDWARE)),
+            ("Size or fit?", "Reply to this email and we'll help.", has_none(HARDWARE))]
+    return facts(ctx, "Good to know before you check out", rows)
 
 
 CHECKS = [("Range.", "Does the battery cover your usual round with margin? 18-hole lithium suits most; go 36 if you play twice on a Saturday."),
@@ -143,43 +141,99 @@ CHECKS = [("Range.", "Does the battery cover your usual round with margin? 18-ho
           ("Hills.", "If your course has them, downhill control matters more than any gadget.")]
 
 
-def e2h(ctx):
+def checks(ctx):
+    """Trolley checks / club fitting, each only when the basket has that kind of item; a reply line otherwise."""
     trolley = (text_row(f'<h3 style="margin:0;font:400 24px/30px {SERIF};color:{HEAD};">Buying a trolley?</h3>', "28px 48px 0")
                + f2.steps(CHECKS))
     clubs = text_row(f'<h3 style="margin:0 0 8px;font:400 24px/30px {SERIF};color:{HEAD};">Buying clubs?</h3>'
                      + p("A fitting on a launch monitor sorts out lie, shaft, length and grip before you commit.", margin="0 0 8px")
                      + link("Book a fitting", URL["fitting"]), "28px 48px 0")
     neither = text_row(p("Not sure it's the right one? Reply to this email and tell us how you play. A real golfer will answer.", margin="0"), "20px 48px 0")
-    lede = ("Then 10% off one order every month after."
-            + (("{% if " + has(TROLLEYS) + " %} On an £800 trolley, that first 10% is £80.{% endif %}") if ctx.live
-               else " On an £800 trolley, that first 10% is £80. " + confirm("").replace("CONFIRM", "TROLLEY BASKETS ONLY")))
-    body = (intro("Before you buy", "A few quick checks")
-            + ctx.when(has(TROLLEYS), trolley, "the basket has a trolley")
+    return (ctx.when(has(TROLLEYS), trolley, "the basket has a trolley")
             + ctx.when(has(CLUBS), clubs, "the basket has new clubs")
-            + (("{% if not " + has(TROLLEYS + CLUBS).replace(" or ", " and not ") + " %}" + neither + "{% endif %}") if ctx.live else "")
-            + feature("Evolution Golf Membership · £36 a year", "Join before you check out and 10% comes off this order.", lede,
-                      BENEFITS, "Become a member, £36 a year", URL["join"], FINE, pad="36px 48px 0", card=True)
+            + (("{% if " + has_none(TROLLEYS + CLUBS) + " %}" + neither + "{% endif %}") if ctx.live else ""))
+
+
+FREE_ROWS = [("5% off everything", "On anything across the site, this order included."),
+             ("Free delivery over £30", "Instead of £50."),
+             ("Loyalty points", "On everything you buy."),
+             ("Your own member portal", "With member deals you won't see anywhere else.")]
+
+
+def join_annual(ctx, heading, pad="36px 48px 0"):
+    """£300+ non-members: 10% off this basket, shown next to their basket total. Free members are offered the upgrade."""
+    lede = (f"10% comes off your {value(ctx)} basket the moment you join, then 10% off one order every month after."
+            + (("{% if person|lookup:'MemberTier' == 'Free' %} As a Free member you get 5% today; this doubles it.{% endif %}") if ctx.live else ""))
+    return feature("Evolution Golf Membership · £36 a year", heading, lede, BENEFITS, "Become a member, £36 a year", URL["join"], FINE,
+                   pad=pad, card=True)
+
+
+def join_free(ctx, pad="36px 48px 0"):
+    """Under £300: the Free membership's 5% on this order; Free members are told their 5% applies, with the upgrade to 10%."""
+    free = feature("Free membership · £0", "Join free and 5% comes off this order.",
+                   "Free members get 5% off everything on the site. It takes a minute, and it works on this basket.",
+                   FREE_ROWS, "Join free", URL["join"],
+                   "Want more? The £36 annual plan gives you 10% off one order every month, free returns and a monthly prize draw.", pad=pad)
+    member = member_note(ctx, "Your 5% can go on this", "As a Free member you get 5% off everything. Or upgrade to 10% off one order every month for £36 a year.",
+                         "See the annual plan")
+    return is_free(ctx, member, free)
+
+
+# ---------------- Annual members ----------------
+def e1m(ctx):
+    body = (f2.intro("Your basket", f"Your 10% can go on this order{name_suffix(ctx)}",
+                     "If you haven't used this month's 10% yet, it can go on this basket. Your code is in the Codes section of your member portal.",
+                     card=True)
+            + basket(ctx) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
+            + text_row(p("Need your code? " + link("Open my member portal", f2.PORTAL), 15, margin="0"), "20px 48px 0")
+            + basket_facts(ctx, member=True) + text_row("", "0 0 40px") + footer(ctx))
+    return f1.shell(ctx, body, "If you haven't used this month's 10% yet, it can go on this basket.", members=True)
+
+
+def e2m(ctx):
+    body = (f2.intro("Before you buy", "A few quick checks", "", card=True) + checks(ctx)
+            + member_note(ctx, "Your 10% can go on this", "If you haven't used this month's 10% yet. The code is in your member portal.",
+                          "Open my portal", f2.PORTAL)
+            + basket(ctx, big=False) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
+            + text_row("", "0 0 40px") + footer(ctx))
+    return f1.shell(ctx, body, "A few quick checks before you buy. Your 10% can still go on it.", members=True)
+
+
+# ---------------- Non-members, £300+ ----------------
+def e1hi(ctx):
+    body = (intro("Your basket is saved", "A good basket to join on", "Your basket is exactly where you left it.")
+            + basket(ctx) + text_row(link("Back to my basket", BASKET), "16px 48px 0")
+            + join_annual(ctx, "Join before you check out and 10% comes off this order.")
+            + basket_facts(ctx) + close(ctx))
+    return f1.shell(ctx, body, "Join before you check out and 10% comes off this basket. Then 10% off one order every month.")
+
+
+def e2hi(ctx):
+    body = (intro("Before you buy", "A few quick checks") + checks(ctx)
+            + join_annual(ctx, "Still to check out? Members get 10% off this order.")
+            + basket(ctx, big=False) + text_row(link("Back to my basket", BASKET), "16px 48px 0") + close(ctx))
+    return f1.shell(ctx, body, "A few quick checks before you buy. Then 10% off this order with membership.")
+
+
+# ---------------- Non-members, under £300 ----------------
+def e1lo(ctx):
+    body = (intro("Your basket is saved", "Still want these? They're right where you left them.")
+            + basket(ctx) + text_row(link("Back to my basket", BASKET), "16px 48px 0")
+            + join_free(ctx) + basket_facts(ctx) + close(ctx))
+    return f1.shell(ctx, body, "5% off this order with Free membership. Your basket's saved.")
+
+
+def e2lo(ctx):
+    body = (intro("Before you check out", "5% off this order, free")
+            + text_row(p("Free membership takes a minute and gives you 5% off everything on the site, including what's in your basket.", margin="0"), "0 48px 0")
             + basket(ctx, big=False) + text_row(link("Back to my basket", BASKET), "16px 48px 0")
-            + close(ctx))
-    return f1.shell(ctx, body, "A few quick checks before you buy. Then a note on membership.")
+            + join_free(ctx, pad="28px 48px 0") + checks(ctx) + close(ctx))
+    return f1.shell(ctx, body, "Free membership takes a minute and takes 5% off this order.")
 
 
-def e2e(ctx):
-    body = (intro("Before you check out", "Members pay less on this, and every month after")
-            + feature("Evolution Golf Membership · £36 a year", "10% off this order, then one order every month.",
-                      "Join for £36 a year and 10% comes off this order. Then you get 10% off one order every month, free delivery from £10, "
-                      "four free returns a year and a prize draw entry every month.",
-                      None, "Become a member, £36 a year", URL["join"],
-                      "Renews at £36 a year. We'll remind you before it does, and you can cancel any time from your account.",
-                      pad="12px 48px 0", card=True)
-            + basket(ctx, big=False) + text_row(link("Back to my basket", BASKET), "16px 48px 0")
-            + close(ctx))
-    return f1.shell(ctx, body, "10% off this order, then one order every month. Here's how.")
-
-
-# ---------------- E3 ----------------
+# ---------------- Email 3 ----------------
 def e3h(ctx):
-    """From Alex: a plain letter, no header, no buttons."""
+    """From Alex (£300+ non-members): a plain letter, no header, no buttons."""
     pp = f'margin:0 0 16px;font:16px/26px {SANS};color:{INK};'
     hi = "{{ person.first_name|default:'there' }}" if ctx.live else "Sam"
     photo = (f'<td width="92" style="padding-right:16px;vertical-align:top;"><img src="{PHOTOS["A1"]}" width="76" height="76" alt="Alex" '
@@ -198,40 +252,44 @@ def e3h(ctx):
     return f1.shell(ctx, body, "Tell me your course and how you play and I'll tell you if it's the right one.", header=False)
 
 
-def e3e(ctx):
+def e3lo(ctx):
     body = (intro("Still in your basket", "Your basket's still here", "We'll stop reminding you after this one.")
             + basket(ctx, big=False) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
-            + member_note(ctx, "Join for £36 a year", "10% comes off this order, then one order every month.")
+            + is_free(ctx, member_note(ctx, "Your 5% can go on this", "As a Free member you get 5% off everything on the site.", "Open my portal", f2.PORTAL),
+                      member_note(ctx, "Join free first", "Free members get 5% off everything, this basket included.", "Join free"))
             + close(ctx))
-    return f1.shell(ctx, body, "Your basket's saved. And if you join, 10% comes off it.")
+    return f1.shell(ctx, body, "Your basket's saved, and 5% can come off it with Free membership.")
 
 
 SMS1 = ("Evolution Golf: your basket's still saved{% if person.first_name %}, {{ person.first_name }}{% endif %}. "
         "Pay in 3 interest-free with Klarna. Finish here: {{ event.extra.checkout_url }}")
 
 BR, ALEX = "⛳ Evolution Golf", "Alex at Evolution Golf"
+SAVED = "Your basket's saved{% if person.first_name %}, {{ person.first_name }}{% endif %}"
 EMAILS = [
-    dict(key="e1h", fn=e1h, name="E1 Hardware · Basket saved", timing="Hardware · 1 hour after checkout", sender=BR,
-         subject="Your basket's saved{% if person.first_name %}, {{ person.first_name }}{% endif %}",
-         preview="Pay in 3 with Klarna, and free UK delivery over £50. Pick up where you left off.", slots=[]),
-    dict(key="e1e", fn=e1e, name="E1 Everything else · Basket saved", timing="Everything else · 45 minutes after checkout", sender=BR,
-         subject="Your basket's saved{% if person.first_name %}, {{ person.first_name }}{% endif %}",
-         preview="Pick up where you left off. Free UK delivery on orders over £50.", slots=[]),
-    dict(key="e2m", fn=e2m, name="E2 Members · Your 10% can go on this", timing="Annual members, both groups · next day 09:30", sender=BR,
-         subject="Your member 10% can go on this", preview="Use this month's code at checkout. Anything else we can answer?", slots=[]),
-    dict(key="e2h", fn=e2h, name="E2 Hardware · How to be sure", timing="Hardware, non-members · next day 09:30", sender=BR,
-         subject="How to be sure it's the right one", preview="A few quick checks before you buy. Then a note on membership.", slots=[]),
-    dict(key="e2e", fn=e2e, name="E2 Everything else · Members pay less", timing="Everything else, non-members · next day 09:30", sender=BR,
-         subject="Before you check out: members pay less", preview="10% off this order, then one order every month. Here's how.", slots=[]),
-    dict(key="e3h", fn=e3h, name="E3 Hardware · From Alex", timing="Hardware · day 3, 09:30", sender=ALEX,
+    dict(key="e1m", fn=e1m, name="E1 Members · Your 10% can go on this", timing="Annual members · 1 hour after checkout", sender=BR,
+         subject="Your 10% can go on this order", preview="If you haven't used this month's 10% yet, it can go on this basket.", slots=[]),
+    dict(key="e2m", fn=e2m, name="E2 Members · Quick checks", timing="Annual members · next day 09:30", sender=BR,
+         subject="A few quick checks before you buy", preview="A few quick checks before you buy. Your 10% can still go on it.", slots=[]),
+    dict(key="e1hi", fn=e1hi, name="E1 £300+ · Join and save 10%", timing="Non-members, basket £300+ · 1 hour after checkout", sender=BR,
+         subject=SAVED, preview="Join before you check out and 10% comes off this basket. Then 10% off one order every month.", slots=[]),
+    dict(key="e2hi", fn=e2hi, name="E2 £300+ · Quick checks", timing="Non-members, basket £300+ · next day 09:30", sender=BR,
+         subject="How to be sure it's the right one", preview="A few quick checks before you buy. Then 10% off this order with membership.", slots=[]),
+    dict(key="e3h", fn=e3h, name="E3 £300+ · From Alex", timing="Non-members, basket £300+ · day 3, 09:30", sender=ALEX,
          subject="Want a second opinion on that?", preview="Tell me your course and how you play and I'll tell you if it's the right one.", slots=[]),
-    dict(key="e3e", fn=e3e, name="E3 Everything else · Last nudge", timing="Everything else, non-members · day 3, 17:30", sender=BR,
-         subject="Still in your basket", preview="Your basket's saved. And if you join, 10% comes off it.", slots=[]),
+    dict(key="e1lo", fn=e1lo, name="E1 Under £300 · Join free, 5% off", timing="Non-members, under £300 · 1 hour after checkout", sender=BR,
+         subject=SAVED, preview="5% off this order with Free membership. Your basket's saved.", slots=[]),
+    dict(key="e2lo", fn=e2lo, name="E2 Under £300 · 5% off, free", timing="Non-members, under £300 · next day 09:30", sender=BR,
+         subject="5% off this order, free", preview="Free membership takes a minute and takes 5% off this order.", slots=[]),
+    dict(key="e3lo", fn=e3lo, name="E3 Under £300 · Last nudge", timing="Non-members, under £300 · day 3, 17:30", sender=BR,
+         subject="Still in your basket", preview="Your basket's saved, and 5% can come off it with Free membership.", slots=[]),
 ]
 
 
 def build():
     OUT.mkdir(exist_ok=True)
+    for f in OUT.glob("*.html"):
+        f.unlink()
     live = {"logo": b.LIVE["logo"], "roundel": b.LIVE["roundel"], **PHOTOS}
     for e in EMAILS:
         (OUT / f"{e['key']}.html").write_text(e["fn"](Ctx(live, "now", True, {}, live=True)))

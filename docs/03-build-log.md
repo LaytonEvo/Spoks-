@@ -113,3 +113,10 @@
   Deviations from the doc: one primary button per email (E2 non-member: membership button, basket as a link); SMS "no fees" →
   "interest-free"; E1 Hardware delivery "Free UK delivery on orders over £50" (+ CONFIRM on days). Dashboard: packs can carry
   `preview_file` (example basket) shown instead of the raw template; metric triggers labelled. Re-entry 7 days set in the editor.
+- 7 Oct: **F3 restructured (Layton)**: paths are now annual members / non-members £300+ / non-members under £300 (split on Checkout Started
+  $value ≥ 300 in the last day), all from E1 at 1 hour. £300+: membership 10% on this order shown next to the basket total (`event|lookup:'$value'`),
+  never "pays for itself" (Layton: insinuate, don't claim). Under £300: Free membership's 5% off everything (Layton: Free 5% is site-wide);
+  Free members see "your 5% can go on this" / the upgrade instead (`person|lookup:'MemberTier'`). Hardware/Everything-else paths removed;
+  trolley checks, club fitting, Motocaddy warranty, YouTube link and size help are conditional sections. E3: Alex for £300+, last nudge under
+  £300, none for members. Templates checked with Django (no brackets in conditions). No discount codes. Delivery-days CONFIRM removed (claim dropped).
+  F2 Free updated for site-wide 5%; Free E2 maths now compares with Free (one £60 order a month covers £36). F2 + F3 docs updated.

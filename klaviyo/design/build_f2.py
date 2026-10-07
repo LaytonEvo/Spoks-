@@ -103,34 +103,35 @@ def fe1(ctx):
     body = (hero(ctx, "W1") + intro("Welcome", f"You're in{name_suffix(ctx)}.",
                   "Your free Evolution Golf membership is live. Here's what it gives you, starting today.")
             + benefit_list(ctx, [("Your own member portal", "Log in to see this month's member deals."),
-                                 ("5% off member portal deals", "Applied when you're logged in."),
+                                 ("5% off everything", "On anything across the site."),
                                  ("Free delivery", "On orders over £30."),
                                  ("Loyalty points", "On everything you buy.")])
             + h2("Two things worth doing this week")
             + steps([("Log in to your portal.", "Check your details and see this month's member deals."),
-                     ("Have a look at the deals.", "Your 5% is applied to member portal deals when you're logged in.")])
+                     ("Use your 5%.", "It works on anything across the site, not just the portal.")])
             + portal_button()
             + footer(ctx))
-    return shell(ctx, body, "5% off member deals, free delivery over £30 and loyalty points. All live now.")
+    return shell(ctx, body, "5% off everything, free delivery over £30 and loyalty points. All live now.")
 
 
 def fe2(ctx):
     maths = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="{CREAM}" style="background:{CREAM};padding:24px;">'
              f'<p style="margin:0 0 10px;font:600 11px/16px {SANS};letter-spacing:.14em;text-transform:uppercase;color:{GOLD};">The sum</p>'
-             f'<p style="margin:0 0 10px;font:400 24px/30px {SERIF};color:{HEAD};">£36 a year pays for itself at £30 an order.</p>'
-             f'<p style="margin:0;font:15px/24px {SANS};color:{INK};">10% off one £30 order a month is £3. Twelve months of that is £36. '
-             f'Your first order gets 10% off too. Spend more than £30 an order and you\'re ahead.</p></td></tr></table>')
+             f'<p style="margin:0 0 10px;font:400 24px/30px {SERIF};color:{HEAD};">One £60 order a month covers the £36.</p>'
+             f'<p style="margin:0;font:15px/24px {SANS};color:{INK};">On Free you already get 5%. The plan takes that to 10% on one order a month: '
+             f'on a £60 order that\'s £3 more, and twelve months of it is £36. On top, you get free returns, a monthly prize draw and '
+             f'free delivery from £10 instead of £30.</p></td></tr></table>')
     body = (intro("Free or £36 a year?", "Is the annual membership worth it? Here's the honest maths.",
-                  "You get 5% off member deals on Free. The £36 plan doubles that and adds a few things Free doesn't have.")
+                  "Free gives you 5% off everything. The £36 plan gives you 10% off one order every month, plus a few things Free doesn't have.")
             + text_row(maths, "20px 48px 8px")
             + member_card("36px 48px 0")
             + h2("What the £36 plan adds")
             + benefit_list(ctx, ANNUAL)
             + text_row(p("If you only buy from us once or twice a year, stay on Free. You keep your 5% either way. "
-                         "If you buy most months, the plan pays for itself.", 16, margin="0"), "16px 48px 24px")
+                         "If you buy most months, the plan is worth a look.", 16, margin="0"), "16px 48px 24px")
             + text_row(button("Compare the two plans", JOIN), "24px 48px 0")
             + icon_row() + footer(ctx))
-    return shell(ctx, body, "10% off one order a month pays back the £36 at about £30 an order. The full sum inside.")
+    return shell(ctx, body, "Compared with Free, one £60 order a month covers the £36. The full sum inside.")
 
 
 def fe3(ctx):
@@ -265,9 +266,9 @@ def pe5(ctx):
 BR = "⛳ Evolution Golf"
 EMAILS = [
     dict(key="fe1", fn=fe1, name="Free E1 · You're in", timing="Free · straight away", sender=BR,
-         subject="You're in: your free Evolution Golf membership", preview="5% off member deals, free delivery over £30 and loyalty points. All live now.", slots=["W1"]),
+         subject="You're in: your free Evolution Golf membership", preview="5% off everything, free delivery over £30 and loyalty points. All live now.", slots=["W1"]),
     dict(key="fe2", fn=fe2, name="Free E2 · The honest maths", timing="Free · day 4 · still on Free", sender=BR,
-         subject="Is the £36 plan worth it? The honest maths", preview="10% off one order a month pays back the £36 at about £30 an order. The full sum inside.", slots=[]),
+         subject="Is the £36 plan worth it? The honest maths", preview="Compared with Free, one £60 order a month covers the £36. The full sum inside.", slots=[]),
     dict(key="fe3", fn=fe3, name="Free E3 · The plan in use", timing="Free · day 12 · still on Free", sender=BR,
          subject="What £36 a year actually gets used for", preview="10% off one order every month, member-only deals and a monthly prize draw. Then it's up to you.", slots=[]),
     dict(key="pe1", fn=pe1, name="Annual E1 · Welcome", timing="Annual · straight away · smart sending off", sender=BR,
