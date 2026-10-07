@@ -86,3 +86,11 @@ pack, and a recommendation on building the other flows this way. Then stop.
   root `/dashboard`, volume `dashboard-data` at `/data`, deploys from branch `claude/new-session-kmtqg8`.
   URL: https://flow-dashboard-production-7b2a.up.railway.app (login user `evolution`; password is the `DASHBOARD_PASSWORD` Railway variable).
   Runs on saved test data until `KLAVIYO_API_KEY` (and optionally `ANTHROPIC_API_KEY`) are added in Railway → service → Variables.
+
+## State at end of 7 Oct 2026
+- Drafts page packs (none created in Klaviyo yet unless Layton approved): f1-welcome-v3 (+ E1 button A/B variant e1b), f2-free, f2-annual,
+  f3-checkout (member / £300+ / under £300), f9-after-delivery (Hardware / Everything else, membership credit offer).
+- Design: editorial system (klaviyo/design/README.md). Builders: build_f1/f2/f3/f9.py → build_packs.py → dashboard/app/drafts/.
+- Copy docs: F1 e33d175e…, F2 08bb8a0b…, F3 v2 f283f33b…, F9 4bcfe548… (claude.ai/code/artifact/<id>).
+- Photos to come: F9 C1, C2, X1. Motocaddy/PowaKaddy registration links to verify by clicking.
+- Next: F5 (F4 held: Added to Cart tracking looks broken). F10 early cross-sell folded into F9.
