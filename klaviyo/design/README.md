@@ -52,7 +52,9 @@ Numbered steps (1, 2, 3 in serif green, hairline rows) are kept for instructions
 ## Icons
 Phosphor Light only (from @phosphor-icons/core), rendered as 48px transparent PNGs in brand green, hosted in Klaviyo,
 shown at 24px. One three-item row per email at most, above the footer (F2: 10% off one order a month · Instant daily
-deals · Monthly prize draw, in the emails without a photo). Never next to benefits, copy, headlines or buttons. No inline SVG.
+deals · Monthly prize draw, in the emails without a photo). Otherwise never next to benefits, copy, headlines or buttons, with one exception (Layton, 7 Oct 2026): section rows
+that each cover one of those three benefits may carry the matching icon beside the heading (F2 Annual E3, E4), and
+then the email has no bottom icon row. No inline SVG.
 
 ## Build
 Tables and inline CSS; media queries are progressive enhancement. Explicit `bgcolor` on cells for dark mode.

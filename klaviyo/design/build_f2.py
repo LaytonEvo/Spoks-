@@ -162,6 +162,19 @@ def pe2(ctx):
     return shell(ctx, body, "Instant daily deals and exclusive member deals. Only in your portal.")
 
 
+def ph_rows(rows):
+    """Section rows with a Phosphor icon beside each heading (Layton, 7 Oct 2026: replaces the bottom icon row in E3/E4)."""
+    out = ""
+    for i, (name, head, text, extra) in enumerate(rows):
+        last = f"border-bottom:1px solid {LINE};" if i == len(rows) - 1 else ""
+        out += (f'<tr><td width="40" valign="top" style="width:40px;padding:22px 0 20px;border-top:1px solid {LINE};{last}">'
+                f'<img src="{PH_ICONS[name]}" width="24" height="24" alt="" style="width:24px;height:24px;display:block;"></td>'
+                f'<td valign="top" style="padding:20px 0;border-top:1px solid {LINE};{last}">'
+                f'<p style="margin:0 0 6px;font:600 16px/24px {SANS};color:{HEAD};">{head}</p>'
+                f'<p style="margin:0 0 {8 if extra else 0}px;font:15px/25px {SANS};color:{INK};">{text}</p>{extra}</td></tr>')
+    return text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{out}</table>', "12px 48px 0")
+
+
 def portal_cta(lead):
     """One clear next step under the sections: a short lead line, then the one primary button."""
     return (text_row(p(f'<strong style="font-weight:600;color:{HEAD};">{lead}</strong> It\'s in your member portal, with today\'s deals.',
@@ -175,22 +188,22 @@ PRIZE_LINK = link("See this month's prize", JOIN)  # the prize is shown on the m
 def pe3(ctx):
     body = (intro("One month in", "Your first month as a member",
                   "A quick reminder of what's there for you, now you've had a month.")
-            + icon_rows(ctx, [
-                ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order, on anything across the site.", ""),
-                ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
-                ("members-portal", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", "")])
+            + ph_rows([
+                ("seal-percent", "This month's 10%", "A new month means a new 10% off one order, on anything across the site.", ""),
+                ("trophy", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
+                ("tag", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", "")])
             + portal_cta("Your 10% code is waiting.")
-            + icon_row() + footer(ctx))
+            + text_row("", "0 0 40px") + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
 
 
 def pe4(ctx):
-    rows = [("member-price-tag", "This month's 10%", "One order this month gets 10% off, on anything across the site.", ""),
-            ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
-            ("members-portal", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", "")]
+    rows = [("seal-percent", "This month's 10%", "One order this month gets 10% off, on anything across the site.", ""),
+            ("trophy", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
+            ("tag", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", "")]
     body = (intro("Two months in", "Two months in: here's what's yours this month",
                   "The monthly 10%, the prize draw and the member deals, all in one place.")
-            + icon_rows(ctx, rows) + portal_cta("This month's 10% code is waiting.") + icon_row() + footer(ctx))
+            + ph_rows(rows) + portal_cta("This month's 10% code is waiting.") + text_row("", "0 0 40px") + footer(ctx))
     return shell(ctx, body, "This month's 10%, the prize draw and member deals. All in your portal.")
 
 
