@@ -49,6 +49,11 @@ No cream, beige, warm off-white, mint, brass or gold.
 
 Numbered steps (1, 2, 3 in serif green, hairline rows) are kept for instructions; they are not benefit lists.
 
+## Annual member card
+`member_card()` / `feature(card=True)` in build_f1.py: Layton's annual card artwork, flattened onto white, shown at
+320px centred. Only where the £36 annual plan is welcomed or sold (F1 E1/E4, F2 Free E2/E3, Annual E1/E5, F3 non-member E2);
+never in the Free welcome. Gold on the card is fine: it's the brand asset, not the email's own palette.
+
 ## Members' edition
 Every email that goes only to members (all of F2; later the member versions in other flows): header logo | MEMBERS
 (small spaced capitals after a thin rule), eyebrows start "Members ·", footer reads "You're receiving this as an Evolution

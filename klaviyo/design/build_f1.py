@@ -187,17 +187,32 @@ def benefits_table(rows):
     return f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">{out}</table>'
 
 
+# Annual member card (Layton, 7 Oct 2026): flattened onto white, 640 x 430, shown at 320 x 215. Annual plan only, never Free.
+CARD = "https://cdn.klaviyomail.com/company/SiyYRR/images/e0287c0c-92d1-4159-844b-825430a2e346.jpeg"
+
+
+def card_img(margin="0 auto"):
+    return (f'<img src="{CARD}" width="320" height="215" alt="The Evolution Golf annual member card" '
+            f'style="width:320px;max-width:100%;height:auto;display:block;margin:{margin};">')
+
+
+def member_card(pad="28px 48px 0"):
+    return f'<tr><td class="px" align="center" bgcolor="{WHITE}" style="padding:{pad};text-align:center;">{card_img()}</td></tr>'
+
+
 def h3(text, margin="0 0 10px"):
     return f'<h3 style="margin:{margin};font:400 28px/34px {SERIF};color:{HEAD};">{text}</h3>'
 
 
-def feature(eyebrow_text, heading, lede, rows, cta=None, href=None, fine="", pad="28px 48px 0"):
+def feature(eyebrow_text, heading, lede, rows, cta=None, href=None, fine="", pad="28px 48px 0", card=False):
     """Feature section: 3px brand-green top rule (not a box), eyebrow, serif H3, muted lede, benefits table, button, fine print."""
     btn = button(cta, href) if cta else ""
     fp = f'<p style="margin:16px 0 0;font:12.5px/19px {SANS};color:{MUTED};">{fine}</p>' if fine else ""
     ld = f'<p style="margin:0 0 24px;font:15px/23px {SANS};color:{MUTED};">{lede}</p>' if lede else ""
     return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:{pad};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
-            f'<tr><td style="border-top:3px solid {G};padding:32px 0 0;">' + eyebrow(eyebrow_text) + h3(heading) + ld
+            f'<tr><td style="border-top:3px solid {G};padding:32px 0 0;">'
+            + (f'<div style="text-align:center;margin:0 0 28px;">{card_img()}</div>' if card else "")
+            + eyebrow(eyebrow_text) + h3(heading) + ld
             + (benefits_table(rows) if rows else "") + btn + fp + '</td></tr></table></td></tr>')
 
 
@@ -236,7 +251,7 @@ FINE = ("Renews at £36 a year. We'll remind you before it does, and you can can
 
 def membership_dark(ctx, heading, cta="Become a member, £36 a year"):
     """Kept name: now the white feature section with the green top rule."""
-    return feature("Membership · £36 a year", heading, "Here's everything that comes with it.", BENEFITS, cta, URL["join"], FINE)
+    return feature("Membership · £36 a year", heading, "Here's everything that comes with it.", BENEFITS, cta, URL["join"], FINE, card=True)
 
 
 def e1(ctx):
@@ -328,7 +343,7 @@ def e4(ctx):
     body = (intro("Paying less at Evolution Golf", "We don't do endless codes. We do these two things.")
             + feature("Way 1", "Membership: 10% off one order every month",
                       "10% off your first order, then 10% off one order every month. Free returns, free delivery over £10 and 48 hours' early access to new kit.",
-                      None, "Become a member, £36 a year", URL["join"], pad="12px 48px 0")
+                      None, "Become a member, £36 a year", URL["join"], pad="12px 48px 0", card=True)
             + feature("Way 2", "Member-only deals and a monthly prize draw",
                       "Members get instant daily deals and exclusive member deals in the portal that you won't see anywhere else on the site, plus an entry into a prize draw every month. This month's prize is on the members page.",
                       None, pad="36px 48px 0")

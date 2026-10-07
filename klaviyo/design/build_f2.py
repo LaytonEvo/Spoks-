@@ -15,7 +15,7 @@ import json, pathlib, re, sys
 import build_f3_b as b
 import build_f1 as f1
 from build_f1 import (hero, name_suffix, G, DG, GOLD, CREAM, INK, HEAD, MUTED, LINE, WHITE, SANS, SERIF, confirm, data_uri, icon, first_name, intro, p,
-                      text_row, link, button, member_note, icon_rows, benefits_table, h3, Ctx, local_icons, HOSTED, OUT)  # intro is redefined below for the Members eyebrow
+                      text_row, link, button, member_note, icon_rows, benefits_table, h3, Ctx, local_icons, HOSTED, OUT, member_card)  # intro is redefined below for the Members eyebrow
 
 PORTAL = "https://members.evolutiongolf.co.uk"
 JOIN = f1.URL["join"]
@@ -114,6 +114,7 @@ def fe2(ctx):
     body = (intro("Free or £36 a year?", "Is the annual membership worth it? Here's the honest maths.",
                   "You get 5% off member deals on Free. The £36 plan doubles that and adds a few things Free doesn't have.")
             + text_row(maths, "20px 48px 8px")
+            + member_card("36px 48px 0")
             + h2("What the £36 plan adds")
             + benefit_list(ctx, ANNUAL)
             + text_row(p("If you only buy from us once or twice a year, stay on Free. You keep your 5% either way. "
@@ -133,6 +134,7 @@ def fe3(ctx):
             ("arrow-u-up-left", "Free returns",
              "Order two sizes of a shoe, keep the one that fits and send the other back free. Four free returns a year.", "")]
     body = (intro("The annual plan, in use", "What £36 a year actually gets used for")
+            + member_card("8px 48px 8px")
             + ph_rows(rows)
             + text_row(p("Happy on Free? That's fine. You keep your 5% either way, and this is the last email about upgrading.", 16, margin="0"), "28px 48px 0")
             + text_row(button("Become a member, £36 a year", JOIN), "24px 48px 0")
@@ -144,6 +146,7 @@ def fe3(ctx):
 def pe1(ctx):
     body = (hero(ctx, "M1") + intro("Welcome", f"Good call{name_suffix(ctx)}. You're a member.",
                   "Your £36 annual membership is live. Everything below works from today.")
+            + member_card("8px 48px 8px")
             + benefit_list(ctx, ANNUAL)
             + h2("Three things to do this week")
             + steps([("Use your first-order 10%.", "Your welcome code is saved in the Codes section of your member portal."),
@@ -232,6 +235,7 @@ def pem(ctx):
 def pe5(ctx):
     body = (intro("Renewal reminder", "Your membership renews in about a month",
                   "We said we'd remind you before your £36 annual membership renews, so here it is.")
+            + member_card("8px 48px 8px")
             + benefit_list(ctx, ANNUAL)
             + text_row(p("Happy with it? You don't need to do anything. Want to stop? You can cancel any time from your member portal "
                          "before it renews.", 16, margin="0"), "16px 48px 24px")
