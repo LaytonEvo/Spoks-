@@ -77,6 +77,8 @@ def public(pid):
     out = {k: pk.get(k) for k in ("id", "title", "summary", "outline", "after", "replaces", "photo_briefs", "photo_rules")}
     out["flow_name"] = pk["flow"]["name"]
     out["emails"] = [{k: t.get(k) for k in ("key", "name", "subject", "preview", "when", "sender")} for t in pk["templates"]]
+    for e in out["emails"]:
+        e["subject"] = snapshot.fill_tags(e["subject"] or "")
     out.update({k: st.get(k) for k in ("status", "segments", "templates", "flow_id", "dropped", "history", "error", "verify")})
     out["running"] = pid in _running
     out["klaviyo_url"] = f"https://www.klaviyo.com/flow/{st['flow_id']}/edit" if st.get("flow_id") else None
@@ -117,8 +119,9 @@ def _journey(pk):
     for m in snapshot._iter_messages(steps):
         m["preview_url"], m["photos"] = previews.get(m["message_id"], (None, []))
         m["draft"] = True
-        if m.get("body"):
-            m["body"] = re.sub(r"{{\s*person\.first_name[^}]*}}", "Sam", m["body"])
+        for k in ("subject", "subject_line", "preview_text", "body"):  # show tags as the example person sees them
+            if isinstance(m.get(k), str) and "{" in m[k]:
+                m[k] = snapshot.fill_tags(m[k].replace("{{ event.extra.checkout_url }}", "[basket link]"))
     trig = (definition.get("triggers") or [{}])[0]
     seg_names = {s["key"]: s["name"] for s in pk.get("segments", [])}
     who = AUDIENCES.get(trig.get("id")) or seg_names.get(trig.get("ref")) or trig.get("id")
