@@ -33,7 +33,7 @@ def shell(ctx, body, pre):
 
 
 def intro(eyebrow, headline, text="", card=False):
-    """Every member email's eyebrow starts "Members ·". card=True (Layton, 7 Oct 2026, trial on Annual E3): a small
+    """Every member email's eyebrow starts "Members ·". card=True (Layton, 7 Oct 2026; approved for all Annual follow-ups): a small
     member card (80px) sits beside the eyebrow like a badge."""
     if not card:
         return f1.intro(f"Members · {eyebrow}", headline, text)
@@ -169,7 +169,7 @@ def pe1(ctx):
 
 def pe2(ctx):
     body = (intro("Your deals", "Your member deals, and where to find them",
-                  "As a member you get deals that nobody else on the site can see. Here's where they are.")
+                  "As a member you get deals that nobody else on the site can see. Here's where they are.", card=True)
             + steps([("Log in to your member portal.", "That's where the deals are."),
                      ("Check the instant daily deals.", "New ones every day, and you won't see them anywhere else on the site."),
                      ("Look through the exclusive member deals.", "Only members can see these, and they're in your portal too.")])
@@ -232,14 +232,14 @@ def pe4(ctx):
             ("trophy", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
             ("tag", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", "")]
     body = (intro("Two months in", "Two months in: here's what's yours this month",
-                  "The monthly 10%, the prize draw and the member deals, all in one place.")
+                  "The monthly 10%, the prize draw and the member deals, all in one place.", card=True)
             + ph_rows(rows) + portal_cta("This month's 10% code is waiting.") + text_row("", "0 0 40px") + footer(ctx))
     return shell(ctx, body, "This month's 10%, the prize draw and member deals. All in your portal.")
 
 
 def pem(ctx):
     body = (intro("Your monthly 10%", "This month's 10% is ready",
-                  "As a member, one order every month gets 10% off. A new month means a new one.")
+                  "As a member, one order every month gets 10% off. A new month means a new one.", card=True)
             + steps([("Open your member portal.", "The code is in the Codes section."),
                      ("Use it on one order this month.", "Anything you need: balls, a glove, or something bigger."),
                      ("Next month there's another.", "A new month brings a new 10%.")])
