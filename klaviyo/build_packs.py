@@ -93,7 +93,7 @@ def add_photos(pack, emails, slots, rules):
     by_key = {e["key"]: e for e in emails}
     used = []
     for t in pack["templates"]:
-        e = by_key[t["key"]]
+        e = by_key.get(t["key"], {})
         if not e.get("slots"):
             continue
         rel = f"{pack['id']}/{t['key']}.photos.html"
@@ -138,14 +138,19 @@ def f1_pack():
                     "Members are skipped (they get F2).", "Email 1 straight away · text 1 an hour later",
                     "Next day 09:30: E2 Hardware if they looked at trolleys or clubs, otherwise E2 Everything else",
                     "2 days later 09:30: E3 from Alex · 3 days later 17:30: E4 Two ways to pay less"],
-        "after": ["Check the used-clubs line in E2 Hardware (“every set is checked before it goes on sale”) and edit if needed.",
+        "after": ["Set up the button test on Email 1 (Klaviyo can't add tests through its API): open Email 1 in the flow, choose "
+                  "“Create A/B test”, set the new variation's content to the saved template “EG · F1 v3 · E1 · Welcome · Test B (brighter button)”, "
+                  "split 50/50, pick the winner by click rate, and let it run until Klaviyo marks a winner.",
+                  "Check the used-clubs line in E2 Hardware (“every set is checked before it goes on sale”) and edit if needed.",
                   "Send yourself a test of each email from the Klaviyo editor.",
                   "When happy, switch it on in Klaviyo and switch off “1. SM: Welcome Sequence”."],
         "split_labels": {"member": {"label": "Already a member?", "yes": "Member: leaves (gets F2)", "no": "Not a member"},
                          "hw": {"label": "Looked at trolleys, clubs or used clubs in the last 7 days", "yes": "Hardware", "no": "Everything else"},
                          "m4h": {"label": "Joined membership during the flow?", "yes": "Member: skips E4", "no": "Not a member"},
                          "m4e": {"label": "Joined membership during the flow?", "yes": "Member: skips E4", "no": "Not a member"}},
-        "templates": templates(pid, f1.EMAILS, "EG · F1 v3", ROOT / "design" / "f1"),
+        "templates": templates(pid, f1.EMAILS, "EG · F1 v3", ROOT / "design" / "f1") + templates(pid, [dict(
+            key="e1b", name="E1 · Welcome · Test B (brighter button)", subject=f1.EMAILS[0]["subject"], preview=f1.EMAILS[0]["preview"],
+            timing="A/B test version of E1: set up in the Klaviyo editor", sender=f1.EMAILS[0]["sender"])], "EG · F1 v3", ROOT / "design" / "f1"),
         "flow": {"name": "EG · F1 Welcome v3", "definition": {
             "triggers": [{"type": "list", "id": "Tzck9t"}],
             "profile_filter": all_of(metric("T9sNn9", "equals", 0, ALL), metric("T9sNn9", "equals", 0, FS), NO_BOUNCE,

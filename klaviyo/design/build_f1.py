@@ -313,6 +313,17 @@ def e4(ctx):
     return shell(ctx, body, "Your monthly 10%, member deals and a monthly prize draw. No codes to chase.")
 
 
+# A/B test (Layton, 7 Oct 2026): E1 with the button in the brighter site green, so it stands apart from the header and
+# footer. Klaviyo's API can't add A/B tests to flows, so this variant is created as a template and the test is set up in the editor.
+BUTTON_TEST = "#006747"
+
+
+def button_variant(html):
+    old = f'bgcolor="{G}" style="background:{G};border-radius:2px;"'
+    assert html.count(old) == 1, "expected exactly one primary button"
+    return html.replace(old, f'bgcolor="{BUTTON_TEST}" style="background:{BUTTON_TEST};border-radius:2px;"')
+
+
 SMS1 = "Evolution Golf: welcome, {{ person.first_name|default:'golfer' }}. Members get 10% off their first order and one order a month: https://evolutiongolf.co.uk/pages/members-page"
 SMS1_SHOWN = "Evolution Golf: welcome, [first name]. Members get 10% off their first order and one order a month: evolutiongolf.co.uk/pages/members-page"
 
@@ -383,6 +394,7 @@ def build(img_dir):
         live = {"logo": b.LIVE["logo"], "roundel": b.LIVE["roundel"]}
         for e in EMAILS:
             (OUT / "f1" / f"{e['key']}.html").write_text(e["fn"](Ctx(live, "none", True, hosted, live=True)))
+        (OUT / "f1" / "e1b.html").write_text(button_variant((OUT / "f1" / "e1.html").read_text()))
         print("live files written")
     print("f1-preview.html", (OUT / "f1-preview.html").stat().st_size // 1024, "KB")
 
