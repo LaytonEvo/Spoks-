@@ -41,7 +41,8 @@ ANNUAL = [("member-price-tag", "10% off your first order, then 10% off one order
           ("free-returns", "Free returns, 4 a year"),
           ("monthly-prize-draw", "A monthly prize draw entry"),
           ("calendar", "48 hours' early access to new products"),
-          ("member-price-tag", "10% off member deals in your portal")]
+          ("members-portal", "Instant daily deals you won't see anywhere else on the site"),
+          ("member-price-tag", "Exclusive member deals in your portal")]
 
 
 def benefit_list(ctx, items):
@@ -102,7 +103,7 @@ def fe3(ctx):
              "Order two sizes of a shoe, keep the one that fits and send the other back free. Four free returns a year.", ""),
             ("monthly-prize-draw", "A prize draw every month", "You're entered automatically every month, and we draw it at the start of the next one.", ""),
             ("member-price-tag", "Member-only deals",
-             "10% off the deals in the member portal, where Free members get 5%.", link("See the member benefits", JOIN)),
+             "Exclusive member deals in the portal, plus instant daily deals you won't see anywhere else on the site.", link("See the member benefits", JOIN)),
             ("calendar", "First look at new kit", "48 hours' early access to new products before everyone else.", "")]
     body = (intro("The annual plan, in use", "What £36 a year actually gets used for")
             + icon_rows(ctx, rows)
@@ -120,7 +121,7 @@ def pe1(ctx):
             + h2("Three things to do this week")
             + steps([("Use your first-order 10%.", "Your welcome code is saved in the Codes section of your member portal."),
                      ("Check this month's 10%.", "You get 10% off one order every month. It's waiting in your portal too."),
-                     ("Look through the member deals.", "Your 10% applies to the deals in your portal, on top of everything above.")])
+                     ("Check the instant daily deals.", "They're in your portal, and you won't see them anywhere else on the site.")])
             + portal_button()
             + text_row(p("Questions? Reply to this email. Alex and the team read every one.", 15, MUTED, "0"), "0 44px 32px")
             + footer(ctx))
@@ -147,7 +148,7 @@ def pe3(ctx):
             + icon_rows(ctx, [
                 ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order. It's in your portal.", link("Open my portal", PORTAL)),
                 ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
-                ("member-price-tag", "Member-only deals", "Your 10% applies to the deals in your portal too.", link("See member deals", PORTAL))])
+                ("members-portal", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", link("See today's deals", PORTAL))])
             + text_row("", "0 0 12px")
             + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
@@ -156,7 +157,7 @@ def pe3(ctx):
 def pe4(ctx):
     rows = [("member-price-tag", "This month's 10%", "One order this month gets 10% off. The code is waiting in your member portal.", link("Open my portal", PORTAL)),
             ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
-            ("calendar", "Member-only deals", "10% off the deals in your portal, and 48 hours' early access to new products.", link("See member deals", PORTAL))]
+            ("members-portal", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", link("See today's deals", PORTAL))]
     body = (intro("Two months in", "Two months in: here's what's yours this month",
                   "The monthly 10%, the prize draw and the member deals. Plus, from today, 5% more on any trade-in.")
             + icon_rows(ctx, rows) + text_row("", "0 0 12px") + footer(ctx))

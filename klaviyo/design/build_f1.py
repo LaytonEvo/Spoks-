@@ -191,7 +191,7 @@ def shell(ctx, body, pre, header=True):
 
 # ---------------- emails ----------------
 BENEFITS = [("free-returns", "Free returns, 4 a year"), ("free-delivery-members", "Free shipping over £10"),
-            ("monthly-prize-draw", "A prize draw entry every month"), ("member-price-tag", "10% off member deals in your portal"),
+            ("monthly-prize-draw", "A prize draw entry every month"), ("member-price-tag", "Instant daily deals and exclusive member deals"),
             ("calendar", "48 hours' early access to new kit")]
 
 
@@ -242,7 +242,7 @@ def e2h(ctx):
             + intro("Trolleys and clubs", "The big buys, without the guesswork",
                     "No single product pushed at you. Just how we'd help a mate choose.")
             + icon_rows(ctx, rows)
-            + member_note(ctx, "10% off one order every month", "Plus member-only deals in your portal and a prize draw every month.")
+            + member_note(ctx, "10% off one order every month", "Plus instant daily deals in your portal and a prize draw every month.")
             + text_row(p("Not sure which way to go? Reply to this email and tell us how you play. A real golfer will answer.", 16, margin="0"), "28px 44px 28px")
             + usp3(ctx) + footer(ctx))
     return shell(ctx, body, "How to choose a trolley, why we fit clubs first, and the used route in.")
@@ -309,7 +309,7 @@ def e4(ctx):
                        "10% off your first order, then 10% off one order every month. Free returns, free shipping over £10 and 48 hours' early access to new kit.",
                        "Join for £36 a year", URL["join"])
             + way_card(ctx, 2, "monthly-prize-draw", "Member-only deals and a monthly prize draw",
-                       "Members get 10% off the deals in the member portal, and an entry into a prize draw every month. This month's prize is on the members page.",
+                       "Members get instant daily deals and exclusive member deals in the portal that you won't see anywhere else on the site, plus an entry into a prize draw every month. This month's prize is on the members page.",
                        "See member deals and this month's prize", URL["join"])
             + text_row(p("Both start the day you join. Any questions, just reply.", 16, margin="0"), "12px 44px 28px")
             + usp3(ctx) + b.trust() + footer(ctx))
