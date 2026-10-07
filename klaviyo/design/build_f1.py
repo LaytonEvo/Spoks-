@@ -160,7 +160,7 @@ def member_note(ctx, heading, body, label="See what membership includes", href=U
     """The one secondary panel: stone strip, a short line on the left, a bold green link on the right."""
     return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:32px 48px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
             f'<tr><td bgcolor="{CREAM}" style="background:{CREAM};padding:22px 24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
-            f'<td class="panel-l" valign="middle" style="font:15px/23px {SANS};color:{INK};"><strong style="font-weight:600;color:{HEAD};">{heading}.</strong> {body}</td>'
+            f'<td class="panel-l" valign="middle" style="font:15px/23px {SANS};color:{INK};"><strong style="font-weight:600;color:{HEAD};">{heading if heading[-1:] in "?!." else heading + "."}</strong> {body}</td>'
             f'<td class="panel-r" valign="middle" align="right" style="padding-left:16px;white-space:nowrap;">'
             f'<a href="{href}" style="font:600 15px/23px {SANS};color:{G};text-decoration:underline;text-underline-offset:3px;">{label}</a></td>'
             f'</tr></table></td></tr></table></td></tr>')

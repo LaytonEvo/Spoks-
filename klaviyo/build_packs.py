@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "design"))
 import build_f1 as f1  # noqa: E402
 import build_f2 as f2  # noqa: E402
 import build_f3 as f3  # noqa: E402
+import build_f9 as f9  # noqa: E402
 
 OUT = ROOT.parent / "dashboard" / "app" / "drafts"
 FROM = "info@evolutiongolf.co.uk"
@@ -258,6 +259,72 @@ def f3_pack():
     }
 
 
+def f9_pack():
+    pid, m = "f9-after-delivery", meta(f9.EMAILS)
+    E = lambda tid, key, nxt, sender=BRAND: email(tid, key, f"F9 {m[key]['name']}", m[key]["subject"], m[key]["preview"], nxt, sender)
+    col = lambda names, days: any_of(*[metric("WJizp7", "greater-than-or-equal", 1, last(days),
+                                              [{"property": "Collections", "filter": {"type": "string", "operator": "contains", "value": c}}]) for c in names])
+    hardware, trolley = col(f3.HARDWARE, 4), col(f3.TROLLEYS, 14)
+    member = any_of({"type": "profile-property", "property": "properties['MemberTier']", "filter": {"type": "existence", "operator": "is-set"}})
+    ordered = lambda days: all_of(metric("T9sNn9", "greater-than-or-equal", 1, last(days)))
+    A = []
+
+    def review_h(tag, base_trolley, base_clubs):
+        """Split trolley / clubs for the Hardware review: waits are from where the branch stands."""
+        A.extend([split(f"t{tag}", trolley, f"wt{tag}", f"wc{tag}"),
+                  wait(f"wt{tag}", base_trolley, "days", f"rt{tag}", at="09:30"), E(f"rt{tag}", "rvh", None, ALEX),
+                  wait(f"wc{tag}", base_clubs, "days", f"rc{tag}", at="09:30"), E(f"rc{tag}", "rvh", None, ALEX)])
+        return f"t{tag}"
+
+    A += [wait("w3", 3, "days", "hw", at="09:30"), split("hw", hardware, "hm", "em")]
+    # Hardware: members / non-members with a recent order (credit offer) / non-members with an older order
+    A += [split("hm", member, "h1m", "hr"), split("hr", ordered(10), "h1o", "h1n")]
+    for tag, key in (("m", "e1hn"), ("n", "e1hn")):
+        A += [E(f"h1{tag}", key, f"h4{tag}"), wait(f"h4{tag}", 4, "days", f"h2{tag}", at="17:30"),
+              E(f"h2{tag}", "e2h", f"th{tag}")]
+        review_h(f"h{tag}", 10, 24)
+    A += [E("h1o", "e1h", "h4o"), wait("h4o", 4, "days", "h2o", at="17:30"), E("h2o", "e2h", "h3o"),
+          wait("h3o", 3, "days", "hro", at="09:30"), split("hro", ordered(12), "remh", "tho"), E("remh", "rem", "thr2")]
+    review_h("ho", 7, 21)
+    review_h("hr2", 7, 21)
+    # Everything else
+    A += [split("em", member, "e1m", "er"), split("er", ordered(10), "e1o", "e1n"),
+          E("e1m", "e1en", "ewm"), wait("ewm", 10, "days", "rvm", at="09:30"), E("rvm", "rve", None, ALEX),
+          E("e1n", "e1en", "ewn"), wait("ewn", 10, "days", "rvn", at="09:30"), E("rvn", "rve", None, ALEX),
+          E("e1o", "e1e", "ew7"), wait("ew7", 7, "days", "ero", at="09:30"), split("ero", ordered(12), "reme", "ew3"),
+          E("reme", "rem", "ew3r"), wait("ew3r", 3, "days", "rvr", at="09:30"), E("rvr", "rve", None, ALEX),
+          wait("ew3", 3, "days", "rvo", at="09:30"), E("rvo", "rve", None, ALEX)]
+    return pid, {
+        "id": pid, "title": "F9 After delivery + review",
+        "summary": "Online orders, 3 days after dispatch: setting up and looking after what they bought (trolley and club sections switch on "
+                   "per order), the membership credit offer for non-members (10% of the order back as store credit if they join within 14 days), "
+                   "then an honest review request from Alex. No codes.",
+        "replaces": "Replaces “NEW: Post-Fulfillment”. Set that to Manual when you switch this on.",
+        "outline": ["Starts: Fulfilled Order, online only (till sales left out). 3 days later, 09:30.",
+                    "Hardware (trolley, club or used club) or Everything else, by what was ordered",
+                    "Members · non-members who ordered in the last 10 days (credit offer) · non-members with older orders (no offer)",
+                    "Hardware: E1 set-up · 4 days later E2 care + accessories · reminder at day 10 (offer path, order still inside 14 days) · "
+                    "review about 2 weeks after delivery for trolleys, about 4 weeks for clubs",
+                    "Everything else: E1 thanks · reminder at day 10 (offer path) · review about 10 days after delivery"],
+        "after": ["Set re-entry to 30 days in the flow settings (the API can't), so a customer with two orders in a month gets one set.",
+                  "Remember the credit: when a non-member joins within 14 days of an order, your team adds 10% of that order as store credit.",
+                  "Send yourself tests with a Motocaddy order, a PowaKaddy order and a clubs order, to check the right sections and links show.",
+                  "When happy, switch it on and set “NEW: Post-Fulfillment” to Manual."],
+        "split_labels": {"hw": {"label": "Order has a trolley, club or used club", "yes": "Hardware", "no": "Everything else"},
+                         **{k: {"label": "Member (Free or annual)?", "yes": "Member", "no": "Not a member"} for k in ("hm", "em")},
+                         **{k: {"label": "Ordered in the last 10 days?", "yes": "Credit offer", "no": "Older order: no offer"} for k in ("hr", "er")},
+                         **{k: {"label": "Order still inside the 14 days?", "yes": "Send the reminder", "no": "Skip it"} for k in ("hro", "ero")},
+                         **{f"t{t}": {"label": "Order has a trolley?", "yes": "Trolley: review at ~2 weeks", "no": "Clubs: review at ~4 weeks"}
+                            for t in ("hm", "hn", "ho", "hr2")}},
+        "templates": templates(pid, f9.EMAILS, "EG · F9", ROOT / "design" / "f9"),
+        "flow": {"name": "EG · F9 After delivery + review", "definition": {
+            "triggers": [{"type": "metric", "id": "WJizp7", "trigger_filter": {"condition_groups": [{"conditions": [
+                {"type": "metric-property", "metric_id": "WJizp7", "field": "Source Name",
+                 "filter": {"type": "string", "operator": "not-equals", "value": "pos"}}]}]}}],
+            "profile_filter": all_of(NO_BOUNCE), "entry_action_id": "w3", "actions": A}},
+    }
+
+
 def check(pk):
     acts = {a["temporary_id"]: a for a in pk["flow"]["definition"]["actions"]}
     keys = {t["key"] for t in pk["templates"]}
@@ -272,7 +339,7 @@ def check(pk):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    packs = [f1_pack(), *f2_packs(), f3_pack()]
+    packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack()]
     add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
     for _, pk in packs[1:]:
         add_photos(pk, f2.EMAILS, f1.SLOTS, f1.PHOTO_RULES)

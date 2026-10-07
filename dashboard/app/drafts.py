@@ -127,7 +127,8 @@ def _journey(pk):
     who = AUDIENCES.get(trig.get("id")) or seg_names.get(trig.get("ref")) or trig.get("id")
     if trig.get("type") == "metric":
         cond = snapshot._filter_label(trig.get("trigger_filter"), {})
-        trigger = f"When someone does “{snapshot._metric(trig.get('id'), {})}”" + (f" ({cond.replace('$value greater-than-or-equal ', 'worth £').replace('$value', 'value')} or more)" if cond else "")
+        trigger = f"When someone does “{snapshot._metric(trig.get('id'), {})}”" + (f" ({cond.replace('$value greater-than-or-equal ', 'worth £').replace('$value', 'value')} or more)" if "$value" in cond
+                  else " (online orders only)" if "Source Name not-equals pos" in cond else f" ({cond})" if cond else "")
     else:
         trigger = f"When someone joins the {trig.get('type')} “{who}”"
     return {"steps": steps, "trigger": trigger, "flow_filter": snapshot._filter_label(definition.get("profile_filter"), {})}
