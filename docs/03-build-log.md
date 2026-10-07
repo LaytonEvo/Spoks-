@@ -121,3 +121,4 @@
   £300, none for members. Templates checked with Django (no brackets in conditions). No discount codes. Delivery-days CONFIRM removed (claim dropped).
   F2 Free updated for site-wide 5%; Free E2 maths now compares with Free (one £60 order a month covers £36). F2 + F3 docs updated.
 - 7 Oct: confirmed (Layton): annual members don't keep Free's 5% on other orders. F2 Free E2 sum ('one £60 order a month covers the £36') stands as written.
+- 7 Oct: F3 updated from Layton's edits in the v2 copy doc (https://claude.ai/code/artifact/f283f33b-3647-47cc-947e-0fb9ad3787b4): Good-to-know rows now Delivery / Returns (membership) / Paying for it / Right choice? (hardware only, talk to the team) / Price? (price match on request, everyone); warranty + YouTube rows removed; help line under trolley checks; clubs block leads with the team (fitting if near Ringwood); Alex E3 reworded; E3 under-£300 note lists Free benefits. Templates re-checked with Django.

@@ -6,7 +6,7 @@ Structure (Layton, 7 Oct 2026): three paths from Email 1, each email 1 hour / ne
     for itself), E2 quick checks + membership, text, E3 from Alex.
   Non-members, under £300: the Free membership (5% off everything on the site) is the offer; E1, E2, text, E3 last nudge.
     Free members on these paths see "your 5% can go on this" / "upgrade to 10%" instead of "join free".
-Trolley checks, club fitting, the Motocaddy warranty and the YouTube review link show only when the basket has that kind of
+Trolley checks, club advice and the 'right choice?' row show only when the basket has that kind of
 item (Klaviyo tags on the event's Collections). No discount codes (member and Free-member savings come from membership). Writes klaviyo/design/f3/<key>.html (live, Klaviyo tags) and <key>.preview.html
 (an example basket, for the dashboard).
 
@@ -120,19 +120,19 @@ def is_free(ctx, yes, no):
     return no + note + yes
 
 
-def youtube(ctx):
-    yt = ("https://www.youtube.com/results?search_query={{ event.extra.line_items.0.product.title|urlencode }}+review"
-          if ctx.live else "https://www.youtube.com/results?search_query=Motocaddy+M1+DHC+review")
-    return (f"Watch independent reviews of the {product_name(ctx)} on YouTube, or reply to this email and we'll help you choose.<br>"
-            + link("Watch reviews on YouTube", yt))
+
+PHONE = f'<a href="tel:03301227089" style="color:{G};">0330 122 7089</a>'
 
 
 def basket_facts(ctx, member=False):
+    """'Good to know' rows (Layton's edits, 7 Oct 2026): no warranty or YouTube rows; returns, choice help and price match."""
     rows = [("Delivery", "Free delivery over £10, as a member." if member else "Free UK delivery on orders over £50.", None),
-            ("Warranty", "2 years on the trolley.", "event.extra.line_items.0.product.vendor == 'Motocaddy'"),
+            ("Returns", "Free, four a year, as a member. Start one from your portal." if member
+             else "Members get four free returns a year, so you can change your mind.", None),
             ("Paying for it", "Pay in 3 interest-free instalments with Klarna at checkout.", None),
-            ("Right model?", youtube(ctx), has(HARDWARE)),
-            ("Size or fit?", "Reply to this email and we'll help.", has_none(HARDWARE))]
+            ("Right choice?", "Feel free to give us a ring or drop us a message. Our expert team will steer you in the right direction.<br>"
+                              + link("Get in touch", URL["contact"]), has(HARDWARE)),
+            ("Price?", "Seen it cheaper somewhere else? Reply to this email or give us a ring and we'll see if we can match it.", None)]
     return facts(ctx, "Good to know before you check out", rows)
 
 
@@ -144,10 +144,13 @@ CHECKS = [("Range.", "Does the battery cover your usual round with margin? 18-ho
 def checks(ctx):
     """Trolley checks / club fitting, each only when the basket has that kind of item; a reply line otherwise."""
     trolley = (text_row(f'<h3 style="margin:0;font:400 24px/30px {SERIF};color:{HEAD};">Buying a trolley?</h3>', "28px 48px 0")
-               + f2.steps(CHECKS))
+               + f2.steps(CHECKS)
+               + text_row(p(f"Not sure on any of these? Reply to this email or call us on {PHONE} and we'll help you pick the right one.",
+                            15, margin="0 0 8px") + link("Get in touch", URL["contact"]), "16px 48px 0"))
     clubs = text_row(f'<h3 style="margin:0 0 8px;font:400 24px/30px {SERIF};color:{HEAD};">Buying clubs?</h3>'
-                     + p("A fitting on a launch monitor sorts out lie, shaft, length and grip before you commit.", margin="0 0 8px")
-                     + link("Book a fitting", URL["fitting"]), "28px 48px 0")
+                     + p(f"Shaft, length, lie and grip all make a difference. Reply to this email or call us on {PHONE} and our team will "
+                         "help you get the right spec. Near Ringwood? A fitting on our launch monitor sorts it out before you commit.", margin="0 0 8px")
+                     + link("Talk to our team", URL["contact"]), "28px 48px 0")
     neither = text_row(p("Not sure it's the right one? Reply to this email and tell us how you play. A real golfer will answer.", margin="0"), "20px 48px 0")
     return (ctx.when(has(TROLLEYS), trolley, "the basket has a trolley")
             + ctx.when(has(CLUBS), clubs, "the basket has new clubs")
@@ -243,8 +246,8 @@ def e3h(ctx):
     body = (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:44px 48px 28px;">'
             f'<p style="{pp}">Hi {hi},</p>'
             f'<p style="{pp}">Alex from Evolution Golf. I can see you were looking at the {product_name(ctx)}.</p>'
-            f'<p style="{pp}">If you\'re not sure it\'s the right one (the course you play, how often, what you\'re trying to fix), reply to this '
-            f'and I\'ll give you a straight answer. If something cheaper would do the job, I\'ll say so.</p>'
+            f'<p style="{pp}">If you\'re not sure it\'s the right choice for you, feel free to reply to this and I\'ll give you a straight answer. '
+            f'If something cheaper would do the job, I\'ll say so.</p>'
             f'<p style="{pp}">If you\'ve already bought elsewhere, no problem at all. Ignore this one.</p>'
             f'{sig}<p style="margin:22px 0 0;font:15px/22px {SANS};"><a href="{BASKET if ctx.live else "#"}" style="color:{G};">My basket</a></p></td></tr>'
             f'<tr><td class="px foot-light" bgcolor="{WHITE}" style="padding:18px 48px 24px;border-top:1px solid {LINE};font:12px/18px {SANS};color:{MUTED};">'
@@ -256,7 +259,8 @@ def e3lo(ctx):
     body = (intro("Still in your basket", "Your basket's still here", "We'll stop reminding you after this one.")
             + basket(ctx, big=False) + text_row(button("Back to my basket", BASKET), "28px 48px 0")
             + is_free(ctx, member_note(ctx, "Your 5% can go on this", "As a Free member you get 5% off everything on the site.", "Open my portal", f2.PORTAL),
-                      member_note(ctx, "Join free first", "Free members get 5% off everything, this basket included.", "Join free"))
+                      member_note(ctx, "Join free first", "Free members get 5% off everything (this basket included), free delivery over £30, "
+                                  "loyalty points on everything they buy, and member deals in the portal you won't see anywhere else.", "Join free"))
             + close(ctx))
     return f1.shell(ctx, body, "Your basket's saved, and 5% can come off it with Free membership.")
 
