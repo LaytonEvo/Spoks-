@@ -5,7 +5,7 @@ two plans on evolutiongolf.co.uk/pages/members-page: Free (£0) and the Annual M
   Free   - FE1 portal live (day 0), FE2 the honest maths (day 4), FE3 the plan in use (day 12). Before FE2/FE3: if no longer
            Free, they get PE1 instead and stop.
   Annual - PE1 welcome (day 0, smart sending off), PE2 free returns (day 3), PE3 first month (day 30),
-           PE4 trade-in bonus on (day 60), PE5 renewal reminder (day 335).
+           PE4 two months in (day 60), PE5 renewal reminder (day 335).
 Every fact below is from the members page; nothing else is assumed.
 
 Run: python3 klaviyo/design/build_f2.py <scratch img dir>
@@ -162,24 +162,35 @@ def pe2(ctx):
     return shell(ctx, body, "Instant daily deals and exclusive member deals. Only in your portal.")
 
 
+def portal_cta(lead):
+    """One clear next step under the sections: a short lead line, then the one primary button."""
+    return (text_row(p(f'<strong style="font-weight:600;color:{HEAD};">{lead}</strong> It\'s in your member portal, with today\'s deals.',
+                       margin="0"), "28px 48px 0")
+            + text_row(button("Open my member portal", PORTAL), "20px 48px 0"))
+
+
+PRIZE_LINK = link("See this month's prize", JOIN)  # the prize is shown on the members page
+
+
 def pe3(ctx):
     body = (intro("One month in", "Your first month as a member",
                   "A quick reminder of what's there for you, now you've had a month.")
             + icon_rows(ctx, [
-                ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order. It's in your portal.", link("Open my portal", PORTAL)),
-                ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
-                ("members-portal", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", link("See today's deals", PORTAL))])
+                ("member-price-tag", "This month's 10%", "A new month means a new 10% off one order, on anything across the site.", ""),
+                ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
+                ("members-portal", "Instant daily deals", "New in your portal every day, and not on the rest of the site.", "")])
+            + portal_cta("Your 10% code is waiting.")
             + icon_row() + footer(ctx))
     return shell(ctx, body, "Your monthly 10%, this month's prize draw and the member deals.")
 
 
 def pe4(ctx):
-    rows = [("member-price-tag", "This month's 10%", "One order this month gets 10% off. The code is waiting in your member portal.", link("Open my portal", PORTAL)),
-            ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", ""),
-            ("members-portal", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", link("See today's deals", PORTAL))]
+    rows = [("member-price-tag", "This month's 10%", "One order this month gets 10% off, on anything across the site.", ""),
+            ("monthly-prize-draw", "This month's prize draw", "You're in it automatically. We draw it at the start of next month.", PRIZE_LINK),
+            ("members-portal", "Instant daily deals", "New in your portal every day and not on the rest of the site, plus 48 hours' early access to new products.", "")]
     body = (intro("Two months in", "Two months in: here's what's yours this month",
-                  "The monthly 10%, the prize draw and the member deals. Plus, from today, 5% more on any trade-in.")
-            + icon_rows(ctx, rows) + icon_row() + footer(ctx))
+                  "The monthly 10%, the prize draw and the member deals, all in one place.")
+            + icon_rows(ctx, rows) + portal_cta("This month's 10% code is waiting.") + icon_row() + footer(ctx))
     return shell(ctx, body, "This month's 10%, the prize draw and member deals. All in your portal.")
 
 
