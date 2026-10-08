@@ -18,6 +18,7 @@ import build_f2 as f2  # noqa: E402
 import build_f3 as f3  # noqa: E402
 import build_f9 as f9  # noqa: E402
 import build_f12 as f12  # noqa: E402
+import build_f13 as f13  # noqa: E402
 
 OUT = ROOT.parent / "dashboard" / "app" / "drafts"
 FROM = "info@evolutiongolf.co.uk"
@@ -368,6 +369,47 @@ def f12_pack():
     }
 
 
+def f13_pack():
+    pid, m = "f13-sunset", meta(f13.EMAILS)
+    E = lambda tid, key, nxt, sender=BRAND: email(tid, key, f"F13 {m[key]['name']}", m[key]["subject"], m[key]["preview"], nxt, sender)
+    candidates = all_of(metric("Wz44Gj", "greater-than-or-equal", 8, ALL), metric("ULCbbQ", "equals", 0, last(150)),
+                        metric("URfrxe", "equals", 0, last(150)), metric("T9sNn9", "equals", 0, last(180)))
+    suppress = any_of({"type": "profile-property", "property": "properties['sunset_status']",
+                       "filter": {"type": "string", "operator": "equals", "value": "suppress"}})
+    member = any_of({"type": "profile-property", "property": "properties['MemberTier']", "filter": {"type": "existence", "operator": "is-set"}})
+    # Same shape as the update-profile steps in the account's live welcome flow (read 8 Oct 2026).
+    mark = {"temporary_id": "mark", "type": "update-profile", "links": {"next": None}, "data": {"profile_operations": [
+        {"operator": "update", "property_type": "string", "property_key": "properties['sunset_status']", "property_value": "suppress"}]}}
+    A = [split("mem", member, None, "e1"), E("e1", "e1", "w10"), wait("w10", 10, "days", "e2", at="17:30"), E("e2", "e2", "w7", ALEX),
+         wait("w7", 7, "days", "mark", at="09:30"), mark]
+    return pid, {
+        "id": pid, "title": "F13 Sunset",
+        "summary": "People who've had 8+ emails but haven't opened or clicked in 150 days or ordered in 180 (members never). One polite "
+                   "'still want these?', one last note from Alex; no click and they're marked to stop getting marketing emails. "
+                   "Protects where all our other emails land. No offers.",
+        "replaces": "New: nothing to switch off.",
+        "outline": ["Starts: someone joins the new segment “EG · Sunset · candidates” (created for this). Any click or order and they leave.",
+                    "Members (Free or annual) leave at the first step.",
+                    "Day 0: E1 still want to hear from us?", "Day 10, 17:30: E2 the last one, from Alex",
+                    "Day 17, 09:30: marked sunset_status = suppress, which puts them in the segment “EG · Sunset · to suppress”"],
+        "after": ["Check the size of “EG · Sunset · candidates” and look at 20 profiles by hand: no members, no recent buyers.",
+                  "Exclude “EG · Sunset · to suppress” from campaigns: add it to “Don't send to” (or to your usual campaign segment).",
+                  "Add “not in EG · Sunset · to suppress” to the flow filters of your existing live marketing flows.",
+                  "Send yourself a test of each email.",
+                  "Switch on, then use “Add past profiles” for the backlog. If the segment is over about 2,000 people, ask me for steps to add it in chunks.",
+                  "Don't start it in the two weeks before Black Friday or Christmas.",
+                  "Optional, to lower your Klaviyo bill: every few months, export “EG · Sunset · to suppress” and bulk-suppress it (Manage → Suppress)."],
+        "segments": [{"key": "candidates", "name": "EG · Sunset · candidates", "definition": candidates},
+                     {"key": "suppress", "name": "EG · Sunset · to suppress", "definition": suppress}],
+        "split_labels": {"mem": {"label": "Member (Free or annual)?", "yes": "Member: leaves", "no": "Not a member"}},
+        "templates": templates(pid, f13.EMAILS, "EG · F13", ROOT / "design" / "f13"),
+        "flow": {"name": "EG · F13 Sunset", "definition": {
+            "triggers": [{"type": "segment", "ref": "candidates"}],
+            "profile_filter": all_of(metric("T9sNn9", "equals", 0, FS), metric("URfrxe", "equals", 0, FS)),
+            "entry_action_id": "mem", "actions": A}},
+    }
+
+
 def check(pk):
     acts = {a["temporary_id"]: a for a in pk["flow"]["definition"]["actions"]}
     keys = {t["key"] for t in pk["templates"]}
@@ -382,7 +424,7 @@ def check(pk):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack(), f12_pack()]
+    packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack(), f12_pack(), f13_pack()]
     add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
     for _, pk in packs[1:3]:
         add_photos(pk, f2.EMAILS, f1.SLOTS, f1.PHOTO_RULES)

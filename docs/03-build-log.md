@@ -147,3 +147,13 @@
   trolleys/clubs/used) → E1h (with "still going strong?" panel) or E1; E2 Alex day 10 17:30; E3 day 24 09:30.
   Deviations: E1 sends as they join (no 09:30 wait at day 0); "once per 6 months" → Klaviyo allows one pass through a segment flow.
   Templates Django-checked.
+- 8 Oct: F13 copy doc (https://claude.ai/code/artifact/9291dfce-47a0-43dd-9bed-d4a69af4c819). Layton: Free members out (all members out);
+  button → home page; no manual monthly step (the "to suppress" segment is excluded from campaigns and flows instead; optional bulk
+  suppress for billing stays manual, since the app never touches contact records); exclusion added to the after-steps.
+- 8 Oct: **F13 Sunset built** as pack `f13-sunset` (2 emails, 6 steps). Builder `klaviyo/design/build_f13.py`.
+  Segments (both created by the app): "EG · Sunset · candidates" = Received Email (Wz44Gj) ≥8 all time, Opened 0 and Clicked 0 in last
+  150 days, Placed Order 0 in last 180; "EG · Sunset · to suppress" = sunset_status equals suppress. Flow: candidates trigger; filter
+  Placed Order 0 + Clicked Email 0 since flow start (any click exits); split members out; E1 → 10 days 17:30 → E2 (Alex) → 7 days
+  → update-profile sunset_status = suppress. update-profile shape copied from the live welcome flow's steps (read via the Klaviyo API);
+  Klaviyo's flow API has no add-to-list step, so the copy doc's list became property + segment (doc updated). Pack's "subscribed
+  150+ days ago" rule dropped (8 received emails covers new subscribers). Django-checked.
