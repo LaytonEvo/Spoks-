@@ -29,11 +29,11 @@ the Motocaddy and PowaKaddy registration pages and the social links couldn't be 
 
 ## Must fix before switching on
 
-1. **F1 E2 Hardware shows a "CONFIRM grading wording" badge** after "Every set is checked before it goes on sale". Confirm that line
+1. ~~**F1 E2 Hardware shows a "CONFIRM grading wording" badge**~~ Done 8 Oct (rescanned). after "Every set is checked before it goes on sale". Confirm that line
    is true (or give the wording), then remove the badge in the Klaviyo editor (template XfKb47). The API can't edit flow emails.
 2. **F13: create "EG · Sunset · to suppress" as soon as the first people are tagged** (about 17 days after switch-on) and exclude it
    from campaigns and live flows. Until then E1's "we'll check once more, then stop" and E2's "last email" aren't true.
-3. **Re-entry settings** (the API can't set them): F3 7 days, F9 30 days, in each flow's settings.
+3. ~~**Re-entry settings**~~ Done 8 Oct (F3 7 days, F9 30 days, rescanned). (the API can't set them): F3 7 days, F9 30 days, in each flow's settings.
 
 ## Should fix (copy and logic)
 

@@ -165,3 +165,4 @@
 - 8 Oct: F13 created in Klaviyo as a draft (Layton confirmed). To do ~17 days after switch-on: create segment 'EG · Sunset · to suppress' (sunset_status equals suppress) and exclude it from campaigns and live flows.
 - 8 Oct: Phase 4 QA (read-only) of all 7 drafts → docs/04-review-pack.md. All match their packs; 1 must-fix (F1 E2h CONFIRM badge), manual steps (F13 suppress segment, re-entry F3/F9), fixes advised for F3 and F9.
 - 8 Oct (Layton): F1 E2h 'CONFIRM grading wording' badge removed in the builder (line kept). Klaviyo copy (template XfKb47, flow XXpu28) to be edited by hand: the API refuses edits to flow templates.
+- 8 Oct: Rescan after Layton's edits: F1 E2h (XfKb47) badge gone (full stop after 'on sale' also went); F3 re-entry 7 days and F9 re-entry 30 days set; both still draft.
