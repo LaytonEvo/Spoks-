@@ -68,18 +68,22 @@ SLOTS = {
                alt="", source="Automatic from Shopify. Main product photos need a plain white background and no badges (the M1 DHC's main photo says \"FREE GIFT\").",
                size="Shows at 240 × 240 px. Shopify main photos should be square, at least 800 px.",
                now="Automatic", now_status="Have", none="Always there if the product has a photo."),
-    "C1": dict(emails="F9 Hardware Email 2 (trolley orders)", title="Trolley battery on charge", where="Across the top of the trolley care section",
+    "C1": dict(emails="F9 Hardware Email 2 (Motocaddy trolley orders)", title="Trolley battery on charge", where="Across the top of the trolley care section",
                what="A lithium trolley battery on charge indoors, plugged in on a hard floor or bench. Matches the first tip: charge after every round, unplug when full.",
                alt="", source="Your own shot in the shop works well; Motocaddy press images are the alternative.",
-               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the care tips lead."),
+               size=HERO_SIZE, now="Supplied 8 Oct (in the Klaviyo library)", now_status="Have", none="Without it, the care tips lead."),
     "C2": dict(emails="F9 Hardware Email 2 (club orders)", title="Looking after clubs", where="Across the top of the club care section",
                what="Close-up hands cleaning a club face with a brush and towel, or a fresh grip going on.",
                alt="", source="Stock is fine; your own workshop shot is better.",
-               size=HERO_SIZE, now="Nothing chosen yet", now_status="Needed", none="Without it, the care tips lead."),
-    "X1": dict(emails="F9 Hardware Email 2 (trolley orders)", title="Trolley with accessories fitted", where="Top of the \"Goes well with it\" section",
+               size=HERO_SIZE, now="Supplied 8 Oct (in the Klaviyo library)", now_status="Have", none="Without it, the care tips lead."),
+    "X2": dict(emails="F9 Hardware Email 2 (club orders)", title="Club accessories", where="Top of the clubs part of \"Goes well with it\"",
+               what="Grips, headcovers, club brushes and a towel laid out together.", alt="", source="Supplied by Layton.",
+               size="Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.", now="Supplied 8 Oct (in the Klaviyo library)",
+               now_status="Have", none="Without it, the accessory links lead."),
+    "X1": dict(emails="F9 Hardware Email 2 (Motocaddy trolley orders)", title="Trolley with accessories fitted", where="Top of the \"Goes well with it\" section",
                what="A Motocaddy trolley out on the course with accessories fitted (umbrella holder, cup holder, scorecard holder), so people see what they'd add.",
                alt="", source="Motocaddy press images are likely to have this.",
-               size="Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.", now="Nothing chosen yet", now_status="Needed",
+               size="Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.", now="Supplied 8 Oct (in the Klaviyo library)", now_status="Have",
                none="Without it, the accessory links lead."),
 }
 # Photos supplied by Layton, 7 Oct 2026 (cropped to 1200 x 720 / 240 x 240, hosted in the Klaviyo library).
@@ -88,10 +92,18 @@ PHOTOS = {"W1": "https://cdn.klaviyomail.com/company/SiyYRR/images/7d745e06-9b49
           "W3": "https://cdn.klaviyomail.com/company/SiyYRR/images/5bffdf31-4a7a-4327-81e7-30b16012080a.jpeg",
           "A1": "https://cdn.klaviyomail.com/company/SiyYRR/images/50596254-d610-4268-a459-f77bfb2dae1b.jpeg",
           "M1": "https://cdn.klaviyomail.com/company/SiyYRR/images/9ef9537c-b4e6-4871-981b-a0db1c224456.jpeg"}
-PHOTO_SIZE = {"M1": (600, 200)}  # supplied as a 1024 x 338 panorama: shown as a wide 3:1 banner rather than blown up to 5:3
+PHOTOS.update({  # F9 photos from Layton, 8 Oct 2026
+    "C1": "https://cdn.klaviyomail.com/company/SiyYRR/images/6c6bf123-ae68-4ac6-bc24-df8ce104229e.jpeg",
+    "C2": "https://cdn.klaviyomail.com/company/SiyYRR/images/b5141762-d509-456b-94eb-759698bcc5cf.jpeg",
+    "X1": "https://cdn.klaviyomail.com/company/SiyYRR/images/e0c58451-50cf-4c0e-b26e-d4030e42f317.jpeg",
+    "X2": "https://cdn.klaviyomail.com/company/SiyYRR/images/f042426a-6042-4bfa-b390-5679406c3da8.jpeg"})
+PHOTO_SIZE = {"M1": (600, 200), "X1": (600, 300), "X2": (600, 300)}  # supplied as a 1024 x 338 panorama: shown as a wide 3:1 banner rather than blown up to 5:3
 PHOTO_ALT = {"W1": "A golf course on a sunny day", "W2": "A golfer walking the course with an electric trolley",
              "W3": "A golfer's shoes on the fairway mid-swing", "A1": "Alex",
-             "M1": "A golfer with a trolley on the first tee on a misty morning"}
+             "M1": "A golfer with a trolley on the first tee on a misty morning",
+             "C1": "A Motocaddy lithium trolley battery", "C2": "Cleaning the face of an iron with a brush and towel",
+             "X1": "A trolley handle with umbrella holder, cup holder and phone holder fitted",
+             "X2": "Golf grips, headcovers, club brushes and a towel"}
 PHOTO_PREVIEW = {"W1": "eg-w1.jpg", "W2": "eg-w2.jpg", "W3": "eg-w3.jpg", "A1": "eg-a1.jpg", "M1": "eg-m1.jpg"}  # in <img dir>/photos_out
 PHOTO_RULES = [
     "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",

@@ -93,6 +93,11 @@ def product_photo(ctx):
     return ("{% if event.extra.line_items.0.product.images.0.src %}" + img + "{% endif %}") if ctx.live else img
 
 
+def moto_only(ctx, html):
+    """C1 and X1 show Motocaddy kit, so they only go to Motocaddy orders."""
+    return ("{% if " + VENDOR + " == 'Motocaddy' %}" + html + "{% endif %}") if (ctx.live and html) else html
+
+
 def hero(ctx, key, h=360):
     """A photo spot (C1, C2, X1): the photo once supplied, a labelled placeholder in the photo-spots view, nothing otherwise."""
     s = ctx.slot(key, 600, h)
@@ -167,9 +172,10 @@ def e2h(ctx):
                  + link("Grips", COL("golf-grips")) + " &nbsp;·&nbsp; " + link("Headcovers", COL("headcovers")) + " &nbsp;·&nbsp; "
                  + link("Golf balls", COL("golf-balls")))
     body = (intro("Looking after it", "Keep it going for years")
-            + ctx.when(has(TROLLEYS), hero(ctx, "C1") + text_row(h3("Your trolley") + bullets(CARE_TROLLEY), "20px 48px 0"), "the order has a trolley")
+            + ctx.when(has(TROLLEYS), moto_only(ctx, hero(ctx, "C1")) + text_row(h3("Your trolley") + bullets(CARE_TROLLEY), "20px 48px 0"), "the order has a trolley")
             + ctx.when(has(CLUBS + f3.USED), hero(ctx, "C2") + text_row(h3("Your clubs") + bullets(CARE_CLUBS), "28px 48px 0"), "the order has clubs")
-            + ctx.when(has(TROLLEYS), hero(ctx, "X1", 300), "the order has a trolley")
+            + ctx.when(has(TROLLEYS), moto_only(ctx, hero(ctx, "X1", 300)), "the order has a Motocaddy trolley")
+            + ctx.when(has(CLUBS + f3.USED), hero(ctx, "X2", 300), "the order has clubs")
             + text_row(f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="border-top:3px solid {G};padding:28px 0 0;">'
                        + b.eyebrow("Goes well with it") + h3("A few things that go with it", "0 0 16px")
                        + (("{% if " + has(TROLLEYS) + " %}") if ctx.live else "") + acc_trolley + (("{% endif %}") if ctx.live else "")
@@ -252,7 +258,7 @@ EMAILS = [
     dict(key="e1hn", fn=lambda c: e1h(c, False), name="E1 Hardware · Getting set up", timing="Hardware, members or older orders · 3 days after dispatch, 09:30",
          sender=BR, subject="Your new kit should be with you. A few things first", preview="Getting set up, and who to call if anything's not right.", slots=["P9"]),
     dict(key="e2h", fn=e2h, name="E2 Hardware · Looking after it", timing="Hardware · 4 days after Email 1, 17:30", sender=BR,
-         subject="Looking after your new kit", preview="A few minutes now keeps it going for years.", slots=["C1", "C2", "X1"]),
+         subject="Looking after your new kit", preview="A few minutes now keeps it going for years.", slots=["C1", "C2", "X1", "X2"]),
     dict(key="e1e", fn=lambda c: e1e(c, True), name="E1 Everything else · Thanks (with credit offer)", timing="Everything else · 3 days after dispatch, 09:30",
          sender=BR, subject="Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
          preview="Thanks for shopping with us. Here's how to reach us if you need anything.", slots=["P9"]),

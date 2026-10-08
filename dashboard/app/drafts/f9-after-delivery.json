@@ -118,7 +118,8 @@
    "photos": [
     "C1",
     "C2",
-    "X1"
+    "X1",
+    "X2"
    ]
   },
   {
@@ -3534,15 +3535,15 @@
   },
   {
    "key": "C1",
-   "emails": "F9 Hardware Email 2 (trolley orders)",
+   "emails": "F9 Hardware Email 2 (Motocaddy trolley orders)",
    "title": "Trolley battery on charge",
    "where": "Across the top of the trolley care section",
    "what": "A lithium trolley battery on charge indoors, plugged in on a hard floor or bench. Matches the first tip: charge after every round, unplug when full.",
    "alt": "",
    "source": "Your own shot in the shop works well; Motocaddy press images are the alternative.",
    "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
-   "now": "Nothing chosen yet",
-   "now_status": "Needed",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
    "none": "Without it, the care tips lead."
   },
   {
@@ -3554,21 +3555,34 @@
    "alt": "",
    "source": "Stock is fine; your own workshop shot is better.",
    "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
-   "now": "Nothing chosen yet",
-   "now_status": "Needed",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
    "none": "Without it, the care tips lead."
   },
   {
    "key": "X1",
-   "emails": "F9 Hardware Email 2 (trolley orders)",
+   "emails": "F9 Hardware Email 2 (Motocaddy trolley orders)",
    "title": "Trolley with accessories fitted",
    "where": "Top of the \"Goes well with it\" section",
    "what": "A Motocaddy trolley out on the course with accessories fitted (umbrella holder, cup holder, scorecard holder), so people see what they'd add.",
    "alt": "",
    "source": "Motocaddy press images are likely to have this.",
    "size": "Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.",
-   "now": "Nothing chosen yet",
-   "now_status": "Needed",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
+   "none": "Without it, the accessory links lead."
+  },
+  {
+   "key": "X2",
+   "emails": "F9 Hardware Email 2 (club orders)",
+   "title": "Club accessories",
+   "where": "Top of the clubs part of \"Goes well with it\"",
+   "what": "Grips, headcovers, club brushes and a towel laid out together.",
+   "alt": "",
+   "source": "Supplied by Layton.",
+   "size": "Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
    "none": "Without it, the accessory links lead."
   }
  ],
