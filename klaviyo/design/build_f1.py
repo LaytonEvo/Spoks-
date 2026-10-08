@@ -307,7 +307,7 @@ def e2h(ctx):
          "A fitting on a launch monitor sorts out lie, shaft, length, grip and gapping before you spend anything. It beats guessing from a review.",
          link("Book a fitting", URL["fitting"])),
         ("used-pre-owned", "Approved used clubs",
-         "The sensible way into better clubs for less. Every set is checked before it goes on sale " + confirm("grading wording") + ".",
+         "The sensible way into better clubs for less. Every set is checked before it goes on sale.",
          link("See approved used clubs", URL["used"])),
         ("pay-later-instalments", "Spread the cost",
          "Big buy? Pay in 3 interest-free instalments with Klarna at checkout. A third today, the rest over the next two months, no fees.",
