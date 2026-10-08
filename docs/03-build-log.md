@@ -162,3 +162,4 @@
   now say to create it about 17 days after switch-on (or ask and it's added to the app). Layton presses Try again.
 - 8 Oct: F13 Try again stopped: flow 400 "Invalid profile operation". Live flows use operator "create" (string) for a property's first
   set (e.g. InWelcomeSequence) and "update" only for existing ones. Mark step now "create". Templates from the earlier attempt are reused.
+- 8 Oct: F13 created in Klaviyo as a draft (Layton confirmed). To do ~17 days after switch-on: create segment 'EG · Sunset · to suppress' (sunset_status equals suppress) and exclude it from campaigns and live flows.
