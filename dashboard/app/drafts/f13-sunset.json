@@ -8,12 +8,12 @@
   "Members (Free or annual) leave at the first step.",
   "Day 0: E1 still want to hear from us?",
   "Day 10, 17:30: E2 the last one, from Alex",
-  "Day 17, 09:30: marked sunset_status = suppress, which puts them in the segment “EG · Sunset · to suppress”"
+  "Day 17, 09:30: marked sunset_status = suppress (the “to suppress” segment is made from this; see after-steps)"
  ],
  "after": [
   "Check the size of “EG · Sunset · candidates” and look at 20 profiles by hand: no members, no recent buyers.",
-  "Exclude “EG · Sunset · to suppress” from campaigns: add it to “Don't send to” (or to your usual campaign segment).",
-  "Add “not in EG · Sunset · to suppress” to the flow filters of your existing live marketing flows.",
+  "About 17 days after switching on (once the first people have been marked), create the segment “EG · Sunset · to suppress”: Properties about someone → sunset_status equals suppress. Klaviyo won't allow it before anyone has that property. Or ask me and I'll add it to the app.",
+  "Then exclude that segment from campaigns (“Don't send to”, or your usual campaign segment) and add “not in EG · Sunset · to suppress” to the flow filters of your live marketing flows.",
   "Send yourself a test of each email.",
   "Switch on, then use “Add past profiles” for the backlog. If the segment is over about 2,000 people, ask me for steps to add it in chunks.",
   "Don't start it in the two weeks before Black Friday or Christmas.",
@@ -104,27 +104,6 @@
          "quantity": 180
         },
         "metric_filters": null
-       }
-      ]
-     }
-    ]
-   }
-  },
-  {
-   "key": "suppress",
-   "name": "EG · Sunset · to suppress",
-   "definition": {
-    "condition_groups": [
-     {
-      "conditions": [
-       {
-        "type": "profile-property",
-        "property": "properties['sunset_status']",
-        "filter": {
-         "type": "string",
-         "operator": "equals",
-         "value": "suppress"
-        }
        }
       ]
      }

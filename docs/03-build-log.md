@@ -157,3 +157,6 @@
   → update-profile sunset_status = suppress. update-profile shape copied from the live welcome flow's steps (read via the Klaviyo API);
   Klaviyo's flow API has no add-to-list step, so the copy doc's list became property + segment (doc updated). Pack's "subscribed
   150+ days ago" rule dropped (8 received emails covers new subscribers). Django-checked.
+- 8 Oct: F13 approval stopped: Klaviyo 400 on the "EG · Sunset · to suppress" segment ("Profile property properties['sunset_status']
+  does not exist for this company"). The candidates segment was created first. Removed the suppress segment from the pack; after-steps
+  now say to create it about 17 days after switch-on (or ask and it's added to the app). Layton presses Try again.

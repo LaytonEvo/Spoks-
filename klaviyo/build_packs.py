@@ -374,8 +374,6 @@ def f13_pack():
     E = lambda tid, key, nxt, sender=BRAND: email(tid, key, f"F13 {m[key]['name']}", m[key]["subject"], m[key]["preview"], nxt, sender)
     candidates = all_of(metric("Wz44Gj", "greater-than-or-equal", 8, ALL), metric("ULCbbQ", "equals", 0, last(150)),
                         metric("URfrxe", "equals", 0, last(150)), metric("T9sNn9", "equals", 0, last(180)))
-    suppress = any_of({"type": "profile-property", "property": "properties['sunset_status']",
-                       "filter": {"type": "string", "operator": "equals", "value": "suppress"}})
     member = any_of({"type": "profile-property", "property": "properties['MemberTier']", "filter": {"type": "existence", "operator": "is-set"}})
     # Same shape as the update-profile steps in the account's live welcome flow (read 8 Oct 2026).
     mark = {"temporary_id": "mark", "type": "update-profile", "links": {"next": None}, "data": {"profile_operations": [
@@ -391,16 +389,19 @@ def f13_pack():
         "outline": ["Starts: someone joins the new segment “EG · Sunset · candidates” (created for this). Any click or order and they leave.",
                     "Members (Free or annual) leave at the first step.",
                     "Day 0: E1 still want to hear from us?", "Day 10, 17:30: E2 the last one, from Alex",
-                    "Day 17, 09:30: marked sunset_status = suppress, which puts them in the segment “EG · Sunset · to suppress”"],
+                    "Day 17, 09:30: marked sunset_status = suppress (the “to suppress” segment is made from this; see after-steps)"],
         "after": ["Check the size of “EG · Sunset · candidates” and look at 20 profiles by hand: no members, no recent buyers.",
-                  "Exclude “EG · Sunset · to suppress” from campaigns: add it to “Don't send to” (or to your usual campaign segment).",
-                  "Add “not in EG · Sunset · to suppress” to the flow filters of your existing live marketing flows.",
+                  "About 17 days after switching on (once the first people have been marked), create the segment “EG · Sunset · to suppress”: "
+                  "Properties about someone → sunset_status equals suppress. Klaviyo won't allow it before anyone has that property. Or ask me and I'll add it to the app.",
+                  "Then exclude that segment from campaigns (“Don't send to”, or your usual campaign segment) and add “not in EG · Sunset · to suppress” "
+                  "to the flow filters of your live marketing flows.",
                   "Send yourself a test of each email.",
                   "Switch on, then use “Add past profiles” for the backlog. If the segment is over about 2,000 people, ask me for steps to add it in chunks.",
                   "Don't start it in the two weeks before Black Friday or Christmas.",
                   "Optional, to lower your Klaviyo bill: every few months, export “EG · Sunset · to suppress” and bulk-suppress it (Manage → Suppress)."],
-        "segments": [{"key": "candidates", "name": "EG · Sunset · candidates", "definition": candidates},
-                     {"key": "suppress", "name": "EG · Sunset · to suppress", "definition": suppress}],
+        # "EG · Sunset · to suppress" (sunset_status equals suppress) can't be created yet: Klaviyo refuses a segment on a property
+        # no profile has (400, 8 Oct 2026). It's made once the first people reach day 17 (after-steps).
+        "segments": [{"key": "candidates", "name": "EG · Sunset · candidates", "definition": candidates}],
         "split_labels": {"mem": {"label": "Member (Free or annual)?", "yes": "Member: leaves", "no": "Not a member"}},
         "templates": templates(pid, f13.EMAILS, "EG · F13", ROOT / "design" / "f13"),
         "flow": {"name": "EG · F13 Sunset", "definition": {
