@@ -163,3 +163,4 @@
 - 8 Oct: F13 Try again stopped: flow 400 "Invalid profile operation". Live flows use operator "create" (string) for a property's first
   set (e.g. InWelcomeSequence) and "update" only for existing ones. Mark step now "create". Templates from the earlier attempt are reused.
 - 8 Oct: F13 created in Klaviyo as a draft (Layton confirmed). To do ~17 days after switch-on: create segment 'EG · Sunset · to suppress' (sunset_status equals suppress) and exclude it from campaigns and live flows.
+- 8 Oct: Phase 4 QA (read-only) of all 7 drafts → docs/04-review-pack.md. All match their packs; 1 must-fix (F1 E2h CONFIRM badge), manual steps (F13 suppress segment, re-entry F3/F9), fixes advised for F3 and F9.
