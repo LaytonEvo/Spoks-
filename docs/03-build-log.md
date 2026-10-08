@@ -167,3 +167,4 @@
 - 8 Oct (Layton): F1 E2h 'CONFIRM grading wording' badge removed in the builder (line kept). Klaviyo copy (template XfKb47, flow XXpu28) to be edited by hand: the API refuses edits to flow templates.
 - 8 Oct: Rescan after Layton's edits: F1 E2h (XfKb47) badge gone (full stop after 'on sale' also went); F3 re-entry 7 days and F9 re-entry 30 days set; both still draft.
 - 8 Oct: F3 fixes in the builder (to be copied into Klaviyo by hand; flow templates can't be edited by API): returns row 'Annual members get…' (E1 £300+, E1 under £300); E1 under £300 preview neutral; E2 under £300 subject/headline '5% off this order', intro conditional for Free members, preview neutral; E3 Alex product-name fallback. Django-checked.
+- 8 Oct: F3 QA fixes made by Layton in Klaviyo and rescanned: returns wording (E1 £300+, E1 under £300), E1 under £300 preview + preheader, E2 under £300 subject/preview/headline/Free conditional, E3 Alex product fallback. All pass; flow still draft.

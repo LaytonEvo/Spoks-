@@ -37,15 +37,15 @@ the Motocaddy and PowaKaddy registration pages and the social links couldn't be 
 
 ## Should fix (copy and logic)
 
-4. **F3 under-£300 emails and Free members.** Free members go down this path, but E2lo's subject ("5% off this order, free"),
+4. ~~**F3 under-£300 emails and Free members.**~~ Done 8 Oct (rescanned). Free members go down this path, but E2lo's subject ("5% off this order, free"),
    headline and intro, and E1lo's preview, tell them to join Free. Only the panel switches.
-5. **F3 "Good to know": "Members get four free returns a year"** reads as if Free members get them. Should say annual members.
+5. ~~**F3 "Good to know": "Members get four free returns a year"**~~ Done 8 Oct (rescanned). reads as if Free members get them. Should say annual members.
 6. **F9 10%-back reminder can reach someone who has joined since E1.** The day-10 check only looks at the order date. Add
    "MemberTier is not set" to that check.
 7. **F9 uses the first item in the order** for the product photo, brand warranty/accessories and the review email's product name.
    A trolley order with a cover listed first would get the wrong or no brand content; an empty order gives "You've had the  for a
    little while". Add a fallback ("your new kit") and prefer the trolley/club item.
-8. **F3 E3 (Alex) product name has no fallback** ("you were looking at the ." if the basket has no items).
+8. ~~**F3 E3 (Alex) product name has no fallback**~~ Done 8 Oct (rescanned). ("you were looking at the ." if the basket has no items).
 
 Fixes 4–8 are in emails already attached to flows, which the API can't edit. Options: make them by hand in the Klaviyo editor, or
 I fix the builders and create v2 drafts of F3 and F9 (old drafts then deleted by you).
