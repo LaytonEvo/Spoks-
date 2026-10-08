@@ -17,6 +17,7 @@ import build_f1 as f1  # noqa: E402
 import build_f2 as f2  # noqa: E402
 import build_f3 as f3  # noqa: E402
 import build_f9 as f9  # noqa: E402
+import build_f12 as f12  # noqa: E402
 
 OUT = ROOT.parent / "dashboard" / "app" / "drafts"
 FROM = "info@evolutiongolf.co.uk"
@@ -325,6 +326,48 @@ def f9_pack():
     }
 
 
+def f12_pack():
+    pid, m = "f12-winback", meta(f12.EMAILS)
+    E = lambda tid, key, nxt, sender=BRAND: email(tid, key, f"F12 {m[key]['name']}", m[key]["subject"], m[key]["preview"], nxt, sender)
+    engaged = any_of(metric("ULCbbQ", "greater-than-or-equal", 1, last(180)), metric("URfrxe", "greater-than-or-equal", 1, last(180)))
+    # Batch 1 of 3 (last order 120 to 180 days ago). Layton widens the 180 to 270, then 365, in Klaviyo a week apart.
+    lapsed = {"condition_groups": [{"conditions": [metric("T9sNn9", "greater-than-or-equal", 1, last(180))]},
+                                   {"conditions": [metric("T9sNn9", "equals", 0, last(120))]},
+                                   engaged["condition_groups"][0], {"conditions": [NO_BOUNCE]}]}
+    member = any_of({"type": "profile-property", "property": "properties['MemberTier']", "filter": {"type": "existence", "operator": "is-set"}})
+    hardware = any_of(*[metric("T9sNn9", "greater-than-or-equal", 1, ALL,
+                               [{"property": "Collections", "filter": {"type": "string", "operator": "contains", "value": c}}]) for c in f3.HARDWARE])
+    A = [split("mem", member, None, "hw"), split("hw", hardware, "e1h", "e1")]
+    for k in ("e1h", "e1"):
+        A += [E(k, k, f"w10{k}"), wait(f"w10{k}", 10, "days", f"e2{k}", at="17:30"), E(f"e2{k}", "e2", f"w14{k}", ALEX),
+              wait(f"w14{k}", 14, "days", f"e3{k}", at="09:30"), E(f"e3{k}", "e3", None)]
+    return pid, {
+        "id": pid, "title": "F12 Winback",
+        "summary": "Customers whose last order was 120+ days ago and who still read our emails, but aren't members (Free or annual). "
+                   "The sale, membership and daily deals; a friendly note from Alex; a short last email. Past trolley and club buyers "
+                   "also get a 'still going strong?' line. No codes.",
+        "replaces": "Replaces the old winback flow if one is live: switch it off when you switch this on.",
+        "outline": ["Starts: someone joins the new segment “EG · Winback · lapsed customers” (created for this). Leaves the moment they order.",
+                    "Members (Free or annual) leave at the first step.",
+                    "Day 0: E1 what's changed (past trolley or club buyers get the version with the 'still going strong?' line)",
+                    "Day 10, 17:30: E2 a note from Alex", "Day 24, 09:30: E3 the last one for a while"],
+        "after": ["Send yourself a test of each email.",
+                  "Week 1: switch the flow on, then use “Add past profiles” in the flow's trigger so people already in the segment (last order 120 "
+                  "to 180 days ago) get it too. From then on, people join daily as they reach 120 days.",
+                  "Week 2: edit the segment in Klaviyo and change “in the last 180 days” to 270. The newly included people start the flow automatically.",
+                  "Week 3: change it to 365.",
+                  "Don't start a batch in December or January.",
+                  "Note: Klaviyo only lets someone through a segment-triggered flow once, so nobody gets this twice."],
+        "segments": [{"key": "lapsed", "name": "EG · Winback · lapsed customers", "definition": lapsed}],
+        "split_labels": {"mem": {"label": "Member (Free or annual)?", "yes": "Member: leaves", "no": "Not a member"},
+                         "hw": {"label": "Ever bought a trolley, club or used club?", "yes": "Hardware version", "no": "Everyone else"}},
+        "templates": templates(pid, f12.EMAILS, "EG · F12", ROOT / "design" / "f12"),
+        "flow": {"name": "EG · F12 Winback", "definition": {
+            "triggers": [{"type": "segment", "ref": "lapsed"}], "profile_filter": all_of(metric("T9sNn9", "equals", 0, FS), NO_BOUNCE),
+            "entry_action_id": "mem", "actions": A}},
+    }
+
+
 def check(pk):
     acts = {a["temporary_id"]: a for a in pk["flow"]["definition"]["actions"]}
     keys = {t["key"] for t in pk["templates"]}
@@ -339,7 +382,7 @@ def check(pk):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack()]
+    packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack(), f12_pack()]
     add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
     for _, pk in packs[1:3]:
         add_photos(pk, f2.EMAILS, f1.SLOTS, f1.PHOTO_RULES)

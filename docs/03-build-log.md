@@ -136,3 +136,14 @@
   Shared fix: member_note no longer adds a full stop after headings ending in ?/!.
 - 7 Oct: F9 images (Layton): P9 their own product photo (automatic, line_items.0 main Shopify image, 240px) under the headline in E1 both paths; photo spots C1 trolley battery on charge, C2 club care (1200×720), X1 trolley with accessories (1200×600) in Hardware E2, each only for matching orders; briefs on the dashboard (Show photo spots). add_photos now uses f3.Ctx; F9 pack included.
 - 8 Oct: F9 photos from Layton: C1 Motocaddy battery (cut-out on white, 1200×720), C2 club cleaning (1200×720), X1 Motocaddy accessories fitted (on white, 1200×600), new X2 club accessories flat-lay (1200×600, clubs part of 'Goes well with it'). Klaviyo images 380988910/923/935/948. C1 + X1 show only for Motocaddy orders (Motocaddy-branded).
+- 8 Oct: F12 copy doc (https://claude.ai/code/artifact/eefcc4f0-b33e-4f78-b251-be7b40c0ff5e). Layton: Alex email warmer (not "did we get something wrong?");
+  Free members left out (all members out; a Free-member winback suggested for after F13); evergreen; no coded fallback; batches agreed;
+  E1 leads with the sale (/collections/sale: tagged Sale + in stock, 345 on 8 Oct; no prices or % in copy); phone 0330 122 7089 confirmed.
+- 8 Oct: **F12 Winback built** as pack `f12-winback` (4 emails, 12 steps). Builder `klaviyo/design/build_f12.py`.
+  Segment "EG · Winback · lapsed customers" (created by the app): Placed Order ≥1 in last 180 days, 0 in last 120, Opened or Clicked
+  Email in last 180, no bounce 30d. Batch 1 = 120–180; Layton widens to 270 then 365 in Klaviyo a week apart (after list).
+  Flow: segment trigger, filter Placed Order 0 since flow start + no bounce; split members out (MemberTier is set → end; is-not-set is
+  rejected by the API so it's a split, not a segment rule); split past hardware buyers (Placed Order all time, Collections in
+  trolleys/clubs/used) → E1h (with "still going strong?" panel) or E1; E2 Alex day 10 17:30; E3 day 24 09:30.
+  Deviations: E1 sends as they join (no 09:30 wait at day 0); "once per 6 months" → Klaviyo allows one pass through a segment flow.
+  Templates Django-checked.
