@@ -128,7 +128,7 @@ def basket_facts(ctx, member=False):
     """'Good to know' rows (Layton's edits, 7 Oct 2026): no warranty or YouTube rows; returns, choice help and price match."""
     rows = [("Delivery", "Free delivery over £10, as a member." if member else "Free UK delivery on orders over £50.", None),
             ("Returns", "Free, four a year, as a member. Start one from your portal." if member
-             else "Members get four free returns a year, so you can change your mind.", None),
+             else "Annual members get four free returns a year, so you can change your mind.", None),
             ("Paying for it", "Pay in 3 interest-free instalments with Klarna at checkout.", None),
             ("Right choice?", "Feel free to give us a ring or drop us a message. Our expert team will steer you in the right direction.<br>"
                               + link("Get in touch", URL["contact"]), has(HARDWARE)),
@@ -222,15 +222,17 @@ def e1lo(ctx):
     body = (intro("Your basket is saved", "Still want these? They're right where you left them.")
             + basket(ctx) + text_row(link("Back to my basket", BASKET), "16px 48px 0")
             + join_free(ctx) + basket_facts(ctx) + close(ctx))
-    return f1.shell(ctx, body, "5% off this order with Free membership. Your basket's saved.")
+    return f1.shell(ctx, body, "Your basket's saved, and 5% can come off it.")
 
 
 def e2lo(ctx):
-    body = (intro("Before you check out", "5% off this order, free")
-            + text_row(p("Free membership takes a minute and gives you 5% off everything on the site, including what's in your basket.", margin="0"), "0 48px 0")
+    body = (intro("Before you check out", "5% off this order")
+            + text_row(p(("{% if person|lookup:'MemberTier' == 'Free' %}As a Free member, your 5% off everything works on what's in your basket.{% else %}" if ctx.live else "")
+                         + "Free membership takes a minute and gives you 5% off everything on the site, including what's in your basket."
+                         + ("{% endif %}" if ctx.live else ""), margin="0"), "0 48px 0")
             + basket(ctx, big=False) + text_row(link("Back to my basket", BASKET), "16px 48px 0")
             + join_free(ctx, pad="28px 48px 0") + checks(ctx) + close(ctx))
-    return f1.shell(ctx, body, "Free membership takes a minute and takes 5% off this order.")
+    return f1.shell(ctx, body, "5% off everything, this order included.")
 
 
 # ---------------- Email 3 ----------------
@@ -244,7 +246,7 @@ def e3h(ctx):
            f'Alex<br><span style="color:{MUTED};">Head of Ecommerce, Evolution Golf</span></td></tr></table>')
     body = (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:44px 48px 28px;">'
             f'<p style="{pp}">Hi {hi},</p>'
-            f'<p style="{pp}">Alex from Evolution Golf. I can see you were looking at the {product_name(ctx)}.</p>'
+            f'<p style="{pp}">Alex from Evolution Golf. I can see you were looking at ' + (('{% if event.extra.line_items.0.product.title %}the ' + product_name(ctx) + '{% else %}something in our shop{% endif %}') if ctx.live else 'the ' + product_name(ctx)) + '.</p>'
             f'<p style="{pp}">If you\'re not sure it\'s the right choice for you, feel free to reply to this and I\'ll give you a straight answer. '
             f'If something cheaper would do the job, I\'ll say so.</p>'
             f'<p style="{pp}">If you\'ve already bought elsewhere, no problem at all. Ignore this one.</p>'
@@ -281,9 +283,9 @@ EMAILS = [
     dict(key="e3h", fn=e3h, name="E3 £300+ · From Alex", timing="Non-members, basket £300+ · day 3, 09:30", sender=ALEX,
          subject="Want a second opinion on that?", preview="Tell me your course and how you play and I'll tell you if it's the right one.", slots=[]),
     dict(key="e1lo", fn=e1lo, name="E1 Under £300 · Join free, 5% off", timing="Non-members, under £300 · 1 hour after checkout", sender=BR,
-         subject=SAVED, preview="5% off this order with Free membership. Your basket's saved.", slots=[]),
+         subject=SAVED, preview="Your basket's saved, and 5% can come off it.", slots=[]),
     dict(key="e2lo", fn=e2lo, name="E2 Under £300 · 5% off, free", timing="Non-members, under £300 · next day 09:30", sender=BR,
-         subject="5% off this order, free", preview="Free membership takes a minute and takes 5% off this order.", slots=[]),
+         subject="5% off this order", preview="5% off everything, this order included.", slots=[]),
     dict(key="e3lo", fn=e3lo, name="E3 Under £300 · Last nudge", timing="Non-members, under £300 · day 3, 17:30", sender=BR,
          subject="Still in your basket", preview="Your basket's saved, and 5% can come off it with Free membership.", slots=[]),
 ]
