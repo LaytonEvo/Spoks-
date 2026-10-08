@@ -160,3 +160,5 @@
 - 8 Oct: F13 approval stopped: Klaviyo 400 on the "EG · Sunset · to suppress" segment ("Profile property properties['sunset_status']
   does not exist for this company"). The candidates segment was created first. Removed the suppress segment from the pack; after-steps
   now say to create it about 17 days after switch-on (or ask and it's added to the app). Layton presses Try again.
+- 8 Oct: F13 Try again stopped: flow 400 "Invalid profile operation". Live flows use operator "create" (string) for a property's first
+  set (e.g. InWelcomeSequence) and "update" only for existing ones. Mark step now "create". Templates from the earlier attempt are reused.

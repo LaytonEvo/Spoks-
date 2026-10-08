@@ -375,9 +375,10 @@ def f13_pack():
     candidates = all_of(metric("Wz44Gj", "greater-than-or-equal", 8, ALL), metric("ULCbbQ", "equals", 0, last(150)),
                         metric("URfrxe", "equals", 0, last(150)), metric("T9sNn9", "equals", 0, last(180)))
     member = any_of({"type": "profile-property", "property": "properties['MemberTier']", "filter": {"type": "existence", "operator": "is-set"}})
-    # Same shape as the update-profile steps in the account's live welcome flow (read 8 Oct 2026).
+    # Same shape as the update-profile steps in the account's live flows (read 8 Oct 2026). A property no profile has yet needs
+    # "create" ("update" was refused: "Invalid profile operation"), as in the live welcome flow's InWelcomeSequence step.
     mark = {"temporary_id": "mark", "type": "update-profile", "links": {"next": None}, "data": {"profile_operations": [
-        {"operator": "update", "property_type": "string", "property_key": "properties['sunset_status']", "property_value": "suppress"}]}}
+        {"operator": "create", "property_type": "string", "property_key": "properties['sunset_status']", "property_value": "suppress"}]}}
     A = [split("mem", member, None, "e1"), E("e1", "e1", "w10"), wait("w10", 10, "days", "e2", at="17:30"), E("e2", "e2", "w7", ALEX),
          wait("w7", 7, "days", "mark", at="09:30"), mark]
     return pid, {

@@ -302,7 +302,7 @@
      "data": {
       "profile_operations": [
        {
-        "operator": "update",
+        "operator": "create",
         "property_type": "string",
         "property_key": "properties['sunset_status']",
         "property_value": "suppress"
