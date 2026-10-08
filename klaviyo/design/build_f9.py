@@ -26,11 +26,23 @@ TRUSTPILOT = "https://uk.trustpilot.com/review/evolutiongolf.co.uk"
 MOTOCADDY_REG = "https://www.motocaddy.com/warranty"          # printed on Motocaddy manuals: "register online"
 POWAKADDY_REG = "https://www.powakaddy.com/my-powakaddy"      # PowaKaddy UK & Ireland warranty leaflet
 VENDOR = "event.extra.line_items.0.vendor"
+# v2 (Layton, 8 Oct 2026): brand content is decided by the whole order's Collections (a Motocaddy trolley collection anywhere in the
+# order), not the first line item. PowaKaddy trolleys aren't sold yet, so their content is kept but switched off.
+MOTO_TROLLEYS = [c for c in TROLLEYS if c.startswith("Motocaddy")]
+POWA_TROLLEYS = [c for c in TROLLEYS if c.startswith("PowaKaddy")]
+POWAKADDY_ON = False
 SAMPLE_PRODUCT = "Motocaddy 2026 M1 DHC Standard Lithium Electric Golf Trolley"
 
 
 def footer(ctx):
     return f1.footer(ctx, REASON)
+
+
+def close(ctx):
+    """Trust line, rating, footer. Annual members see their own delivery threshold (Layton, 8 Oct 2026)."""
+    delivery = ("{% if person|lookup:'MemberTier' == 'AnnualMember' %}Free delivery over £10{% else %}Free delivery over £50{% endif %}"
+                if ctx.live else "Free delivery over £50")
+    return b.usp([delivery] + b.TRUST_ITEMS[1:]) + b.trust() + footer(ctx)
 
 
 def name(ctx):
@@ -56,8 +68,10 @@ def tier(ctx, annual, free, none):
 
 
 def by_vendor(ctx, moto, powa, other):
+    """Motocaddy content if the order has a Motocaddy trolley; PowaKaddy only when POWAKADDY_ON; otherwise the general version."""
     if ctx.live:
-        return ("{% if " + VENDOR + " == 'Motocaddy' %}" + moto + "{% elif " + VENDOR + " == 'PowaKaddy' %}" + powa
+        return ("{% if " + has(MOTO_TROLLEYS) + " %}" + moto
+                + (("{% elif " + has(POWA_TROLLEYS) + " %}" + powa) if POWAKADDY_ON else "")
                 + "{% else %}" + other + "{% endif %}")
     return moto
 
@@ -95,7 +109,7 @@ def product_photo(ctx):
 
 def moto_only(ctx, html):
     """C1 and X1 show Motocaddy kit, so they only go to Motocaddy orders."""
-    return ("{% if " + VENDOR + " == 'Motocaddy' %}" + html + "{% endif %}") if (ctx.live and html) else html
+    return ("{% if " + has(MOTO_TROLLEYS) + " %}" + html + "{% endif %}") if (ctx.live and html) else html
 
 
 def hero(ctx, key, h=360):
@@ -124,7 +138,7 @@ def e1h(ctx, offer=True):
                     "Your trolley and charger have a 2-year warranty. Register your lithium battery with Motocaddy within 45 days of buying it "
                     "and its warranty goes up to 5 years. " + link("Register with Motocaddy", MOTOCADDY_REG),
                     "Register your trolley and battery with PowaKaddy within 30 days of buying them. Unregistered batteries get 2 years; "
-                    "registered ones go onto PowaKaddy's 5-year battery warranty scheme. " + link("Register with PowaKaddy", POWAKADDY_REG),
+                    "registered ones go onto PowaKaddy's 5-year pro-rata battery warranty scheme. " + link("Register with PowaKaddy", POWAKADDY_REG),
                     "Check your manual for how to register with the maker.")
     trolley = (text_row(h3("New trolley?", "0"), "28px 48px 0")
                + numbered([("Charge it after every round.", "Get into the habit of charging the battery after each round, ideally the same day, "
@@ -140,7 +154,7 @@ def e1h(ctx, offer=True):
             + ctx.when(has(TROLLEYS), trolley, "the order has a trolley")
             + ctx.when(has(CLUBS + f3.USED), clubs, "the order has clubs")
             + text_row(p(f"Questions? Call us on {PHONE} or " + link("get in touch", URL["contact"]) + ".", 15, margin="0"), "24px 48px 0")
-            + membership(ctx, offer) + first_order(ctx) + text_row("", "0 0 8px") + f3.close(ctx).replace(f3.REASON, REASON))
+            + membership(ctx, offer) + first_order(ctx) + text_row("", "0 0 8px") + close(ctx))
     return f1.shell(ctx, body, "Getting set up, and who to call if anything's not right.")
 
 
@@ -182,7 +196,7 @@ def e2h(ctx):
                        + (("{% if " + has(CLUBS + f3.USED) + " %}") if ctx.live else '<div style="height:16px;"></div>') + acc_clubs
                        + (("{% endif %}") if ctx.live else "") + '</td></tr></table>', "36px 48px 0")
             + text_row(button("Get in touch with our team", URL["contact"]), "32px 48px 0")
-            + text_row("", "0 0 8px") + f3.close(ctx).replace(f3.REASON, REASON))
+            + text_row("", "0 0 8px") + close(ctx))
     return f1.shell(ctx, body, "A few minutes now keeps it going for years.")
 
 
@@ -201,7 +215,7 @@ def e1e(ctx, offer=True):
                   f"question about what you bought, reply to this email or call us on {PHONE}.")
             + product_photo(ctx)
             + ctx.when(has(SHOES), text_row(h3("New shoes?") + bullets(CARE_SHOES), "12px 48px 0"), "the order has golf shoes")
-            + membership(ctx, offer) + first_order(ctx) + text_row("", "0 0 8px") + f3.close(ctx).replace(f3.REASON, REASON))
+            + membership(ctx, offer) + first_order(ctx) + text_row("", "0 0 8px") + close(ctx))
     return f1.shell(ctx, body, "Thanks for shopping with us. Here's how to reach us if you need anything.")
 
 
@@ -216,7 +230,7 @@ def rem(ctx):
                       "to your account after you join. Renews at £36 a year; cancel any time from your account.", pad="12px 48px 0", card=True)
             + text_row(p("<strong style=\"font-weight:600;color:" + HEAD + ";\">Or start free:</strong> Free members get 5% off everything on the site. "
                          + link("Join free", URL["join"]), 15, margin="0"), "24px 48px 0")
-            + text_row("", "0 0 8px") + f3.close(ctx).replace(f3.REASON, REASON))
+            + text_row("", "0 0 8px") + close(ctx))
     return f1.shell(ctx, body, "Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.")
 
 
@@ -236,7 +250,7 @@ def letter(ctx, paras, preheader):
 
 
 def rvh(ctx):
-    return letter(ctx, [f"Alex here. You've had the {product(ctx)} for a little while now, so hopefully you've had a round or two with it.",
+    return letter(ctx, ["Alex here. You've had your " + (("{% if " + has(TROLLEYS) + " %}new trolley{% else %}new clubs{% endif %}") if ctx.live else "new trolley") + " for a little while now, so hopefully you've had a round or two with it.",
                         "Would you leave a short, honest review on Trustpilot? Good or bad, it helps the next golfer who's choosing, and we read every one.",
                         "And if anything isn't right, just reply to this email. I'll sort it, whatever you write in your review.",
                         "Thanks for buying from a shop run by golfers."],
@@ -266,7 +280,7 @@ EMAILS = [
          sender=BR, subject="Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
          preview="Thanks for shopping with us. Here's how to reach us if you need anything.", slots=["P9"]),
     dict(key="rem", fn=rem, name="Membership reminder · 10% back", timing="Non-members, order still inside 14 days · 10 days after dispatch, 09:30",
-         sender=BR, subject="Your 10% back offer ends soon",
+         sender=BR, subject="Still time to get 10% back on your order",
          preview="Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.", slots=[]),
     dict(key="rvh", fn=rvh, name="Review · Hardware (from Alex)", timing="Trolleys about 2 weeks, clubs about 4 weeks after delivery, 09:30", sender=ALEX,
          subject="How's it going with the new kit?", preview="A quick, honest review would help the next golfer choosing.", slots=[]),

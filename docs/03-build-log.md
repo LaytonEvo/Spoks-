@@ -168,3 +168,10 @@
 - 8 Oct: Rescan after Layton's edits: F1 E2h (XfKb47) badge gone (full stop after 'on sale' also went); F3 re-entry 7 days and F9 re-entry 30 days set; both still draft.
 - 8 Oct: F3 fixes in the builder (to be copied into Klaviyo by hand; flow templates can't be edited by API): returns row 'Annual members get…' (E1 £300+, E1 under £300); E1 under £300 preview neutral; E2 under £300 subject/headline '5% off this order', intro conditional for Free members, preview neutral; E3 Alex product-name fallback. Django-checked.
 - 8 Oct: F3 QA fixes made by Layton in Klaviyo and rescanned: returns wording (E1 £300+, E1 under £300), E1 under £300 preview + preheader, E2 under £300 subject/preview/headline/Free conditional, E3 Alex product fallback. All pass; flow still draft.
+- 8 Oct: **F9 v2 built** as pack `f9-after-delivery-v2` (8 emails, 61 steps), flow "EG · F9 After delivery + review v2". From QA + Layton:
+  reminder skipped if they've joined since E1 (extra MemberTier split after the 12-day check, review steps repeated on that branch);
+  Motocaddy content (warranty line, accessories, C1/X1) decided by a Motocaddy trolley collection anywhere in the order's Collections
+  (Fulfilled Order has no brand list: checked field names only); PowaKaddy content kept but off (POWAKADDY_ON=False; not sold), wording
+  now "pro-rata"; review email says "your new trolley/clubs" instead of the first item's name; reminder subject "Still time to get 10%
+  back on your order"; trust bar shows annual members "Free delivery over £10". Django-checked with Motocaddy-trolley-with-cover-first,
+  other-trolley + PowaKaddy accessory, and clubs orders. Layton to delete RsuJHT once v2 is created.

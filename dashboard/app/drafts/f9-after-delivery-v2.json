@@ -1,0 +1,4154 @@
+{
+ "id": "f9-after-delivery-v2",
+ "title": "F9 After delivery + review v2",
+ "summary": "Online orders, 3 days after dispatch: setting up and looking after what they bought (trolley and club sections switch on per order), the membership credit offer for non-members (10% of the order back as store credit if they join within 14 days), then an honest review request from Alex. No codes.",
+ "replaces": "Replaces the first F9 draft “EG · F9 After delivery + review” (RsuJHT): delete that once this is created. Also replaces “NEW: Post-Fulfillment”: set that to Manual when you switch this on.",
+ "outline": [
+  "Starts: Fulfilled Order, online only (till sales left out). 3 days later, 09:30.",
+  "Hardware (trolley, club or used club) or Everything else, by what was ordered",
+  "Members · non-members who ordered in the last 10 days (credit offer) · non-members with older orders (no offer)",
+  "Hardware: E1 set-up · 4 days later E2 care + accessories · reminder at day 10 (offer path, order still inside 14 days) · review about 2 weeks after delivery for trolleys, about 4 weeks for clubs",
+  "Everything else: E1 thanks · reminder at day 10 (offer path) · review about 10 days after delivery"
+ ],
+ "after": [
+  "Set re-entry to 30 days in the flow settings (the API can't), so a customer with two orders in a month gets one set.",
+  "Delete the first F9 draft “EG · F9 After delivery + review” (RsuJHT).",
+  "Remember the credit: when a non-member joins within 14 days of an order, your team adds 10% of that order as store credit.",
+  "Send yourself tests with a Motocaddy order, a PowaKaddy order and a clubs order, to check the right sections and links show.",
+  "When happy, switch it on and set “NEW: Post-Fulfillment” to Manual."
+ ],
+ "split_labels": {
+  "hw": {
+   "label": "Order has a trolley, club or used club",
+   "yes": "Hardware",
+   "no": "Everything else"
+  },
+  "hm": {
+   "label": "Member (Free or annual)?",
+   "yes": "Member",
+   "no": "Not a member"
+  },
+  "em": {
+   "label": "Member (Free or annual)?",
+   "yes": "Member",
+   "no": "Not a member"
+  },
+  "hr": {
+   "label": "Ordered in the last 10 days?",
+   "yes": "Credit offer",
+   "no": "Older order: no offer"
+  },
+  "er": {
+   "label": "Ordered in the last 10 days?",
+   "yes": "Credit offer",
+   "no": "Older order: no offer"
+  },
+  "hro": {
+   "label": "Order still inside the 14 days?",
+   "yes": "Check they haven't joined",
+   "no": "Skip it"
+  },
+  "ero": {
+   "label": "Order still inside the 14 days?",
+   "yes": "Check they haven't joined",
+   "no": "Skip it"
+  },
+  "hrm": {
+   "label": "Joined since Email 1?",
+   "yes": "Member now: skip the reminder",
+   "no": "Send the reminder"
+  },
+  "erm": {
+   "label": "Joined since Email 1?",
+   "yes": "Member now: skip the reminder",
+   "no": "Send the reminder"
+  },
+  "thm": {
+   "label": "Order has a trolley?",
+   "yes": "Trolley: review at ~2 weeks",
+   "no": "Clubs: review at ~4 weeks"
+  },
+  "thn": {
+   "label": "Order has a trolley?",
+   "yes": "Trolley: review at ~2 weeks",
+   "no": "Clubs: review at ~4 weeks"
+  },
+  "tho": {
+   "label": "Order has a trolley?",
+   "yes": "Trolley: review at ~2 weeks",
+   "no": "Clubs: review at ~4 weeks"
+  },
+  "thm2": {
+   "label": "Order has a trolley?",
+   "yes": "Trolley: review at ~2 weeks",
+   "no": "Clubs: review at ~4 weeks"
+  },
+  "thr2": {
+   "label": "Order has a trolley?",
+   "yes": "Trolley: review at ~2 weeks",
+   "no": "Clubs: review at ~4 weeks"
+  }
+ },
+ "templates": [
+  {
+   "key": "e1h",
+   "file": "f9-after-delivery-v2/e1h.html",
+   "template_name": "EG · F9 v2 · E1 Hardware · Getting set up (with credit offer)",
+   "name": "E1 Hardware · Getting set up (with credit offer)",
+   "subject": "Your new kit should be with you. A few things first",
+   "preview": "Getting set up, and who to call if anything's not right.",
+   "when": "Hardware · 3 days after dispatch, 09:30",
+   "sender": "⛳ Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/e1h.preview.html",
+   "photos_file": "f9-after-delivery-v2/e1h.photos.html",
+   "photos": [
+    "P9"
+   ]
+  },
+  {
+   "key": "e1hn",
+   "file": "f9-after-delivery-v2/e1hn.html",
+   "template_name": "EG · F9 v2 · E1 Hardware · Getting set up",
+   "name": "E1 Hardware · Getting set up",
+   "subject": "Your new kit should be with you. A few things first",
+   "preview": "Getting set up, and who to call if anything's not right.",
+   "when": "Hardware, members or older orders · 3 days after dispatch, 09:30",
+   "sender": "⛳ Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/e1hn.preview.html",
+   "photos_file": "f9-after-delivery-v2/e1hn.photos.html",
+   "photos": [
+    "P9"
+   ]
+  },
+  {
+   "key": "e2h",
+   "file": "f9-after-delivery-v2/e2h.html",
+   "template_name": "EG · F9 v2 · E2 Hardware · Looking after it",
+   "name": "E2 Hardware · Looking after it",
+   "subject": "Looking after your new kit",
+   "preview": "A few minutes now keeps it going for years.",
+   "when": "Hardware · 4 days after Email 1, 17:30",
+   "sender": "⛳ Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/e2h.preview.html",
+   "photos_file": "f9-after-delivery-v2/e2h.photos.html",
+   "photos": [
+    "C1",
+    "C2",
+    "X1",
+    "X2"
+   ]
+  },
+  {
+   "key": "e1e",
+   "file": "f9-after-delivery-v2/e1e.html",
+   "template_name": "EG · F9 v2 · E1 Everything else · Thanks (with credit offer)",
+   "name": "E1 Everything else · Thanks (with credit offer)",
+   "subject": "Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
+   "preview": "Thanks for shopping with us. Here's how to reach us if you need anything.",
+   "when": "Everything else · 3 days after dispatch, 09:30",
+   "sender": "⛳ Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/e1e.preview.html",
+   "photos_file": "f9-after-delivery-v2/e1e.photos.html",
+   "photos": [
+    "P9"
+   ]
+  },
+  {
+   "key": "e1en",
+   "file": "f9-after-delivery-v2/e1en.html",
+   "template_name": "EG · F9 v2 · E1 Everything else · Thanks",
+   "name": "E1 Everything else · Thanks",
+   "subject": "Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
+   "preview": "Thanks for shopping with us. Here's how to reach us if you need anything.",
+   "when": "Everything else, members or older orders · 3 days after dispatch, 09:30",
+   "sender": "⛳ Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/e1en.preview.html",
+   "photos_file": "f9-after-delivery-v2/e1en.photos.html",
+   "photos": [
+    "P9"
+   ]
+  },
+  {
+   "key": "rem",
+   "file": "f9-after-delivery-v2/rem.html",
+   "template_name": "EG · F9 v2 · Membership reminder · 10% back",
+   "name": "Membership reminder · 10% back",
+   "subject": "Still time to get 10% back on your order",
+   "preview": "Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.",
+   "when": "Non-members, order still inside 14 days · 10 days after dispatch, 09:30",
+   "sender": "⛳ Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/rem.preview.html"
+  },
+  {
+   "key": "rvh",
+   "file": "f9-after-delivery-v2/rvh.html",
+   "template_name": "EG · F9 v2 · Review · Hardware (from Alex)",
+   "name": "Review · Hardware (from Alex)",
+   "subject": "How's it going with the new kit?",
+   "preview": "A quick, honest review would help the next golfer choosing.",
+   "when": "Trolleys about 2 weeks, clubs about 4 weeks after delivery, 09:30",
+   "sender": "Alex at Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/rvh.preview.html"
+  },
+  {
+   "key": "rve",
+   "file": "f9-after-delivery-v2/rve.html",
+   "template_name": "EG · F9 v2 · Review · Everything else (from Alex)",
+   "name": "Review · Everything else (from Alex)",
+   "subject": "Quick one: how did we do?",
+   "preview": "A sentence on Trustpilot is plenty.",
+   "when": "About 10 days after delivery, 09:30",
+   "sender": "Alex at Evolution Golf",
+   "preview_file": "f9-after-delivery-v2/rve.preview.html"
+  }
+ ],
+ "flow": {
+  "name": "EG · F9 After delivery + review v2",
+  "definition": {
+   "triggers": [
+    {
+     "type": "metric",
+     "id": "WJizp7",
+     "trigger_filter": {
+      "condition_groups": [
+       {
+        "conditions": [
+         {
+          "type": "metric-property",
+          "metric_id": "WJizp7",
+          "field": "Source Name",
+          "filter": {
+           "type": "string",
+           "operator": "not-equals",
+           "value": "pos"
+          }
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "profile_filter": {
+    "condition_groups": [
+     {
+      "conditions": [
+       {
+        "type": "profile-metric",
+        "metric_id": "Y2WUPe",
+        "measurement": "count",
+        "measurement_filter": {
+         "type": "numeric",
+         "operator": "equals",
+         "value": 0
+        },
+        "timeframe_filter": {
+         "type": "date",
+         "operator": "in-the-last",
+         "unit": "day",
+         "quantity": 30
+        },
+        "metric_filters": null
+       }
+      ]
+     }
+    ]
+   },
+   "entry_action_id": "w3",
+   "actions": [
+    {
+     "temporary_id": "w3",
+     "type": "time-delay",
+     "links": {
+      "next": "hw"
+     },
+     "data": {
+      "unit": "days",
+      "value": 3,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "hw",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push & Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "GPS Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Remote Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric & Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push/Pull Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Cube Golf Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Mens Golf Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Ladies Golf Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Women's Golf Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Junior Golf Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Left Handed Golf Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Drivers"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Fairways"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Fairway Woods"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Hybrids & Utility Irons"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Wedges"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Putters"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Custom Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Mens Custom Fitted Golf Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Golf Club Package Sets"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Approved Used Golf Clubs"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 4
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "All Approved Used Golf Clubs"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "hm",
+      "next_if_false": "em"
+     }
+    },
+    {
+     "temporary_id": "hm",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "existence",
+            "operator": "is-set"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "h1m",
+      "next_if_false": "hr"
+     }
+    },
+    {
+     "temporary_id": "hr",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "T9sNn9",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 10
+           },
+           "metric_filters": null
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "h1o",
+      "next_if_false": "h1n"
+     }
+    },
+    {
+     "temporary_id": "h1m",
+     "type": "send-email",
+     "links": {
+      "next": "h4m"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your new kit should be with you. A few things first",
+       "preview_text": "Getting set up, and who to call if anything's not right.",
+       "template_ref": "e1hn",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E1 Hardware · Getting set up"
+      }
+     }
+    },
+    {
+     "temporary_id": "h4m",
+     "type": "time-delay",
+     "links": {
+      "next": "h2m"
+     },
+     "data": {
+      "unit": "days",
+      "value": 4,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "17:30"
+     }
+    },
+    {
+     "temporary_id": "h2m",
+     "type": "send-email",
+     "links": {
+      "next": "thm"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Looking after your new kit",
+       "preview_text": "A few minutes now keeps it going for years.",
+       "template_ref": "e2h",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E2 Hardware · Looking after it"
+      }
+     }
+    },
+    {
+     "temporary_id": "thm",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push & Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "GPS Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Remote Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric & Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push/Pull Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Cube Golf Push Trolleys"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "wthm",
+      "next_if_false": "wchm"
+     }
+    },
+    {
+     "temporary_id": "wthm",
+     "type": "time-delay",
+     "links": {
+      "next": "rthm"
+     },
+     "data": {
+      "unit": "days",
+      "value": 10,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rthm",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "wchm",
+     "type": "time-delay",
+     "links": {
+      "next": "rchm"
+     },
+     "data": {
+      "unit": "days",
+      "value": 24,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rchm",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "h1n",
+     "type": "send-email",
+     "links": {
+      "next": "h4n"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your new kit should be with you. A few things first",
+       "preview_text": "Getting set up, and who to call if anything's not right.",
+       "template_ref": "e1hn",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E1 Hardware · Getting set up"
+      }
+     }
+    },
+    {
+     "temporary_id": "h4n",
+     "type": "time-delay",
+     "links": {
+      "next": "h2n"
+     },
+     "data": {
+      "unit": "days",
+      "value": 4,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "17:30"
+     }
+    },
+    {
+     "temporary_id": "h2n",
+     "type": "send-email",
+     "links": {
+      "next": "thn"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Looking after your new kit",
+       "preview_text": "A few minutes now keeps it going for years.",
+       "template_ref": "e2h",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E2 Hardware · Looking after it"
+      }
+     }
+    },
+    {
+     "temporary_id": "thn",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push & Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "GPS Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Remote Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric & Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push/Pull Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Cube Golf Push Trolleys"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "wthn",
+      "next_if_false": "wchn"
+     }
+    },
+    {
+     "temporary_id": "wthn",
+     "type": "time-delay",
+     "links": {
+      "next": "rthn"
+     },
+     "data": {
+      "unit": "days",
+      "value": 10,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rthn",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "wchn",
+     "type": "time-delay",
+     "links": {
+      "next": "rchn"
+     },
+     "data": {
+      "unit": "days",
+      "value": 24,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rchn",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "h1o",
+     "type": "send-email",
+     "links": {
+      "next": "h4o"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your new kit should be with you. A few things first",
+       "preview_text": "Getting set up, and who to call if anything's not right.",
+       "template_ref": "e1h",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E1 Hardware · Getting set up (with credit offer)"
+      }
+     }
+    },
+    {
+     "temporary_id": "h4o",
+     "type": "time-delay",
+     "links": {
+      "next": "h2o"
+     },
+     "data": {
+      "unit": "days",
+      "value": 4,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "17:30"
+     }
+    },
+    {
+     "temporary_id": "h2o",
+     "type": "send-email",
+     "links": {
+      "next": "h3o"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Looking after your new kit",
+       "preview_text": "A few minutes now keeps it going for years.",
+       "template_ref": "e2h",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E2 Hardware · Looking after it"
+      }
+     }
+    },
+    {
+     "temporary_id": "h3o",
+     "type": "time-delay",
+     "links": {
+      "next": "hro"
+     },
+     "data": {
+      "unit": "days",
+      "value": 3,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "hro",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "T9sNn9",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 12
+           },
+           "metric_filters": null
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "hrm",
+      "next_if_false": "tho"
+     }
+    },
+    {
+     "temporary_id": "hrm",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "existence",
+            "operator": "is-set"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "thm2",
+      "next_if_false": "remh"
+     }
+    },
+    {
+     "temporary_id": "remh",
+     "type": "send-email",
+     "links": {
+      "next": "thr2"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Still time to get 10% back on your order",
+       "preview_text": "Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.",
+       "template_ref": "rem",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Membership reminder · 10% back"
+      }
+     }
+    },
+    {
+     "temporary_id": "tho",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push & Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "GPS Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Remote Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric & Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push/Pull Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Cube Golf Push Trolleys"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "wtho",
+      "next_if_false": "wcho"
+     }
+    },
+    {
+     "temporary_id": "wtho",
+     "type": "time-delay",
+     "links": {
+      "next": "rtho"
+     },
+     "data": {
+      "unit": "days",
+      "value": 7,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rtho",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "wcho",
+     "type": "time-delay",
+     "links": {
+      "next": "rcho"
+     },
+     "data": {
+      "unit": "days",
+      "value": 21,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rcho",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "thm2",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push & Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "GPS Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Remote Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric & Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push/Pull Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Cube Golf Push Trolleys"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "wthm2",
+      "next_if_false": "wchm2"
+     }
+    },
+    {
+     "temporary_id": "wthm2",
+     "type": "time-delay",
+     "links": {
+      "next": "rthm2"
+     },
+     "data": {
+      "unit": "days",
+      "value": 7,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rthm2",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "wchm2",
+     "type": "time-delay",
+     "links": {
+      "next": "rchm2"
+     },
+     "data": {
+      "unit": "days",
+      "value": 21,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rchm2",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "thr2",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push & Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "GPS Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Remote Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Electric Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Motocaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric & Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Electric Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "PowaKaddy Push Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push/Pull Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Push Golf Trolleys"
+             }
+            }
+           ]
+          },
+          {
+           "type": "profile-metric",
+           "metric_id": "WJizp7",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 14
+           },
+           "metric_filters": [
+            {
+             "property": "Collections",
+             "filter": {
+              "type": "string",
+              "operator": "contains",
+              "value": "Cube Golf Push Trolleys"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "wthr2",
+      "next_if_false": "wchr2"
+     }
+    },
+    {
+     "temporary_id": "wthr2",
+     "type": "time-delay",
+     "links": {
+      "next": "rthr2"
+     },
+     "data": {
+      "unit": "days",
+      "value": 7,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rthr2",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "wchr2",
+     "type": "time-delay",
+     "links": {
+      "next": "rchr2"
+     },
+     "data": {
+      "unit": "days",
+      "value": 21,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rchr2",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "How's it going with the new kit?",
+       "preview_text": "A quick, honest review would help the next golfer choosing.",
+       "template_ref": "rvh",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Hardware (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "em",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "existence",
+            "operator": "is-set"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "e1m",
+      "next_if_false": "er"
+     }
+    },
+    {
+     "temporary_id": "er",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "T9sNn9",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 10
+           },
+           "metric_filters": null
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "e1o",
+      "next_if_false": "e1n"
+     }
+    },
+    {
+     "temporary_id": "e1m",
+     "type": "send-email",
+     "links": {
+      "next": "ewm"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
+       "preview_text": "Thanks for shopping with us. Here's how to reach us if you need anything.",
+       "template_ref": "e1en",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E1 Everything else · Thanks"
+      }
+     }
+    },
+    {
+     "temporary_id": "ewm",
+     "type": "time-delay",
+     "links": {
+      "next": "rvm"
+     },
+     "data": {
+      "unit": "days",
+      "value": 10,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rvm",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Quick one: how did we do?",
+       "preview_text": "A sentence on Trustpilot is plenty.",
+       "template_ref": "rve",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Everything else (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "e1n",
+     "type": "send-email",
+     "links": {
+      "next": "ewn"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
+       "preview_text": "Thanks for shopping with us. Here's how to reach us if you need anything.",
+       "template_ref": "e1en",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E1 Everything else · Thanks"
+      }
+     }
+    },
+    {
+     "temporary_id": "ewn",
+     "type": "time-delay",
+     "links": {
+      "next": "rvn"
+     },
+     "data": {
+      "unit": "days",
+      "value": 10,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rvn",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Quick one: how did we do?",
+       "preview_text": "A sentence on Trustpilot is plenty.",
+       "template_ref": "rve",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Everything else (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "e1o",
+     "type": "send-email",
+     "links": {
+      "next": "ew7"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Your order should be with you{% if person.first_name %}, {{ person.first_name }}{% endif %}",
+       "preview_text": "Thanks for shopping with us. Here's how to reach us if you need anything.",
+       "template_ref": "e1e",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 E1 Everything else · Thanks (with credit offer)"
+      }
+     }
+    },
+    {
+     "temporary_id": "ew7",
+     "type": "time-delay",
+     "links": {
+      "next": "ero"
+     },
+     "data": {
+      "unit": "days",
+      "value": 7,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "ero",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "T9sNn9",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "greater-than-or-equal",
+            "value": 1
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "in-the-last",
+            "unit": "day",
+            "quantity": 12
+           },
+           "metric_filters": null
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "erm",
+      "next_if_false": "ew3"
+     }
+    },
+    {
+     "temporary_id": "erm",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-property",
+           "property": "properties['MemberTier']",
+           "filter": {
+            "type": "existence",
+            "operator": "is-set"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "ew3m",
+      "next_if_false": "reme"
+     }
+    },
+    {
+     "temporary_id": "ew3m",
+     "type": "time-delay",
+     "links": {
+      "next": "rvm2"
+     },
+     "data": {
+      "unit": "days",
+      "value": 3,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rvm2",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Quick one: how did we do?",
+       "preview_text": "A sentence on Trustpilot is plenty.",
+       "template_ref": "rve",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Everything else (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "reme",
+     "type": "send-email",
+     "links": {
+      "next": "ew3r"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Still time to get 10% back on your order",
+       "preview_text": "Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.",
+       "template_ref": "rem",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Membership reminder · 10% back"
+      }
+     }
+    },
+    {
+     "temporary_id": "ew3r",
+     "type": "time-delay",
+     "links": {
+      "next": "rvr"
+     },
+     "data": {
+      "unit": "days",
+      "value": 3,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rvr",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Quick one: how did we do?",
+       "preview_text": "A sentence on Trustpilot is plenty.",
+       "template_ref": "rve",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Everything else (from Alex)"
+      }
+     }
+    },
+    {
+     "temporary_id": "ew3",
+     "type": "time-delay",
+     "links": {
+      "next": "rvo"
+     },
+     "data": {
+      "unit": "days",
+      "value": 3,
+      "secondary_value": 0,
+      "timezone": "profile",
+      "delay_until_time": "09:30"
+     }
+    },
+    {
+     "temporary_id": "rvo",
+     "type": "send-email",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "Alex at Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "Quick one: how did we do?",
+       "preview_text": "A sentence on Trustpilot is plenty.",
+       "template_ref": "rve",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F9 Review · Everything else (from Alex)"
+      }
+     }
+    }
+   ]
+  }
+ },
+ "photo_briefs": [
+  {
+   "key": "P9",
+   "emails": "F9 Email 1 (both paths)",
+   "title": "Their own product",
+   "where": "Under the headline, centred",
+   "what": "The main Shopify photo of the first item in their order, pulled in automatically. Nothing to supply.",
+   "alt": "",
+   "source": "Automatic from Shopify. Main product photos need a plain white background and no badges (the M1 DHC's main photo says \"FREE GIFT\").",
+   "size": "Shows at 240 × 240 px. Shopify main photos should be square, at least 800 px.",
+   "now": "Automatic",
+   "now_status": "Have",
+   "none": "Always there if the product has a photo."
+  },
+  {
+   "key": "C1",
+   "emails": "F9 Hardware Email 2 (Motocaddy trolley orders)",
+   "title": "Trolley battery on charge",
+   "where": "Across the top of the trolley care section",
+   "what": "A lithium trolley battery on charge indoors, plugged in on a hard floor or bench. Matches the first tip: charge after every round, unplug when full.",
+   "alt": "",
+   "source": "Your own shot in the shop works well; Motocaddy press images are the alternative.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
+   "none": "Without it, the care tips lead."
+  },
+  {
+   "key": "C2",
+   "emails": "F9 Hardware Email 2 (club orders)",
+   "title": "Looking after clubs",
+   "where": "Across the top of the club care section",
+   "what": "Close-up hands cleaning a club face with a brush and towel, or a fresh grip going on.",
+   "alt": "",
+   "source": "Stock is fine; your own workshop shot is better.",
+   "size": "Supply 1200 × 720 px (landscape, 5:3). Shows at 600 × 360. JPG, under 250 KB. Keep the subject in the middle third (phones crop the edges). No text on the photo.",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
+   "none": "Without it, the care tips lead."
+  },
+  {
+   "key": "X1",
+   "emails": "F9 Hardware Email 2 (Motocaddy trolley orders)",
+   "title": "Trolley with accessories fitted",
+   "where": "Top of the \"Goes well with it\" section",
+   "what": "A Motocaddy trolley out on the course with accessories fitted (umbrella holder, cup holder, scorecard holder), so people see what they'd add.",
+   "alt": "",
+   "source": "Motocaddy press images are likely to have this.",
+   "size": "Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
+   "none": "Without it, the accessory links lead."
+  },
+  {
+   "key": "X2",
+   "emails": "F9 Hardware Email 2 (club orders)",
+   "title": "Club accessories",
+   "where": "Top of the clubs part of \"Goes well with it\"",
+   "what": "Grips, headcovers, club brushes and a towel laid out together.",
+   "alt": "",
+   "source": "Supplied by Layton.",
+   "size": "Supply 1200 × 600 px (2:1). Shows at 600 × 300. JPG, under 250 KB.",
+   "now": "Supplied 8 Oct (in the Klaviyo library)",
+   "now_status": "Have",
+   "none": "Without it, the accessory links lead."
+  }
+ ],
+ "photo_rules": [
+  "People like your customers: ordinary club golfers of mixed ages, not tour pros or models.",
+  "UK courses and UK weather: parkland, heath, some grey skies. No palm trees, desert courses or sunset silhouettes.",
+  "Product in use, not posed: a trolley being walked, shoes on grass. Studio packshots belong in the basket emails.",
+  "Nothing written on the photo: text goes in the email so it stays readable.",
+  "Logos small: a badge on a trolley is fine; a brand name filling the frame isn't, unless it's the brand you want to push."
+ ]
+}
