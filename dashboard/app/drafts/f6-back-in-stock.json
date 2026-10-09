@@ -1,0 +1,174 @@
+{
+ "id": "f6-back-in-stock",
+ "title": "F6 Back in stock",
+ "summary": "People who tap “Email me when it's back” on a sold-out product or size. The moment that exact variant is back: one plain email with their product. A text 4 hours later only if they haven't clicked and have agreed to texts. No codes.",
+ "replaces": "New. Replaces the Notify Me app (switch its theme embed off when the Klaviyo button goes live).",
+ "outline": [
+  "Starts: Subscribed to Back in Stock (Klaviyo's button on sold-out products).",
+  "Waits until that exact size or variant is back in stock.",
+  "Email 1 straight away (Smart Sending off: they asked for it)",
+  "4 hours later: a text, only if they haven't clicked and can receive texts"
+ ],
+ "after": [
+  "Only switch on once the back-in-stock button is live (section 8 of the checklist with Luke).",
+  "Test: set a test variant to 0 stock, sign up with a test email, restock to 1. Check the email arrives with the right product name, size, photo, price and link, then tell Claude so the event fields can be checked.",
+  "Klaviyo back-in-stock settings: notify when stock is 1 or more; notify everyone waiting."
+ ],
+ "split_labels": {
+  "clk": {
+   "label": "Haven't clicked Email 1?",
+   "yes": "Send the text",
+   "no": "Clicked: done"
+  }
+ },
+ "templates": [
+  {
+   "key": "e1",
+   "file": "f6-back-in-stock/e1.html",
+   "template_name": "EG · F6 · E1 · It's back",
+   "name": "E1 · It's back",
+   "subject": "{{ event.ProductName|default:'The item you wanted' }} is back in stock",
+   "preview": "You asked us to tell you. Here it is.",
+   "when": "The moment it's back in stock",
+   "sender": "⛳ Evolution Golf",
+   "preview_file": "f6-back-in-stock/e1.preview.html"
+  }
+ ],
+ "flow": {
+  "name": "EG · F6 Back in stock",
+  "definition": {
+   "triggers": [
+    {
+     "type": "metric",
+     "id": "UiRDfZ"
+    }
+   ],
+   "profile_filter": {
+    "condition_groups": [
+     {
+      "conditions": [
+       {
+        "type": "profile-metric",
+        "metric_id": "Y2WUPe",
+        "measurement": "count",
+        "measurement_filter": {
+         "type": "numeric",
+         "operator": "equals",
+         "value": 0
+        },
+        "timeframe_filter": {
+         "type": "date",
+         "operator": "in-the-last",
+         "unit": "day",
+         "quantity": 30
+        },
+        "metric_filters": null
+       }
+      ]
+     }
+    ]
+   },
+   "entry_action_id": "bis",
+   "actions": [
+    {
+     "temporary_id": "bis",
+     "type": "back-in-stock-delay",
+     "links": {
+      "next": "e1"
+     },
+     "data": {}
+    },
+    {
+     "temporary_id": "e1",
+     "type": "send-email",
+     "links": {
+      "next": "w4h"
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "from_email": "info@evolutiongolf.co.uk",
+       "from_label": "⛳ Evolution Golf",
+       "reply_to_email": "info@evolutiongolf.co.uk",
+       "subject_line": "{{ event.ProductName|default:'The item you wanted' }} is back in stock",
+       "preview_text": "You asked us to tell you. Here it is.",
+       "template_ref": "e1",
+       "smart_sending_enabled": false,
+       "transactional": false,
+       "add_tracking_params": true,
+       "name": "F6 E1 · It's back"
+      }
+     }
+    },
+    {
+     "temporary_id": "w4h",
+     "type": "time-delay",
+     "links": {
+      "next": "clk"
+     },
+     "data": {
+      "unit": "hours",
+      "value": 4,
+      "secondary_value": 0,
+      "timezone": "profile"
+     }
+    },
+    {
+     "temporary_id": "clk",
+     "type": "conditional-split",
+     "data": {
+      "profile_filter": {
+       "condition_groups": [
+        {
+         "conditions": [
+          {
+           "type": "profile-metric",
+           "metric_id": "URfrxe",
+           "measurement": "count",
+           "measurement_filter": {
+            "type": "numeric",
+            "operator": "equals",
+            "value": 0
+           },
+           "timeframe_filter": {
+            "type": "date",
+            "operator": "flow-start"
+           },
+           "metric_filters": null
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "links": {
+      "next_if_true": "sms",
+      "next_if_false": null
+     }
+    },
+    {
+     "temporary_id": "sms",
+     "type": "send-sms",
+     "links": {
+      "next": null
+     },
+     "data": {
+      "status": "draft",
+      "message": {
+       "body": "Evolution Golf: {{ event.ProductName|default:'the item you asked about' }} is back in stock. Have a look here: {{ event.URL|default:'https://evolutiongolf.co.uk/' }}",
+       "name": "F6 SMS 1 · Back in stock",
+       "smart_sending_enabled": true,
+       "transactional": false,
+       "shorten_links": true,
+       "add_org_prefix": false,
+       "add_info_link": false,
+       "add_opt_out_language": true,
+       "sms_quiet_hours_enabled": true,
+       "add_tracking_params": true
+      }
+     }
+    }
+   ]
+  }
+ }
+}

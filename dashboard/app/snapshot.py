@@ -171,6 +171,8 @@ def _walk(start, actions, names, seen):
             steps.append(node)
         elif t == "time-delay":
             steps.append({"kind": "delay", "label": _delay_label(data)})
+        elif t == "back-in-stock-delay":
+            steps.append({"kind": "delay", "label": "Wait until it's back in stock"})
         elif t == "update-profile":
             ops = data.get("profile_operations") or []
             keys = [re.sub(r"properties\['(.+)'\]", r"\1", o.get("property_key", "")) for o in ops]

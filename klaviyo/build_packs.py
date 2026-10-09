@@ -19,6 +19,7 @@ import build_f3 as f3  # noqa: E402
 import build_f9 as f9  # noqa: E402
 import build_f12 as f12  # noqa: E402
 import build_f13 as f13  # noqa: E402
+import build_f6 as f6  # noqa: E402
 
 OUT = ROOT.parent / "dashboard" / "app" / "drafts"
 FROM = "info@evolutiongolf.co.uk"
@@ -418,6 +419,36 @@ def f13_pack():
     }
 
 
+def f6_pack():
+    pid, m = "f6-back-in-stock", meta(f6.EMAILS)
+    # Klaviyo's back-in-stock flows start from "Subscribed to Back in Stock" and wait with a back-in-stock delay step until that
+    # variant is restocked (Klaviyo's own setting decides the threshold and how many people are told).
+    A = [{"temporary_id": "bis", "type": "back-in-stock-delay", "links": {"next": "e1"}, "data": {}},
+         email("e1", "e1", f"F6 {m['e1']['name']}", m["e1"]["subject"], m["e1"]["preview"], "w4h", smart=False),
+         wait("w4h", 4, "hours", "clk"),
+         split("clk", all_of(metric("URfrxe", "equals", 0, FS)), "sms", None),
+         sms("sms", "F6 SMS 1 · Back in stock", f6.SMS1, None)]
+    return pid, {
+        "id": pid, "title": "F6 Back in stock",
+        "summary": "People who tap “Email me when it's back” on a sold-out product or size. The moment that exact variant is back: one "
+                   "plain email with their product. A text 4 hours later only if they haven't clicked and have agreed to texts. No codes.",
+        "replaces": "New. Replaces the Notify Me app (switch its theme embed off when the Klaviyo button goes live).",
+        "outline": ["Starts: Subscribed to Back in Stock (Klaviyo's button on sold-out products).",
+                    "Waits until that exact size or variant is back in stock.",
+                    "Email 1 straight away (Smart Sending off: they asked for it)",
+                    "4 hours later: a text, only if they haven't clicked and can receive texts"],
+        "after": ["Only switch on once the back-in-stock button is live (section 8 of the checklist with Luke).",
+                  "Test: set a test variant to 0 stock, sign up with a test email, restock to 1. Check the email arrives with the right "
+                  "product name, size, photo, price and link, then tell Claude so the event fields can be checked.",
+                  "Klaviyo back-in-stock settings: notify when stock is 1 or more; notify everyone waiting."],
+        "split_labels": {"clk": {"label": "Haven't clicked Email 1?", "yes": "Send the text", "no": "Clicked: done"}},
+        "templates": templates(pid, f6.EMAILS, "EG · F6", ROOT / "design" / "f6"),
+        "flow": {"name": "EG · F6 Back in stock", "definition": {
+            "triggers": [{"type": "metric", "id": "UiRDfZ"}], "profile_filter": all_of(NO_BOUNCE),
+            "entry_action_id": "bis", "actions": A}},
+    }
+
+
 def check(pk):
     acts = {a["temporary_id"]: a for a in pk["flow"]["definition"]["actions"]}
     keys = {t["key"] for t in pk["templates"]}
@@ -432,7 +463,7 @@ def check(pk):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack(), f12_pack(), f13_pack()]
+    packs = [f1_pack(), *f2_packs(), f3_pack(), f9_pack(), f12_pack(), f13_pack(), f6_pack()]
     add_photos(packs[0][1], f1.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
     for _, pk in packs[1:3]:
         add_photos(pk, f2.EMAILS, f1.SLOTS, f1.PHOTO_RULES)
