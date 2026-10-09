@@ -260,3 +260,50 @@ contact.complained template.updated flow.enabled flow.disabled`.
 accept your outline format and compile it? (2) Can you pull the current template HTML out of Klaviyo for the
 packs, or should we start from the `emails/` sources in this repo? (3) Which custom events exist today (membership
 tier change from the portal?) and who can push them?
+
+## 8. Round-1 answers (9 Oct 2026, replying to the dashboard developer)
+
+**Your three answers, accepted.** (1) Packs are structured on your side → you emit the flow JSON and
+check it against `/flows/{key}/validate` before pushing. (2) Templates are authored in your repo in our
+token format, starting from your approved HTML — no Klaviyo translation step. (3) No custom events exist
+today. **Membership is owned by the members portal** (repo `MemberPortal/EvoGolfMembersApp`, Next.js on Fly,
+`members.evolutiongolf.co.uk`). Confirmed from its code (`src/lib/membershipMode.ts`, `membershipSyncConstants.ts`):
+- **Two tiers since Sep 2026:** `free` (everyone without a paid membership) and `annual_pro` (**the one paid
+  plan, £36/year**, Shopify product "Clubhouse membership" id 9008844472578). Every paid member — Stripe
+  monthly/annual, legacy date-window, Shopify product — resolves to `annual_pro`; the old Club Access /
+  Evolution Pro tiers are grandfathered labels only. So `customer.member_tier` ∈ {`free`, `annual_pro`}.
+- **The portal already writes membership to Shopify tags:** `EvoMember` (any member) + `AnnualMember` (the
+  tier tag; legacy "Evolution Annual" is stripped on re-sync). → `customer.member` = has tag `AnnualMember`
+  (or `EvoMember`), available to the engine **today** from Shopify, no event needed for the flag.
+- **The portal already pushes to Klaviyo** from one function, `syncMembershipPlatforms()` (and
+  `clearMembershipPlatforms()` on cancel), called on join start/complete, the Shopify order-paid webhook,
+  the Stripe webhook and the member-tag re-sync. It also adds dropped signups to a Klaviyo list (`WayZvN`)
+  that drives a "finish signing up" flow. **The Evoflows hook goes in those same two functions:**
+  `POST /events` with `membership_changed` `{tier, previous, member_since, source}`, `membership_cancelled`,
+  and `signup_dropped` (replacing the Klaviyo dropped-signup list). ~1 hour of portal work; the portal's
+  `MembershipSubscription` carries the start date, so `customer.member_since` arrives with the event.
+  Existing members need a one-off backfill of `member_since` from the portal DB (script) or the engine
+  treats them as "joined before <go-live>".
+- F2 therefore has exactly two journeys (your `f2-free` and `f2-annual` packs) — the Club/Pro packs are dead.
+
+**Your problems, agreed.**
+- **F12 Winback / F13 Sunset stay on Klaviyo** (or wait) until the engine tracks opens/clicks (phase 2
+  pixel + redirect). We will not fake engagement from purchases.
+- **Images → Shopify Files.** `cdn.shopify.com` is accepted by the upload check. Upload JPG/PNG, not WebP
+  (Outlook). ~30 images, before Klaviyo is cancelled.
+- **The F9 in §4.2 was illustrative; your approved v3 is the spec.** Same for F3: send us the approved
+  version and we diff it against the flow running today. v3 needs two things added to the field list:
+  `customer.member_since` / `customer.days_since_joined` (only available once the membership system
+  sends it — tags carry no date) and vendor matching on the whole order (`order.vendors` already listed;
+  `{ "field": "order.vendors", "contains": "Motocaddy" }`).
+
+**Your seven confirmations.**
+| Question | Answer |
+|---|---|
+| Frequency cap like Smart Sending? | **Across flows: yes, v1.** Per-flow `max_per_contact_hours` (default 16) and a global `flow_frequency_cap_hours` — a step due inside the window is delayed to the window's end, not skipped. **Across campaigns: partial.** Listmonk does not log per-subscriber campaign sends, so the engine can only pause flow sends while a broadcast to a list the contact is on is *running* (`pause_during_campaigns: true`). A true cross-channel cap needs Listmonk's individual tracking on, which is off for privacy reasons. |
+| "If this list contains" checks in templates? | **Yes, as precomputed flags.** Go templates can't test slice membership cleanly, so the engine puts booleans in `.Tx.Data`: `is_member`, `on_list_<id>`, `has_tag_<slug>`, plus `member_tier`. Tell us which lists/tags your emails test and we add them. |
+| Collection names vs URL-style handles? | **Both.** Conditions match on `order.collections` (handles, stable) and `order.collection_titles` (display names). Prefer handles; titles get renamed. |
+| Manage-preferences link? | **Not in v1** — one-click global unsubscribe only (`{{ .Tx.Data.unsubscribe_url }}`). A preferences page served by the engine is phase 2; template token reserved: `{{ .Tx.Data.preferences_url }}` (empty until then — guard with `{{ if }}`). |
+| Conditions checked when each step runs? | **Yes.** Entry conditions at trigger time; every step's `when` at the moment the step is due, with fresh contact/customer/order data (consent re-checked too). A flow-level `exit.when` is evaluated before every step. |
+| F6 back-in-stock has no trigger without Klaviyo's button? | **Correct.** Needs a "notify me" capture on the product page posting `back_in_stock_requested` to `/events` (and a stock poll to fire `back_in_stock`). Theme work; after F9. |
+| SMS steps? | **Dropped on import** — `validate` returns a warning per SMS step and the flow is accepted without them. No SMS channel planned (1,222 consented numbers, weak provenance). |
