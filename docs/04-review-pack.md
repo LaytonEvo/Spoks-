@@ -15,7 +15,7 @@ Links and images were checked. Copy was swept for codes, deadlines, made-up figu
 | EG · F2 Membership · Free | Y5dese | 7/7 match | 3 match | OK | Pass |
 | EG · F2 Membership · Annual | UQTuXm | 25/25 match | 13 sends, 6 templates match | OK | Pass |
 | EG · F3 Checkout abandonment | SJxQ7E | 22/22 match (8 emails, 3 texts) | 8 match | OK | Pass, 2 copy fixes advised |
-| EG · F9 After delivery + review | RsuJHT | 52/52 match, 33 splits | 23 match | 15 renders OK | Pass, 2 fixes advised |
+| EG · F9 After delivery + review v3 | TGqZQc (replaced RsuJHT) | 52/52 match, 33 splits | 23 match | 15 renders OK | Pass, 2 fixes advised |
 | EG · F12 Winback | QQicb5 | 12/12 match | 6 match | OK | Pass |
 | EG · F13 Sunset | XrnVxd | 6/6 match, profile update correct | 2 match | OK | Pass, manual steps essential |
 
@@ -40,9 +40,9 @@ the Motocaddy and PowaKaddy registration pages and the social links couldn't be 
 4. ~~**F3 under-£300 emails and Free members.**~~ Done 8 Oct (rescanned). Free members go down this path, but E2lo's subject ("5% off this order, free"),
    headline and intro, and E1lo's preview, tell them to join Free. Only the panel switches.
 5. ~~**F3 "Good to know": "Members get four free returns a year"**~~ Done 8 Oct (rescanned). reads as if Free members get them. Should say annual members.
-6. **F9 10%-back reminder can reach someone who has joined since E1.** The day-10 check only looks at the order date. Add
+6. ~~**F9 10%-back reminder can reach someone who has joined since E1.**~~ Done in F9 v3 (TGqZQc, 9 Oct, checked). The day-10 check only looks at the order date. Add
    "MemberTier is not set" to that check.
-7. **F9 uses the first item in the order** for the product photo, brand warranty/accessories and the review email's product name.
+7. ~~**F9 uses the first item in the order**~~ Done in F9 v3 (TGqZQc, 9 Oct, checked). for the product photo, brand warranty/accessories and the review email's product name.
    A trolley order with a cover listed first would get the wrong or no brand content; an empty order gives "You've had the  for a
    little while". Add a fallback ("your new kit") and prefer the trolley/club item.
 8. ~~**F3 E3 (Alex) product name has no fallback**~~ Done 8 Oct (rescanned). ("you were looking at the ." if the basket has no items).

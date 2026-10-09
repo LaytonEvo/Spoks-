@@ -176,3 +176,4 @@
   back on your order"; trust bar shows annual members "Free delivery over £10". Django-checked with Motocaddy-trolley-with-cover-first,
   other-trolley + PowaKaddy accessory, and clubs orders. Layton to delete RsuJHT once v2 is created.
 - 9 Oct: F9 v2 (WaPWdB) QA: 61/61 steps match, re-entry 30 days set, RsuJHT deleted. Two copy fixes → pack f9-after-delivery-v3: E1 'How we work' delivery line now £10 for annual members (was a fixed £50 contradicting the trust bar); rvh 'with them' for clubs. Layton to approve v3 and delete WaPWdB.
+- 9 Oct: F9 v3 (TGqZQc) final QA: 61/61 steps, 0 mismatches, re-entry 30 days, v2 deleted; members' delivery line and 'with them' render correctly. F9 done.
