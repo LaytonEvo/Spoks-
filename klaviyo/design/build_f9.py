@@ -120,8 +120,9 @@ def hero(ctx, key, h=360):
 
 def first_order(ctx):
     """'How we work', as a plain line for everyone (a template can't see someone's order count; and one panel per email)."""
+    over = ("{% if person|lookup:'MemberTier' == 'AnnualMember' %}£10 for you as a member{% else %}£50{% endif %}" if ctx.live else "£50")
     return text_row(p(f"<strong style=\"font-weight:600;color:{HEAD};\">How we work:</strong> we're real people who play, free UK delivery is "
-                      f"over £50, and if anything's wrong, you reply to an email or call us and a person sorts it.", 15, MUTED, "0"), "24px 48px 0")
+                      f"over {over}, and if anything's wrong, you reply to an email or call us and a person sorts it.", 15, MUTED, "0"), "24px 48px 0")
 
 
 def h3(t, m="0 0 8px"):
@@ -250,7 +251,7 @@ def letter(ctx, paras, preheader):
 
 
 def rvh(ctx):
-    return letter(ctx, ["Alex here. You've had your " + (("{% if " + has(TROLLEYS) + " %}new trolley{% else %}new clubs{% endif %}") if ctx.live else "new trolley") + " for a little while now, so hopefully you've had a round or two with it.",
+    return letter(ctx, ["Alex here. You've had your " + (("{% if " + has(TROLLEYS) + " %}new trolley for a little while now, so hopefully you've had a round or two with it{% else %}new clubs for a little while now, so hopefully you've had a round or two with them{% endif %}") if ctx.live else "new trolley for a little while now, so hopefully you've had a round or two with it") + ".",
                         "Would you leave a short, honest review on Trustpilot? Good or bad, it helps the next golfer who's choosing, and we read every one.",
                         "And if anything isn't right, just reply to this email. I'll sort it, whatever you write in your review.",
                         "Thanks for buying from a shop run by golfers."],

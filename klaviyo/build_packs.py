@@ -262,7 +262,7 @@ def f3_pack():
 
 
 def f9_pack():
-    pid, m = "f9-after-delivery-v2", meta(f9.EMAILS)
+    pid, m = "f9-after-delivery-v3", meta(f9.EMAILS)
     E = lambda tid, key, nxt, sender=BRAND: email(tid, key, f"F9 {m[key]['name']}", m[key]["subject"], m[key]["preview"], nxt, sender)
     col = lambda names, days: any_of(*[metric("WJizp7", "greater-than-or-equal", 1, last(days),
                                               [{"property": "Collections", "filter": {"type": "string", "operator": "contains", "value": c}}]) for c in names])
@@ -301,11 +301,11 @@ def f9_pack():
           E("reme", "rem", "ew3r"), wait("ew3r", 3, "days", "rvr", at="09:30"), E("rvr", "rve", None, ALEX),
           wait("ew3", 3, "days", "rvo", at="09:30"), E("rvo", "rve", None, ALEX)]
     return pid, {
-        "id": pid, "title": "F9 After delivery + review v2",
+        "id": pid, "title": "F9 After delivery + review v3",
         "summary": "Online orders, 3 days after dispatch: setting up and looking after what they bought (trolley and club sections switch on "
                    "per order), the membership credit offer for non-members (10% of the order back as store credit if they join within 14 days), "
                    "then an honest review request from Alex. No codes.",
-        "replaces": "Replaces the first F9 draft “EG · F9 After delivery + review” (RsuJHT): delete that once this is created. Also replaces “NEW: Post-Fulfillment”: set that to Manual when you switch this on.",
+        "replaces": "Replaces the F9 v2 draft “EG · F9 After delivery + review v2” (WaPWdB): delete that once this is created. Also replaces “NEW: Post-Fulfillment”: set that to Manual when you switch this on.",
         "outline": ["Starts: Fulfilled Order, online only (till sales left out). 3 days later, 09:30.",
                     "Hardware (trolley, club or used club) or Everything else, by what was ordered",
                     "Members · non-members who ordered in the last 10 days (credit offer) · non-members with older orders (no offer)",
@@ -313,7 +313,7 @@ def f9_pack():
                     "review about 2 weeks after delivery for trolleys, about 4 weeks for clubs",
                     "Everything else: E1 thanks · reminder at day 10 (offer path) · review about 10 days after delivery"],
         "after": ["Set re-entry to 30 days in the flow settings (the API can't), so a customer with two orders in a month gets one set.",
-                  "Delete the first F9 draft “EG · F9 After delivery + review” (RsuJHT).",
+                  "Delete the F9 v2 draft “EG · F9 After delivery + review v2” (WaPWdB).",
                   "Remember the credit: when a non-member joins within 14 days of an order, your team adds 10% of that order as store credit.",
                   "Send yourself tests with a Motocaddy order, a PowaKaddy order and a clubs order, to check the right sections and links show.",
                   "When happy, switch it on and set “NEW: Post-Fulfillment” to Manual."],
@@ -324,8 +324,8 @@ def f9_pack():
                          **{k: {"label": "Joined since Email 1?", "yes": "Member now: skip the reminder", "no": "Send the reminder"} for k in ("hrm", "erm")},
                          **{f"t{t}": {"label": "Order has a trolley?", "yes": "Trolley: review at ~2 weeks", "no": "Clubs: review at ~4 weeks"}
                             for t in ("hm", "hn", "ho", "hm2", "hr2")}},
-        "templates": templates(pid, f9.EMAILS, "EG · F9 v2", ROOT / "design" / "f9"),
-        "flow": {"name": "EG · F9 After delivery + review v2", "definition": {
+        "templates": templates(pid, f9.EMAILS, "EG · F9 v3", ROOT / "design" / "f9"),
+        "flow": {"name": "EG · F9 After delivery + review v3", "definition": {
             "triggers": [{"type": "metric", "id": "WJizp7", "trigger_filter": {"condition_groups": [{"conditions": [
                 {"type": "metric-property", "metric_id": "WJizp7", "field": "Source Name",
                  "filter": {"type": "string", "operator": "not-equals", "value": "pos"}}]}]}}],
