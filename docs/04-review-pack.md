@@ -66,3 +66,37 @@ I fix the builders and create v2 drafts of F3 and F9 (old drafts then deleted by
 
 SMS rendering (no render tool); live event fields (would mean reading customer data); real inbox rendering (Gmail / Outlook /
 Apple Mail): all covered by test sends next.
+
+## Data audit (9 Oct 2026, read-only, counts only)
+
+### Membership tags — needs a decision before switching on
+- **"Free TIer Members" (MemberTier contains "Free") has 2 people.** No sampled profile has MemberTier "Free". Free members aren't
+  tagged that way in Klaviyo, so F2 Free barely triggers, and every "Free member" line in F3/F9 (and the member exclusions in F12/F13,
+  which rely on MemberTier being set) treats Free members as non-members.
+- **MemberTier vs Shopify tags disagree.** In a sample of the 5,000 most recently updated profiles: 642 MemberTier "AnnualMember",
+  5 "Club", 1 "Evolution Pro", none "Free", 4,352 not set. Shopify tags in the same sample (pages 5–50): AnnualMember 743, EvoMember 613,
+  ClubhouseMember 358, clubhouse-member 57, Club 3, Evolution Pro 1. About 210 profiles have the AnnualMember Shopify tag but no
+  MemberTier "AnnualMember" (so the flows treat them as non-members: join pitches, winback, sunset); about 75 have MemberTier
+  "AnnualMember" without the tag (possibly lapsed, still getting member emails).
+- **No expiry/renewal property** on any profile, so lapsed annual members can't be detected in Klaviyo.
+- **Old tiers still present:** Club Access segment 20, Evolution Pro 1, Evolution Pro Annual 0.
+- Annual segment "EG · Members · Annual" = 642, matching MemberTier, but not the 743 Shopify-tagged.
+- First name present on 88.6% of the sample. Stray property "in_secondorder_flow " (trailing space, 28 profiles).
+
+### Collections (Shopify, checked 9 Oct)
+All trolley, clubs and used-club collections the flows use exist with products. Not in Shopify: "Golf Shoes", "Ladies Golf Shoes",
+"Womens Golf Shoes" (F9 shoe tips still trigger via Mens Golf Shoes etc.). "Fairway Woods" has 0 products (harmless). Newer trolley
+collections (Skymax, NAVEE, 2026 Motocaddy Trolley Range, New In Golf Trolleys) are covered: their products are also in collections
+we use. PowaKaddy trolleys: all 20+ products are drafts with no stock (confirms not sold).
+
+### Live flows that overlap the new ones (switch off when the new one goes on)
+| New | Live flow to switch off | Same trigger? |
+|---|---|---|
+| F1 Welcome | 1. SM: Welcome Sequence | Yes (main list Tzck9t) |
+| F1 (SMS step) | 1.1 SM SMS Club Welcome (SMS list) | Different list; someone on both gets two welcome texts |
+| F2 Free | FLOW: Welcome - Evolution Free | Yes (W3N8WF) |
+| F2 Annual | FLOW: Welcome — Club Access / Evolution Pro / Evolution Pro Annual | Old-tier segments (20 / 1 / 0 people) |
+| F3 | NEW: Abandoned Checkout (category-routed) | Checkout Started |
+| F9 v3 | NEW: Post-Fulfillment; also review NEW: Second-Order Conversion (overlaps F9's timing) | Fulfilled / Placed Order |
+| F12 | NEW: Winback | — |
+Keep: Order Confirmation – Standard, NEW: Abandoned Cart, NEW: Browse Abandonment (until F4/F5 replace them).
