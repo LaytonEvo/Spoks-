@@ -423,7 +423,7 @@ def f6_pack():
     pid, m = "f6-back-in-stock", meta(f6.EMAILS)
     # Klaviyo's back-in-stock flows start from "Subscribed to Back in Stock" and wait with a back-in-stock delay step until that
     # variant is restocked (Klaviyo's own setting decides the threshold and how many people are told).
-    A = [{"temporary_id": "bis", "type": "back-in-stock-delay", "links": {"next": "e1"}, "data": {}},
+    A = [{"temporary_id": "bis", "type": "back-in-stock-delay", "links": {"next": "e1"}},  # takes no "data" (Klaviyo 400, 9 Oct)
          email("e1", "e1", f"F6 {m['e1']['name']}", m["e1"]["subject"], m["e1"]["preview"], "w4h", smart=False),
          wait("w4h", 4, "hours", "clk"),
          split("clk", all_of(metric("URfrxe", "equals", 0, FS)), "sms", None),

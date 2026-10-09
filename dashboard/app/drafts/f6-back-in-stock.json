@@ -75,8 +75,7 @@
      "type": "back-in-stock-delay",
      "links": {
       "next": "e1"
-     },
-     "data": {}
+     }
     },
     {
      "temporary_id": "e1",
