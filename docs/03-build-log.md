@@ -204,3 +204,23 @@
   `EvoMember` + `Free`; annual = `AnnualMember` / `ClubhouseMember` / `Club` / `Evolution Pro` / `Evolution Annual`.
 - F9 tokens are confirmed, so F9 v3 can move. F4 is unblocked: the cookie pop-up was fixed on 9 Oct, and the cart
   tracker went live on 12 Oct. Portal membership events (F2) are not scheduled yet.
+
+### 12 Oct 2026: correctness check of what's built
+- **Evoflows F3, passes:**
+  - 576 Go renders: 8 templates × 12 real baskets from `GET /carts` × 3 audiences (annual / Free / not a member) × with
+    and without a first name. No leftover tags, empty prices, empty images, missing items or missing unsubscribe links.
+  - No trolley, clubs or "Right choice?" content without the matching basket; no Free wording to non-Free customers;
+    no "Join free" to Free members.
+  - Wording is word-for-word the approved Klaviyo copy.
+  - The live templates equal the built ones, apart from the engine's `link_qs` on our own links (none on tel:, social,
+    portal, recovery or unsubscribe links).
+  - The live flow equals the built one, validates clean, and is disabled. Alex's email has its own sender name.
+- **Klaviyo drafts, problem found:** the drafts staying on Klaviyo spot members by `MemberTier`, which Luke says to
+  ignore; the engine uses Shopify tags. Affected:
+  - F1: member skip.
+  - F2: both segments (Free = 2 people).
+  - F6: delivery line.
+  - F12: member skip.
+  - F13: member exclusion. It could suppress paying Clubhouse members.
+
+  All are still off. Fix proposed to Layton: v2 drafts keyed on `Shopify Tags`.
