@@ -1,6 +1,8 @@
 # Evolution Golf — email flow programme (draft-only build)
 
-> **Current route (29 Sep 2026): Klaviyo short term, flows built as drafts via the Windsor.ai MCP.**
+> **Current route (12 Oct 2026): every `EG ·` flow moves to Evoflows** (self-hosted engine, `klaviyo/evoflows.py`,
+> contract `docs/source/FLOW_API.md`). None of the flows we built will run on Klaviyo; the Klaviyo `EG ·` drafts stay off
+> (Layton deletes them when he chooses). Never call Evoflows `enable`: Luke switches flows on. Earlier route: Klaviyo drafts (29 Sep).
 > Spoks was tested and parked (see `docs/00-spoks-capabilities.md` and the decision PDF). Read `docs/HANDOFF.md` first.
 
 Source brief: `docs/source/CLAUDE_CODE_PROMPT_spoks_flow_build.md` (Layton). Source of truth for flow logic and copy:

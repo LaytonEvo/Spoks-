@@ -15,6 +15,7 @@
 >   - F3 staff seed test and switch-on (with Luke), and the Klaviyo switch-off hour (Luke and Layton).
 >   - Portal membership events: about an hour of work, not scheduled yet.
 > - The engine reads Shopify tags only; Klaviyo's `MemberTier` can be ignored.
+> - **Decision (Layton, 12 Oct):** none of our flows stays on Klaviyo; all move to Evoflows.
 > - Live version: Claude Doc https://claude.ai/code/artifact/0cef0612-0079-431f-ba83-6d7b5a5a8ed4
 
 **Where things stand:**
@@ -62,5 +63,5 @@ Below is what only Luke can do, in order.
 ## D. Later (nothing to do yet)
 
 13. **Opens and clicks** (tracking pixel and click tracking), plus `contact.last_open_at`, `last_click_at` and `emails_received`.
-    Until these exist, F12 (Winback) and F13 (Sunset) stay on Klaviyo.
-14. **A back-in-stock trigger.** Until there is one, F6 stays on Klaviyo.
+    Until these exist, F12 (Winback) and F13 (Sunset) wait. They won't run on Klaviyo.
+14. **A back-in-stock trigger.** Until there is one, F6 waits.
