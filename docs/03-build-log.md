@@ -224,3 +224,23 @@
   - F13: member exclusion. It could suppress paying Clubhouse members.
 
   All are still off. Fix proposed to Layton: v2 drafts keyed on `Shopify Tags`.
+
+### 12 Oct 2026: F9 v3 on Evoflows (pushed, switched off)
+- Decision (Layton): none of our flows stays on Klaviyo; all move to Evoflows. CLAUDE.md route updated.
+- `klaviyo/evoflows.py` now builds F3 and F9 (`FLOWS` table, `push <what> [flow key]`).
+- F9 v3 translated to `f9_after_delivery`:
+  - trigger `order_fulfilled`, not `pos`; re-entry after 30 days.
+  - Membership checks use `flags.is_member`; "ordered in the last 10/12 days" uses `order.age_days`; the review timing
+    uses `flags.has_trolley`.
+  - The first item is `.Tx.Data.order.first_item`.
+  - The clubs care block uses has_clubs or has_used_clubs.
+  - Four E2 photos re-hosted on Shopify Files (`eg-email-f9-*.jpg`).
+- Checks:
+  - Journey simulation: 81 scenarios (hardware, trolley, member at day 3 and day 10, order age) give the same emails at
+    the same times as the Klaviyo v3 graph (9 distinct journeys).
+  - Wording is word-for-word the approved copy.
+  - 672 Go renders: 7 baskets × 3 audiences × name/no name × photo/no photo. No errors, tags, empty images or prices;
+    no Motocaddy, trolley or clubs content without the matching order; the member delivery line only for annual
+    members (outside the benefits table).
+- Push: 8 templates 200 with no warnings; validate `valid`, no problems or warnings; flow v1 `enabled: false`.
+  Tests of all 8 sent to layton@evolutiongolf.co.uk with the engine's "order" sample.

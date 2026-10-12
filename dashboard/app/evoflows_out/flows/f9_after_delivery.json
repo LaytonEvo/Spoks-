@@ -1,0 +1,509 @@
+{
+ "key": "f9_after_delivery",
+ "name": "F9 After delivery",
+ "version": 1,
+ "description": "Online orders, 3 days after fulfilment. Hardware (trolley, clubs, used clubs): set-up, care, review at ~2 weeks (trolleys) or ~4 weeks (clubs). Everything else: thanks, review at ~10 days. Non-members with a recent order get the 14-day 10% credit offer and one reminder if they still haven't joined. Till orders left out.",
+ "trigger": {
+  "type": "order_fulfilled",
+  "when": {
+   "field": "order.source",
+   "ne": "pos"
+  }
+ },
+ "entry": {
+  "one_active_per_contact": true,
+  "reentry_after_days": 30
+ },
+ "consent": "soft_opt_in",
+ "send_window": {
+  "timezone": "Europe/London",
+  "quiet_hours": [
+   "21:00",
+   "08:00"
+  ]
+ },
+ "utm": {
+  "source": "evolutiongolf-email",
+  "medium": "flow",
+  "campaign": "f9-after-delivery"
+ },
+ "steps": [
+  {
+   "id": "w3",
+   "type": "wait",
+   "for": {
+    "days": 3
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "hw",
+   "type": "split",
+   "branches": [
+    {
+     "id": "hardware",
+     "when": {
+      "field": "flags.has_hardware",
+      "eq": true
+     },
+     "steps": [
+      {
+       "id": "hm",
+       "type": "split",
+       "branches": [
+        {
+         "id": "hm_member",
+         "when": {
+          "field": "flags.is_member",
+          "eq": true
+         },
+         "steps": [
+          {
+           "id": "h1m",
+           "type": "email",
+           "template": "f9_e1hn"
+          },
+          {
+           "id": "h4m",
+           "type": "wait",
+           "for": {
+            "days": 4
+           },
+           "until_time": "17:30"
+          },
+          {
+           "id": "h2m",
+           "type": "email",
+           "template": "f9_e2h"
+          },
+          {
+           "id": "thm",
+           "type": "split",
+           "branches": [
+            {
+             "id": "thm_trolley",
+             "when": {
+              "field": "flags.has_trolley",
+              "eq": true
+             },
+             "steps": [
+              {
+               "id": "wthm",
+               "type": "wait",
+               "for": {
+                "days": 10
+               },
+               "until_time": "09:30"
+              },
+              {
+               "id": "rthm",
+               "type": "email",
+               "template": "f9_rvh"
+              }
+             ]
+            },
+            {
+             "id": "thm_clubs",
+             "steps": [
+              {
+               "id": "wchm",
+               "type": "wait",
+               "for": {
+                "days": 24
+               },
+               "until_time": "09:30"
+              },
+              {
+               "id": "rchm",
+               "type": "email",
+               "template": "f9_rvh"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "hm_offer",
+         "when": {
+          "field": "order.age_days",
+          "lte": 10
+         },
+         "steps": [
+          {
+           "id": "h1o",
+           "type": "email",
+           "template": "f9_e1h"
+          },
+          {
+           "id": "h4o",
+           "type": "wait",
+           "for": {
+            "days": 4
+           },
+           "until_time": "17:30"
+          },
+          {
+           "id": "h2o",
+           "type": "email",
+           "template": "f9_e2h"
+          },
+          {
+           "id": "h3o",
+           "type": "wait",
+           "for": {
+            "days": 3
+           },
+           "until_time": "09:30"
+          },
+          {
+           "id": "rh",
+           "type": "split",
+           "branches": [
+            {
+             "id": "rh_remind",
+             "when": {
+              "all": [
+               {
+                "field": "order.age_days",
+                "lte": 12
+               },
+               {
+                "not": {
+                 "field": "flags.is_member",
+                 "eq": true
+                }
+               }
+              ]
+             },
+             "steps": [
+              {
+               "id": "remh",
+               "type": "email",
+               "template": "f9_rem"
+              },
+              {
+               "id": "thr",
+               "type": "split",
+               "branches": [
+                {
+                 "id": "thr_trolley",
+                 "when": {
+                  "field": "flags.has_trolley",
+                  "eq": true
+                 },
+                 "steps": [
+                  {
+                   "id": "wthr",
+                   "type": "wait",
+                   "for": {
+                    "days": 7
+                   },
+                   "until_time": "09:30"
+                  },
+                  {
+                   "id": "rthr",
+                   "type": "email",
+                   "template": "f9_rvh"
+                  }
+                 ]
+                },
+                {
+                 "id": "thr_clubs",
+                 "steps": [
+                  {
+                   "id": "wchr",
+                   "type": "wait",
+                   "for": {
+                    "days": 21
+                   },
+                   "until_time": "09:30"
+                  },
+                  {
+                   "id": "rchr",
+                   "type": "email",
+                   "template": "f9_rvh"
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            },
+            {
+             "id": "rh_skip",
+             "steps": [
+              {
+               "id": "ths",
+               "type": "split",
+               "branches": [
+                {
+                 "id": "ths_trolley",
+                 "when": {
+                  "field": "flags.has_trolley",
+                  "eq": true
+                 },
+                 "steps": [
+                  {
+                   "id": "wths",
+                   "type": "wait",
+                   "for": {
+                    "days": 7
+                   },
+                   "until_time": "09:30"
+                  },
+                  {
+                   "id": "rths",
+                   "type": "email",
+                   "template": "f9_rvh"
+                  }
+                 ]
+                },
+                {
+                 "id": "ths_clubs",
+                 "steps": [
+                  {
+                   "id": "wchs",
+                   "type": "wait",
+                   "for": {
+                    "days": 21
+                   },
+                   "until_time": "09:30"
+                  },
+                  {
+                   "id": "rchs",
+                   "type": "email",
+                   "template": "f9_rvh"
+                  }
+                 ]
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "hm_old",
+         "steps": [
+          {
+           "id": "h1n",
+           "type": "email",
+           "template": "f9_e1hn"
+          },
+          {
+           "id": "h4n",
+           "type": "wait",
+           "for": {
+            "days": 4
+           },
+           "until_time": "17:30"
+          },
+          {
+           "id": "h2n",
+           "type": "email",
+           "template": "f9_e2h"
+          },
+          {
+           "id": "thn",
+           "type": "split",
+           "branches": [
+            {
+             "id": "thn_trolley",
+             "when": {
+              "field": "flags.has_trolley",
+              "eq": true
+             },
+             "steps": [
+              {
+               "id": "wthn",
+               "type": "wait",
+               "for": {
+                "days": 10
+               },
+               "until_time": "09:30"
+              },
+              {
+               "id": "rthn",
+               "type": "email",
+               "template": "f9_rvh"
+              }
+             ]
+            },
+            {
+             "id": "thn_clubs",
+             "steps": [
+              {
+               "id": "wchn",
+               "type": "wait",
+               "for": {
+                "days": 24
+               },
+               "until_time": "09:30"
+              },
+              {
+               "id": "rchn",
+               "type": "email",
+               "template": "f9_rvh"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "everything_else",
+     "steps": [
+      {
+       "id": "em",
+       "type": "split",
+       "branches": [
+        {
+         "id": "em_member",
+         "when": {
+          "field": "flags.is_member",
+          "eq": true
+         },
+         "steps": [
+          {
+           "id": "e1m",
+           "type": "email",
+           "template": "f9_e1en"
+          },
+          {
+           "id": "ewm",
+           "type": "wait",
+           "for": {
+            "days": 10
+           },
+           "until_time": "09:30"
+          },
+          {
+           "id": "rvm",
+           "type": "email",
+           "template": "f9_rve"
+          }
+         ]
+        },
+        {
+         "id": "em_offer",
+         "when": {
+          "field": "order.age_days",
+          "lte": 10
+         },
+         "steps": [
+          {
+           "id": "e1o",
+           "type": "email",
+           "template": "f9_e1e"
+          },
+          {
+           "id": "ew7",
+           "type": "wait",
+           "for": {
+            "days": 7
+           },
+           "until_time": "09:30"
+          },
+          {
+           "id": "re",
+           "type": "split",
+           "branches": [
+            {
+             "id": "re_remind",
+             "when": {
+              "all": [
+               {
+                "field": "order.age_days",
+                "lte": 12
+               },
+               {
+                "not": {
+                 "field": "flags.is_member",
+                 "eq": true
+                }
+               }
+              ]
+             },
+             "steps": [
+              {
+               "id": "reme",
+               "type": "email",
+               "template": "f9_rem"
+              },
+              {
+               "id": "ew3er",
+               "type": "wait",
+               "for": {
+                "days": 3
+               },
+               "until_time": "09:30"
+              },
+              {
+               "id": "rver",
+               "type": "email",
+               "template": "f9_rve"
+              }
+             ]
+            },
+            {
+             "id": "re_skip",
+             "steps": [
+              {
+               "id": "ew3es",
+               "type": "wait",
+               "for": {
+                "days": 3
+               },
+               "until_time": "09:30"
+              },
+              {
+               "id": "rves",
+               "type": "email",
+               "template": "f9_rve"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "em_old",
+         "steps": [
+          {
+           "id": "e1n",
+           "type": "email",
+           "template": "f9_e1en"
+          },
+          {
+           "id": "ewn",
+           "type": "wait",
+           "for": {
+            "days": 10
+           },
+           "until_time": "09:30"
+          },
+          {
+           "id": "rvn",
+           "type": "email",
+           "template": "f9_rve"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
