@@ -1,0 +1,73 @@
+{
+ "key": "f2_free",
+ "name": "F2 Membership · Free",
+ "version": 1,
+ "description": "New Free members: you're in, the honest maths on £36 (day 4), the plan in use (day 12). Emails 2 and 3 only if they're still on Free.",
+ "trigger": {
+  "type": "custom",
+  "event_name": "membership_changed",
+  "when": {
+   "field": "event.data.tier",
+   "in": [
+    "free"
+   ]
+  }
+ },
+ "entry": {
+  "one_active_per_contact": true
+ },
+ "consent": "soft_opt_in",
+ "send_window": {
+  "timezone": "Europe/London",
+  "quiet_hours": [
+   "21:00",
+   "08:00"
+  ]
+ },
+ "utm": {
+  "source": "evolutiongolf-email",
+  "medium": "flow",
+  "campaign": "f2-free"
+ },
+ "steps": [
+  {
+   "id": "fe1",
+   "type": "email",
+   "template": "f2_fe1"
+  },
+  {
+   "id": "w4",
+   "type": "wait",
+   "for": {
+    "days": 4
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "fe2",
+   "type": "email",
+   "template": "f2_fe2",
+   "when": {
+    "field": "flags.is_free_member",
+    "eq": true
+   }
+  },
+  {
+   "id": "w8",
+   "type": "wait",
+   "for": {
+    "days": 8
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "fe3",
+   "type": "email",
+   "template": "f2_fe3",
+   "when": {
+    "field": "flags.is_free_member",
+    "eq": true
+   }
+  }
+ ]
+}

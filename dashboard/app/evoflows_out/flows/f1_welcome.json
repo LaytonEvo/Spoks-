@@ -1,0 +1,106 @@
+{
+ "key": "f1_welcome",
+ "name": "F1 Welcome",
+ "version": 1,
+ "description": "New subscribers who haven't bought and aren't members. Welcome, the most-asked questions, a note from Alex, then the two ways to pay less (skipped if they joined in the meantime). Leaves when they order.",
+ "trigger": {
+  "type": "subscribed",
+  "when": {
+   "all": [
+    {
+     "not": {
+      "field": "customer.orders_count",
+      "gt": 0
+     }
+    },
+    {
+     "not": {
+      "field": "flags.is_member",
+      "eq": true
+     }
+    }
+   ]
+  }
+ },
+ "entry": {
+  "one_active_per_contact": true
+ },
+ "exit": {
+  "when": {
+   "field": "customer.orders_count",
+   "gt": 0
+  }
+ },
+ "consent": "soft_opt_in",
+ "send_window": {
+  "timezone": "Europe/London",
+  "quiet_hours": [
+   "21:00",
+   "08:00"
+  ]
+ },
+ "utm": {
+  "source": "evolutiongolf-email",
+  "medium": "flow",
+  "campaign": "f1-welcome"
+ },
+ "steps": [
+  {
+   "id": "e1",
+   "type": "email",
+   "template": "f1_e1"
+  },
+  {
+   "id": "w1h",
+   "type": "wait",
+   "for": {
+    "hours": 1
+   }
+  },
+  {
+   "id": "w1d",
+   "type": "wait",
+   "for": {
+    "days": 1
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "e2e",
+   "type": "email",
+   "template": "f1_e2e"
+  },
+  {
+   "id": "w2",
+   "type": "wait",
+   "for": {
+    "days": 2
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "e3",
+   "type": "email",
+   "template": "f1_e3"
+  },
+  {
+   "id": "w3",
+   "type": "wait",
+   "for": {
+    "days": 3
+   },
+   "until_time": "17:30"
+  },
+  {
+   "id": "e4",
+   "type": "email",
+   "template": "f1_e4",
+   "when": {
+    "not": {
+     "field": "flags.is_member",
+     "eq": true
+    }
+   }
+  }
+ ]
+}

@@ -44,6 +44,23 @@ IMAGES = {
         "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-f9-trolley-accessories.jpg?v=1791817953",
     "https://cdn.klaviyomail.com/company/SiyYRR/images/f042426a-6042-4bfa-b390-5679406c3da8.jpeg":
         "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-f9-club-accessories.jpg?v=1791817953",
+    # F1 / F2 photos and F2 icons (re-hosted 12 Oct 2026)
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/7d745e06-9b49-42df-92bb-4c6f3c48ac4e.jpeg":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-course-sunny.jpg?v=1791818492",
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/5bffdf31-4a7a-4327-81e7-30b16012080a.jpeg":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-shoes-fairway.jpg?v=1791818492",
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/9ef9537c-b4e6-4871-981b-a0db1c224456.jpeg":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-first-tee-trolley.jpg?v=1791818493",
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/dafe9b01-ed19-48c3-9fba-b99fb479e11d.png":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-icon-dafe9b01.png?v=1791818491",
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/e562e48c-d737-4094-9968-7b77fc3cc9b1.png":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-icon-e562e48c.png?v=1791818491",
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/a29ce19b-81ee-40bb-9771-99db73608069.png":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-icon-a29ce19b.png?v=1791818492",
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/2fa9b035-5e5b-4818-8a6d-f7ac79b607be.png":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-icon-2fa9b035.png?v=1791818492",
+    "https://cdn.klaviyomail.com/company/SiyYRR/images/132fdae8-dd17-46f0-b648-8dbd74936d6f.png":
+        "https://cdn.shopify.com/s/files/1/0499/9014/0061/files/eg-email-icon-132fdae8.png?v=1791818492",
 }
 
 # ---------------- flags (collection handles, checked against Shopify 9 and 12 Oct 2026) ----------------
@@ -150,10 +167,12 @@ def translate(text):
 
 
 # ---------------- templates (F3, F9) ----------------
-def pack_templates(pack, prefix):
+def pack_templates(pack, prefix, skip=()):
     pk = json.loads((ROOT.parent / "dashboard/app/drafts" / f"{pack}.json").read_text())
     out = {}
     for t in pk["templates"]:
+        if t["key"] in skip:
+            continue
         html = (ROOT.parent / "dashboard/app/drafts/html" / t["file"]).read_text()
         out[f"{prefix}_{t['key']}"] = {"name": f"{prefix.upper()} {t['name']}", "subject": translate(t["subject"]),
                                        "preview_text": translate(t["preview"]), "html": translate(html),
@@ -242,6 +261,75 @@ def f9_flow():
     }
 
 
+COMMON = {"consent": "soft_opt_in", "send_window": {"timezone": "Europe/London", "quiet_hours": ["21:00", "08:00"]}}
+
+
+def f1_flow():
+    """Approved F1 v3 (Klaviyo draft, new look). Dropped on Evoflows, recorded as deviations:
+    - the welcome text (no SMS channel);
+    - the E2 Hardware branch: it keys on Viewed Product, which Evoflows can't see until product_viewed ships (phase 2),
+      so everyone gets E2 Everything else (f1_e2h is kept in the builder, not pushed);
+    - the E1 A/B variant e1b (no A/B tests in Evoflows).
+    Klaviyo also took people out when they started a checkout; Evoflows has no field for that yet (asked)."""
+    E1 = lambda k, i=None, when=None: {**E("f1", k, i), **({"when": when} if when else {})}
+    not_member = {"not": {"field": "flags.is_member", "eq": True}}
+    return {
+        "key": "f1_welcome", "name": "F1 Welcome", "version": 1,
+        "description": "New subscribers who haven't bought and aren't members. Welcome, the most-asked questions, a note from Alex, "
+                       "then the two ways to pay less (skipped if they joined in the meantime). Leaves when they order.",
+        # "not > 0" rather than "= 0": a subscriber with no Shopify customer record has no orders_count, and a missing field is false
+        "trigger": {"type": "subscribed", "when": {"all": [{"not": {"field": "customer.orders_count", "gt": 0}}, not_member]}},
+        "entry": {"one_active_per_contact": True},
+        "exit": {"when": {"field": "customer.orders_count", "gt": 0}},
+        **COMMON,
+        "utm": {"source": "evolutiongolf-email", "medium": "flow", "campaign": "f1-welcome"},
+        "steps": [E1("e1"), W("w1h", hours=1), W("w1d", days=1, at="09:30"), E1("e2e"), W("w2", days=2, at="09:30"), E1("e3"),
+                  W("w3", days=3, at="17:30"), E1("e4", when=not_member)],
+    }
+
+
+TIER = lambda *names: {"field": "event.data.tier", "in": list(names)}
+
+
+def f2_free_flow():
+    """Approved F2 Free. Klaviyo started it on joining the Free segment; Evoflows starts it on the portal's membership_changed
+    event with tier free. Emails 2 and 3 only if still on Free when due."""
+    still_free = {"field": "flags.is_free_member", "eq": True}
+    return {
+        "key": "f2_free", "name": "F2 Membership · Free", "version": 1,
+        "description": "New Free members: you're in, the honest maths on £36 (day 4), the plan in use (day 12). Emails 2 and 3 only if "
+                       "they're still on Free.",
+        "trigger": {"type": "custom", "event_name": "membership_changed", "when": TIER("free")},
+        "entry": {"one_active_per_contact": True},
+        **COMMON,
+        "utm": {"source": "evolutiongolf-email", "medium": "flow", "campaign": "f2-free"},
+        "steps": [E("f2", "fe1"), W("w4", days=4, at="09:30"), {**E("f2", "fe2"), "when": still_free},
+                  W("w8", days=8, at="09:30"), {**E("f2", "fe3"), "when": still_free}],
+    }
+
+
+def f2_annual_flow():
+    """Approved F2 Annual. Starts on membership_changed with the paid tier (annual_pro; "annual" in the contract's example).
+    Every email after the welcome checks they're still annual when due (Klaviyo: leaves if they stop being annual)."""
+    annual = {"field": "flags.is_annual", "eq": True}
+    A = lambda k, i=None: {**E("f2", k, i), "when": annual}
+    steps = [E("f2", "pe1"), W("w3", days=3, at="09:30"), A("pe2"), W("w27", days=27, at="09:30"), A("pe3"),
+             W("w30", days=30, at="09:30"), A("pe4")]
+    for i in range(1, 9):  # months 3 to 10: the monthly 10% reminder
+        steps += [W(f"wm{i}", days=30, at="09:30"), A("pem", f"pm{i}")]
+    steps += [W("w35", days=35, at="09:30"), A("pe5")]
+    return {
+        "key": "f2_annual", "name": "F2 Membership · Annual", "version": 1,
+        "description": "New £36 annual members: welcome (day 0), member deals (day 3), first month (day 30), two months in (day 60), "
+                       "the monthly 10% reminder (days 90 to 300), renewal reminder (day 335). Stops if they stop being annual.",
+        "trigger": {"type": "custom", "event_name": "membership_changed", "when": TIER("annual_pro", "annual")},
+        "entry": {"one_active_per_contact": True},
+        **COMMON,
+        "utm": {"source": "evolutiongolf-email", "medium": "flow", "campaign": "f2-annual"},
+        "steps": steps,
+    }
+
+
 def _emails(steps):
     for s in steps:
         if s["type"] == "email":
@@ -251,7 +339,10 @@ def _emails(steps):
 
 
 FLOWS = {"f3_checkout": (lambda: pack_templates("f3-checkout", "f3"), lambda: f3_flow()),
-         "f9_after_delivery": (lambda: pack_templates("f9-after-delivery-v3", "f9"), lambda: f9_flow())}
+         "f9_after_delivery": (lambda: pack_templates("f9-after-delivery-v3", "f9"), lambda: f9_flow()),
+         "f1_welcome": (lambda: pack_templates("f1-welcome-v3", "f1", skip=("e2h", "e1b")), lambda: f1_flow()),
+         "f2_free": (lambda: pack_templates("f2-free", "f2"), lambda: f2_free_flow()),
+         "f2_annual": (lambda: pack_templates("f2-annual", "f2"), lambda: f2_annual_flow())}
 
 
 def build():

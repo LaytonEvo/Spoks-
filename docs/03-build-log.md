@@ -244,3 +244,27 @@
     members (outside the benefits table).
 - Push: 8 templates 200 with no warnings; validate `valid`, no problems or warnings; flow v1 `enabled: false`.
   Tests of all 8 sent to layton@evolutiongolf.co.uk with the engine's "order" sample.
+
+### 12 Oct 2026: F1, F2 Free, F2 Annual on Evoflows (pushed, switched off)
+- Flows:
+  - **`f1_welcome`:** trigger `subscribed`, for people with no orders who aren't members. Leaves on order. E4 only if
+    still not a member.
+  - **`f2_free`:** custom `membership_changed` with tier `free`. E2/E3 only while still Free.
+  - **`f2_annual`:** `membership_changed` with tier `annual_pro` (or `annual`). Every email after the welcome checks
+    it's still annual.
+- Deviations (Layton to accept):
+  - F1 SMS dropped.
+  - F1 E2 Hardware not pushed: it needs product views (phase 2).
+  - F1 A/B variant e1b dropped.
+  - No exit on checkout started: no such field yet.
+- Fixed before push: the F1 entry is "not >0 orders", not "=0", because Evoflows treats a missing field as false and
+  subscribers without a Shopify record have no orders_count.
+- 8 more images re-hosted on Shopify Files (F1/F2 photos and F2 icons); all 15 template images return 200.
+- Checks:
+  - Wording is word-for-word the approved copy.
+  - 78 Go renders are clean.
+  - Validate passes with no problems; we confirmed the validator rejects unknown fields.
+  - Tests of the 13 emails sent to layton@evolutiongolf.co.uk.
+- Field probe via validate. Missing: customer.collections, contact.emails_received / last_open_at / last_click_at, any
+  "checkout started" or "active in flow" field.
+- Requirements for Luke (17 numbered items): Claude Doc https://claude.ai/code/artifact/15cd837c-d77f-4584-a38c-7f7bb4c3ec1e

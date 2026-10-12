@@ -1,0 +1,244 @@
+{
+ "key": "f2_annual",
+ "name": "F2 Membership · Annual",
+ "version": 1,
+ "description": "New £36 annual members: welcome (day 0), member deals (day 3), first month (day 30), two months in (day 60), the monthly 10% reminder (days 90 to 300), renewal reminder (day 335). Stops if they stop being annual.",
+ "trigger": {
+  "type": "custom",
+  "event_name": "membership_changed",
+  "when": {
+   "field": "event.data.tier",
+   "in": [
+    "annual_pro",
+    "annual"
+   ]
+  }
+ },
+ "entry": {
+  "one_active_per_contact": true
+ },
+ "consent": "soft_opt_in",
+ "send_window": {
+  "timezone": "Europe/London",
+  "quiet_hours": [
+   "21:00",
+   "08:00"
+  ]
+ },
+ "utm": {
+  "source": "evolutiongolf-email",
+  "medium": "flow",
+  "campaign": "f2-annual"
+ },
+ "steps": [
+  {
+   "id": "pe1",
+   "type": "email",
+   "template": "f2_pe1"
+  },
+  {
+   "id": "w3",
+   "type": "wait",
+   "for": {
+    "days": 3
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pe2",
+   "type": "email",
+   "template": "f2_pe2",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "w27",
+   "type": "wait",
+   "for": {
+    "days": 27
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pe3",
+   "type": "email",
+   "template": "f2_pe3",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "w30",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pe4",
+   "type": "email",
+   "template": "f2_pe4",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm1",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm1",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm2",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm2",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm3",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm3",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm4",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm4",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm5",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm5",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm6",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm6",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm7",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm7",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "wm8",
+   "type": "wait",
+   "for": {
+    "days": 30
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pm8",
+   "type": "email",
+   "template": "f2_pem",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  },
+  {
+   "id": "w35",
+   "type": "wait",
+   "for": {
+    "days": 35
+   },
+   "until_time": "09:30"
+  },
+  {
+   "id": "pe5",
+   "type": "email",
+   "template": "f2_pe5",
+   "when": {
+    "field": "flags.is_annual",
+    "eq": true
+   }
+  }
+ ]
+}
