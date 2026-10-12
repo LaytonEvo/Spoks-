@@ -196,3 +196,11 @@
 - Templates: the product photo now shows only when the item has an image (`{{ if .image }}`), so a missing photo leaves
   no broken box; the per-item price is now the line total (`line_total`, unit price as fallback), as in the Klaviyo version.
 - Re-pushed all 8 F3 templates (200, no warnings); test of f3_e3lo re-sent to layton@evolutiongolf.co.uk. Flow not enabled.
+
+### 12 Oct 2026: Luke's answers
+- New Evoflows token works (the old one now returns 401). Railway `EVOFLOWS_TOKEN` updated. A re-test of f3_e3lo was
+  sent with the fixed sample, and preview now returns HTML.
+- Webhook: Luke confirmed two signed deliveries were accepted. Money fields are two-decimal strings. Free = tags
+  `EvoMember` + `Free`; annual = `AnnualMember` / `ClubhouseMember` / `Club` / `Evolution Pro` / `Evolution Annual`.
+- F9 tokens are confirmed, so F9 v3 can move. F4 is unblocked: the cookie pop-up was fixed on 9 Oct, and the cart
+  tracker went live on 12 Oct. Portal membership events (F2) are not scheduled yet.

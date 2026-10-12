@@ -1,5 +1,22 @@
 # Evoflows: what we need from Luke (12 Oct 2026)
 
+> **Update 12 Oct, Luke's answers:**
+> - **Done:**
+>   - Token rotated. The new one is in Railway; the old one is refused.
+>   - Webhook verified (2 signed deliveries accepted).
+>   - Money fields are two-decimal strings (`checkout.total` / `order.total` are numbers, for conditions only).
+>   - `is_free_member` = Shopify tags `EvoMember` + `Free`. Annual = any of `AnnualMember`, `ClubhouseMember`, `Club`,
+>     `Evolution Pro`, `Evolution Annual` (contract section 9.1).
+>   - Both bugs fixed: the test sample now has real product images; preview returns HTML.
+> - **F9:** nothing needed from Luke. Trigger `order_fulfilled`. Tokens: `.Tx.Data.total`, `.Tx.Data.order.created_at`,
+>   `.fulfilled_at`, `.age_days`, `.first_item.title/.image/.url`, `.Tx.Data.order.source` (`"pos"` = till order).
+> - **F4:** the cookie pop-up was fixed on 9 Oct, and the cart tracker went live on 12 Oct. Push F4 when the pack is ready.
+> - **Still open:**
+>   - F3 staff seed test and switch-on (with Luke), and the Klaviyo switch-off hour (Luke and Layton).
+>   - Portal membership events: about an hour of work, not scheduled yet.
+> - The engine reads Shopify tags only; Klaviyo's `MemberTier` can be ignored.
+> - Live version: Claude Doc https://claude.ai/code/artifact/0cef0612-0079-431f-ba83-6d7b5a5a8ed4
+
 **Where things stand:**
 - F3 is built and pushed to Evoflows, and it is **switched off**. That covers the flags, the 8 templates and the flow (it passed validation).
 - The dashboard reads `/flows`, `/metrics`, `/runs` and `/carts`.
