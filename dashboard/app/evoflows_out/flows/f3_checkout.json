@@ -22,6 +22,11 @@
    "08:00"
   ]
  },
+ "utm": {
+  "source": "evolutiongolf-email",
+  "medium": "flow",
+  "campaign": "f3-checkout"
+ },
  "steps": [
   {
    "id": "w1h",

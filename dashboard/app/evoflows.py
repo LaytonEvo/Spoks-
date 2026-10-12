@@ -113,8 +113,8 @@ def push(what, who):
             body = json.loads(f.read_text())
             status, res = _call("POST", f"/flows/{f.stem}/validate", body)
             results.append((f"POST /flows/{f.stem}/validate", status, res))
-            problems = status >= 400 or (res or {}).get("errors") or any(
-                (w.get("code") if isinstance(w, dict) else str(w)) == "template_missing" for w in (res or {}).get("warnings", []))
+            problems = (status >= 400 or not (res or {}).get("valid") or (res or {}).get("problems")
+                        or any("template_missing" in str(w) for w in (res or {}).get("warnings", [])))
             if what == "flow" and not problems:
                 body.pop("enabled", None)  # never switch on from here
                 results.append((f"PUT /flows/{f.stem}", *_call("PUT", f"/flows/{f.stem}", body)))

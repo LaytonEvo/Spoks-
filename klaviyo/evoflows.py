@@ -154,6 +154,7 @@ def f3_flow():
         "entry": {"one_active_per_contact": True, "reentry_after_days": 7},
         "consent": "soft_opt_in",
         "send_window": {"timezone": "Europe/London", "quiet_hours": ["21:00", "08:00"]},
+        "utm": {"source": "evolutiongolf-email", "medium": "flow", "campaign": "f3-checkout"},
         "steps": [
             W("w1h", hours=1),
             {"id": "path", "type": "split", "branches": [
@@ -208,7 +209,8 @@ def push(what):
     if what in ("validate", "all", "flow"):
         status, res = call("POST", "/flows/f3_checkout/validate", flow)
         print("POST /flows/f3_checkout/validate", status, json.dumps(res, indent=1))
-        if what in ("all", "flow") and (status >= 400 or (res or {}).get("errors")):
+        if what in ("all", "flow") and (status >= 400 or not (res or {}).get("valid") or (res or {}).get("problems")
+                                         or any("template_missing" in str(w) for w in (res or {}).get("warnings", []))):
             sys.exit("validate failed: not pushing the flow")
     if what in ("flow", "all"):
         print("PUT /flows/f3_checkout", call("PUT", "/flows/f3_checkout", flow))  # lands disabled; never call /enable here
