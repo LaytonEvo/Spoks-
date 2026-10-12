@@ -66,13 +66,15 @@ FIXED = {
     "{{ item.product.title }}": "{{ .title }}",
     "{{ item.quantity }}": "{{ .qty }}",
     "{{ item.product.images.0.src }}": "{{ .image }}",
-    "{{ item.line_price|floatformat:2 }}": "{{ .price }}",
+    # line total (as Klaviyo showed), unit price if the engine sends no line_total
+    "{{ item.line_price|floatformat:2 }}": "{{ if .line_total }}{{ .line_total }}{{ else }}{{ .price }}{{ end }}",
     "{{ event.extra.checkout_url }}": "{{ .Tx.Data.recovery_url }}",
     "{{ event|lookup:'$value'|floatformat:2 }}": "{{ .Tx.Data.total }}",
     "{{ person.first_name|default:'there' }}": "{{ if .Tx.Data.first_name }}{{ .Tx.Data.first_name }}{{ else }}there{{ end }}",
     "{% if person.first_name %}": "{{ if .Tx.Data.first_name }}",
     "{{ person.first_name }}": "{{ .Tx.Data.first_name }}",
     "{% if event.extra.line_items.0.product.title %}": "{{ if .Tx.Data.items }}",
+    "{% if item.product.images.0.src %}": "{{ if .image }}",
     "{{ event.extra.line_items.0.product.title }}": "{{ (index .Tx.Data.items 0).title }}",
     "{% if person|lookup:'MemberTier' == 'Free' %}": "{{ if .Tx.Data.is_free_member }}",
     "{% if person|lookup:'MemberTier' == 'AnnualMember' %}": "{{ if .Tx.Data.is_annual }}",
@@ -106,9 +108,13 @@ def _collections(tag):
     raise ValueError(f"no flag for collection condition: {sorted(names)[:3]}… ({len(names)} names)")
 
 
+IMG_ITEM = re.compile(r'<img src="\{\{ item\.product\.images\.0\.src \}\}"[^>]*>')
+
+
 def translate(text):
     for k, v in IMAGES.items():
         text = text.replace(k, v)
+    text = IMG_ITEM.sub(lambda m: "{% if item.product.images.0.src %}" + m.group(0) + "{% endif %}", text)
     for k in sorted(FIXED, key=len, reverse=True):
         text = text.replace(k, FIXED[k])
 
