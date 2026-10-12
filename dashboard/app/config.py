@@ -42,3 +42,9 @@ TIMEFRAMES = ["last_30_days", "last_90_days", "last_365_days"]
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
 # Public address of the dashboard, for links in the summary (Railway sets RAILWAY_PUBLIC_DOMAIN).
 PUBLIC_URL = os.getenv("PUBLIC_URL") or (f"https://{os.getenv('RAILWAY_PUBLIC_DOMAIN')}" if os.getenv("RAILWAY_PUBLIC_DOMAIN") else "")
+
+# Evoflows (the self-hosted flow engine replacing Klaviyo flows). Token issued by Luke; set in Railway Variables, never commit it.
+EVOFLOWS_BASE = os.getenv("EVOFLOWS_BASE", "https://mail.evolutiongolf.co.uk/flow/api/v1")
+EVOFLOWS_TOKEN = os.getenv("EVOFLOWS_TOKEN", "")
+# Optional: the webhook secret, if set by hand. Normally the app stores the secret PUT /webhooks returns on its volume.
+EVOFLOWS_WEBHOOK_SECRET = os.getenv("EVOFLOWS_WEBHOOK_SECRET", "")

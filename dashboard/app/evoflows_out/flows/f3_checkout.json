@@ -1,0 +1,143 @@
+{
+ "key": "f3_checkout",
+ "name": "F3 Checkout abandonment",
+ "version": 1,
+ "description": "Checkouts worth £30+ that don't complete. Annual members: their 10% can go on it. Non-members £300+: join and 10% comes off this basket, then a note from Alex. Under £300: Free membership's 5%. No codes.",
+ "trigger": {
+  "type": "checkout_abandoned",
+  "when": {
+   "field": "checkout.total",
+   "gte": 30
+  }
+ },
+ "entry": {
+  "one_active_per_contact": true,
+  "reentry_after_days": 7
+ },
+ "consent": "soft_opt_in",
+ "send_window": {
+  "timezone": "Europe/London",
+  "quiet_hours": [
+   "21:00",
+   "08:00"
+  ]
+ },
+ "steps": [
+  {
+   "id": "w1h",
+   "type": "wait",
+   "for": {
+    "hours": 1
+   }
+  },
+  {
+   "id": "path",
+   "type": "split",
+   "branches": [
+    {
+     "id": "annual",
+     "when": {
+      "field": "flags.is_annual",
+      "eq": true
+     },
+     "steps": [
+      {
+       "id": "e1m",
+       "type": "email",
+       "template": "f3_e1m"
+      },
+      {
+       "id": "m1",
+       "type": "wait",
+       "for": {
+        "days": 1
+       },
+       "until_time": "09:30"
+      },
+      {
+       "id": "e2m",
+       "type": "email",
+       "template": "f3_e2m"
+      }
+     ]
+    },
+    {
+     "id": "big",
+     "when": {
+      "field": "checkout.total",
+      "gte": 300
+     },
+     "steps": [
+      {
+       "id": "e1hi",
+       "type": "email",
+       "template": "f3_e1hi"
+      },
+      {
+       "id": "h1",
+       "type": "wait",
+       "for": {
+        "days": 1
+       },
+       "until_time": "09:30"
+      },
+      {
+       "id": "e2hi",
+       "type": "email",
+       "template": "f3_e2hi"
+      },
+      {
+       "id": "h3",
+       "type": "wait",
+       "for": {
+        "days": 2
+       },
+       "until_time": "09:30"
+      },
+      {
+       "id": "e3h",
+       "type": "email",
+       "template": "f3_e3h"
+      }
+     ]
+    },
+    {
+     "id": "small",
+     "steps": [
+      {
+       "id": "e1lo",
+       "type": "email",
+       "template": "f3_e1lo"
+      },
+      {
+       "id": "l1",
+       "type": "wait",
+       "for": {
+        "days": 1
+       },
+       "until_time": "09:30"
+      },
+      {
+       "id": "e2lo",
+       "type": "email",
+       "template": "f3_e2lo"
+      },
+      {
+       "id": "l3",
+       "type": "wait",
+       "for": {
+        "days": 2
+       },
+       "until_time": "17:30"
+      },
+      {
+       "id": "e3lo",
+       "type": "email",
+       "template": "f3_e3lo"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

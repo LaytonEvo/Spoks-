@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, digest, drafts, fixes, review, snapshot
+from . import config, digest, drafts, evoflows, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -309,3 +309,72 @@ def flow_map(user=Depends(auth)):
             '<script>window.mermaid && mermaid.initialize({startOnLoad: true, theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "neutral"});</script>'
             '</body></html>')
     return HTMLResponse(page)
+
+
+# ---------- Evoflows (the engine replacing Klaviyo flows) ----------
+EVO_KEY = re.compile(r"^[a-z0-9_]{2,60}$")
+
+
+def _evo(fn, *a, **k):
+    try:
+        return fn(*a, **k)
+    except evoflows.EvoflowsError as e:
+        raise HTTPException(502, str(e))
+
+
+@app.get("/api/evoflows")
+def api_evoflows(period: str = "30d", fresh: int = 0, user=Depends(auth)):
+    if period not in ("30d", "90d", "365d"):
+        raise HTTPException(400, "period")
+    if not evoflows.enabled():
+        return {"enabled": False}
+    data = _evo(evoflows.overview, period, bool(fresh))
+    return {"enabled": True, **data, "webhook": evoflows.webhook_info(), "events": evoflows.recent_events()[:20],
+            "log": evoflows.push_log()}
+
+
+@app.get("/api/evoflows/runs")
+def api_evoflows_runs(flow: str, status: str = "", user=Depends(auth)):
+    if not EVO_KEY.match(flow) or status not in ("", "active", "done", "exited"):
+        raise HTTPException(400, "flow")
+    return _evo(evoflows.runs, flow, status)
+
+
+@app.get("/api/evoflows/carts")
+def api_evoflows_carts(user=Depends(auth)):
+    return _evo(evoflows.carts)
+
+
+@app.get("/api/evoflows/ping")
+def api_evoflows_ping(user=Depends(auth)):
+    status, res = _evo(evoflows.ping)
+    return {"status": status, "response": res}
+
+
+@app.post("/api/evoflows/push/{what}")
+def api_evoflows_push(what: str, user=Depends(auth)):
+    """Push the built flags / templates / flow (validate first). Never enables anything."""
+    if what not in ("flags", "templates", "validate", "flow"):
+        raise HTTPException(404)
+    return {"results": _evo(evoflows.push, what, user)}
+
+
+@app.post("/api/evoflows/webhook")
+def api_evoflows_webhook(user=Depends(auth)):
+    if not config.PUBLIC_URL:
+        raise HTTPException(400, "PUBLIC_URL / RAILWAY_PUBLIC_DOMAIN not set")
+    status, res = _evo(evoflows.register_webhook, f"{config.PUBLIC_URL}/evoflows/hook", user)
+    return {"status": status, "response": res}
+
+
+@app.post("/evoflows/hook")
+async def evoflows_hook(request: Request):
+    """Deliveries from Evoflows. No login (Evoflows can't send one): every body must carry a valid HMAC signature."""
+    raw = await request.body()
+    if not evoflows.verify(raw, request.headers.get("X-Evoflows-Signature", "")):
+        raise HTTPException(401, "bad signature")
+    try:
+        evoflows.record_event(json.loads(raw))
+    except ValueError:
+        raise HTTPException(400, "not JSON")
+    return {"ok": True}

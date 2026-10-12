@@ -1,0 +1,67 @@
+{
+ "has_trolley": {
+  "collections": [
+   "golf-trolleys",
+   "electric-trolleys",
+   "gps-electric-trolleys",
+   "remote-electric-trolleys",
+   "motocaddy-electric-trolleys",
+   "motocaddy-golf-trolleys",
+   "motocaddy-electric-golf-trolleys",
+   "motocaddy-push-trolleys",
+   "powakaddy-golf-trolleys",
+   "powakaddy-electric-trolleys",
+   "powakaddy-push-trolleys",
+   "push-pull-trolleys",
+   "push-golf-trolleys",
+   "cube-golf-push-trolleys"
+  ]
+ },
+ "has_motocaddy_trolley": {
+  "collections": [
+   "motocaddy-electric-trolleys",
+   "motocaddy-golf-trolleys",
+   "motocaddy-electric-golf-trolleys",
+   "motocaddy-push-trolleys"
+  ]
+ },
+ "has_clubs": {
+  "collections": [
+   "mens-golf-clubs",
+   "ladies-golf-clubs",
+   "womens-golf-clubs",
+   "junior-golf-clubs",
+   "left-handed-golf-clubs",
+   "golf-drivers",
+   "fairways",
+   "fairway-woods",
+   "hybrids-utility-irons",
+   "golf-wedges",
+   "putters",
+   "custom-clubs",
+   "mens-custom-fitted-golf-clubs",
+   "complete-package-sets",
+   "ladies-golf-drivers",
+   "ladies-golf-fairway-woods",
+   "ladies-golf-hybrids",
+   "ladies-golf-irons",
+   "ladies-golf-wedges",
+   "ladies-golf-package-sets"
+  ]
+ },
+ "has_used_clubs": {
+  "collections": [
+   "approved-used-golf-clubs",
+   "all-second-hand-golf-clubs"
+  ]
+ },
+ "has_shoes": {
+  "collections": [
+   "mens-golf-shoes",
+   "mens-spiked-golf-shoes",
+   "mens-spikeless-golf-shoes",
+   "mens-waterproof-golf-shoes",
+   "junior-golf-shoes"
+  ]
+ }
+}

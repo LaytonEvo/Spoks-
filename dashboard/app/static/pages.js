@@ -499,3 +499,68 @@ document.addEventListener("change", (e) => {
   draftState.photos = e.target.checked;
   if (state.pvId) { const f = $("#pane-frame"); if (f) f.removeAttribute("src"); showInPane(state.pvId); }
 });
+
+// ---------- Evoflows: the engine replacing Klaviyo flows (read metrics/runs; push built drafts, never enable) ----------
+let evoState = { period: "30d", runsFor: null };
+const evoRate = (v) => (v == null ? "–" : pct(v));
+async function renderEvoflows(fresh = false) {
+  $("#main").innerHTML = `<p class="muted">Loading Evoflows…</p>`;
+  let d;
+  try { d = await api(`/api/evoflows?period=${evoState.period}${fresh ? "&fresh=1" : ""}`); }
+  catch (err) { $("#main").innerHTML = `<h1>Evoflows</h1><p class="flag high">${esc(err.message)}</p>`; return; }
+  if (!d.enabled) { $("#main").innerHTML = `<h1>Evoflows</h1><p>Not connected. Add <code>EVOFLOWS_TOKEN</code> (from Luke) in Railway Variables.</p>`; return; }
+  const rows = d.flows.map(({ flow: f, metrics: m }) => {
+    const t = (m && m.totals) || {};
+    return `<tr><td><a href="#" data-evo-runs="${esc(f.key)}">${esc(f.name || f.key)}</a><br><span class="muted">${esc(f.key)} · v${esc(f.version ?? "–")}</span></td>
+      <td>${f.enabled ? '<span class="badge live">On</span>' : '<span class="badge skip">Off</span>'}</td>
+      <td>${n(t.enrolled)}</td><td>${n(t.active)}</td><td>${n(t.sent)}</td><td>${n(t.finished)}</td>
+      <td>${n(t.converted_after_email)}</td><td>${gbp(t.revenue)}</td><td>${n(t.refused_no_consent)}</td><td>${n(t.unsubscribed)}</td>
+      <td>${evoRate(t.conversion_rate)}</td><td>${evoRate(t.unsubscribe_rate)}</td><td>${evoRate(t.bounce_rate)}</td>
+      <td class="muted" title="Evoflows v1 doesn't track opens or clicks yet">n/a</td></tr>${m && m.error ? `<tr><td colspan="14" class="flag high">${esc(m.error)}</td></tr>` : ""}`;
+  }).join("");
+  $("#main").innerHTML = `<p class="eyebrow">New engine</p><h1>Evoflows</h1>
+    <p class="muted">Flows running on the self-hosted engine (Listmonk + SES). Opens and clicks aren't tracked in v1, so they show as n/a, not zero. This page can push new drafts (always switched off) but can't switch a flow on: Luke does that after the staff seed test.</p>
+    <div class="summary-actions">${["30d", "90d", "365d"].map((p) => `<button type="button" class="btn ${evoState.period === p ? "" : "secondary"}" data-evo-period="${p}">${p}</button>`).join(" ")}
+      <button type="button" class="btn secondary" id="evo-refresh">Refresh</button></div>
+    <table class="mini"><thead><tr><th>Flow</th><th></th><th>Enrolled</th><th>Active</th><th>Sent</th><th>Finished</th><th>Converted after email</th><th>Revenue</th><th>Refused (no consent)</th><th>Unsubscribed</th><th>Conversion</th><th>Unsub rate</th><th>Bounce rate</th><th>Opens / clicks</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="14" class="muted">No flows yet.</td></tr>`}</tbody></table>
+    <div id="evo-runs"></div>
+    <div class="summary-grid">
+      <div class="panel"><h3>Push built drafts</h3><p class="muted">From <code>klaviyo/evoflows.py</code>: flags, F3 templates and the F3 flow. The flow is validated first and lands switched off.</p>
+        <div class="fix-actions">${["flags", "templates", "validate", "flow"].map((w) => `<button type="button" class="btn secondary" data-evo-push="${w}">${{ flags: "Push flags", templates: "Push templates", validate: "Validate flow", flow: "Push flow (off)" }[w]}</button>`).join(" ")}</div>
+        <pre id="evo-push-out" class="muted" style="white-space:pre-wrap;max-height:320px;overflow:auto"></pre></div>
+      <div class="panel"><h3>Webhook</h3>${d.webhook ? `<p>Registered: <code>${esc(d.webhook.url)}</code><br><span class="muted">${esc(d.webhook.at)} by ${esc(d.webhook.by)}</span></p>` : `<p class="muted">Not registered yet.</p>`}
+        <button type="button" class="btn secondary" id="evo-webhook">${d.webhook ? "Re-register" : "Register webhook"}</button>
+        <h3>Recent events</h3>${d.events.length ? `<ul>${d.events.map((e) => `<li>${esc((e.at || "").slice(0, 16).replace("T", " "))} · ${esc(e.event)}${e.flow ? ` · ${esc(e.flow)}` : ""}${e.step ? ` · ${esc(e.step)}` : ""}</li>`).join("")}</ul>` : `<p class="muted">None received yet.</p>`}</div>
+      <div class="panel"><h3>Push history</h3>${d.log.length ? `<ul>${d.log.map((l) => `<li>${esc(l.at.slice(0, 16).replace("T", " "))} · ${esc(l.by)} · ${esc(l.push || ("webhook " + (l.webhook || "")))}</li>`).join("")}</ul>` : `<p class="muted">Nothing pushed from the app yet.</p>`}</div>
+    </div>`;
+}
+async function showEvoRuns(key) {
+  const box = $("#evo-runs");
+  box.innerHTML = `<p class="muted">Loading people in ${esc(key)}…</p>`;
+  try {
+    const r = await api(`/api/evoflows/runs?flow=${encodeURIComponent(key)}`);
+    const list = r.runs || r || [];
+    box.innerHTML = `<h3>People in ${esc(key)}</h3>${list.length ? `<table class="mini"><thead><tr><th>Status</th><th>Current step</th><th>Next due</th><th>Exit</th><th>Order</th></tr></thead><tbody>
+      ${list.map((x) => `<tr><td>${esc(x.status)}</td><td>${esc(x.current_step ?? x.step ?? "–")}</td><td>${esc((x.next_due || "").slice(0, 16).replace("T", " "))}</td><td>${esc(x.exit_reason || "")}</td><td>${esc(x.order || "")}</td></tr>`).join("")}</tbody></table>` : `<p class="muted">No runs yet.</p>`}`;
+  } catch (err) { box.innerHTML = `<p class="flag high">${esc(err.message)}</p>`; }
+}
+document.addEventListener("click", async (e) => {
+  const per = e.target.closest("[data-evo-period]");
+  if (per) { evoState.period = per.dataset.evoPeriod; renderEvoflows(); return; }
+  if (e.target.id === "evo-refresh") { renderEvoflows(true); return; }
+  const runs = e.target.closest("[data-evo-runs]");
+  if (runs) { e.preventDefault(); showEvoRuns(runs.dataset.evoRuns); return; }
+  const push = e.target.closest("[data-evo-push]");
+  if (push) {
+    const out = $("#evo-push-out"); push.disabled = true; out.textContent = "Working…";
+    try { const r = await api(`/api/evoflows/push/${push.dataset.evoPush}`, { method: "POST" }); out.textContent = JSON.stringify(r.results, null, 1); }
+    catch (err) { out.textContent = err.message; }
+    push.disabled = false; return;
+  }
+  if (e.target.id === "evo-webhook") {
+    const btn = e.target; btn.disabled = true;
+    try { const r = await api("/api/evoflows/webhook", { method: "POST" }); btn.textContent = r.status < 400 ? "Registered" : `Failed (${r.status})`; }
+    catch (err) { alertInline(btn, err.message); }
+  }
+});
