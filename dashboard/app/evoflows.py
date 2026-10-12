@@ -204,3 +204,20 @@ def _log(entry):
 
 def _now():
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+
+
+def preview(key, sample="checkout"):
+    return _call("POST", f"/templates/{key}/preview", {"sample": sample})
+
+
+def test_send(key, to, who, sample="checkout"):
+    """Real render to a staff inbox (Evoflows only allows @evolutiongolf.co.uk). Logged with who asked."""
+    if not to.lower().endswith("@evolutiongolf.co.uk"):
+        raise EvoflowsError("Test sends go to @evolutiongolf.co.uk addresses only.")
+    status, res = _call("POST", f"/templates/{key}/test", {"to": to, "sample": sample})
+    _log({"at": _now(), "by": who, "push": f"test {key} → {to}", "status": status})
+    return status, res
+
+
+def template_keys():
+    return sorted(f.stem for f in (OUT / "templates").glob("*.json"))

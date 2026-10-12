@@ -529,6 +529,9 @@ async function renderEvoflows(fresh = false) {
       <div class="panel"><h3>Push built drafts</h3><p class="muted">From <code>klaviyo/evoflows.py</code>: flags, F3 templates and the F3 flow. The flow is validated first and lands switched off.</p>
         <div class="fix-actions">${["flags", "templates", "validate", "flow"].map((w) => `<button type="button" class="btn secondary" data-evo-push="${w}">${{ flags: "Push flags", templates: "Push templates", validate: "Validate flow", flow: "Push flow (off)" }[w]}</button>`).join(" ")}</div>
         <pre id="evo-push-out" class="muted" style="white-space:pre-wrap;max-height:320px;overflow:auto"></pre></div>
+      <div class="panel"><h3>Templates: preview and test</h3><p class="muted">Preview renders Evoflows' sample basket. Test sends one real email to a staff address.</p>
+        <p><input id="evo-test-to" type="email" placeholder="you@evolutiongolf.co.uk" style="width:100%"></p>
+        <table class="mini"><tbody>${(d.templates || []).map((k) => `<tr><td>${esc(k)}</td><td><a href="/evoflows/preview/${esc(k)}" target="_blank" rel="noopener">Preview</a></td><td><button type="button" class="btn secondary" data-evo-test="${esc(k)}">Send test</button></td></tr>`).join("")}</tbody></table></div>
       <div class="panel"><h3>Webhook</h3>${d.webhook ? `<p>Registered: <code>${esc(d.webhook.url)}</code><br><span class="muted">${esc(d.webhook.at)} by ${esc(d.webhook.by)}</span></p>` : `<p class="muted">Not registered yet.</p>`}
         <button type="button" class="btn secondary" id="evo-webhook">${d.webhook ? "Re-register" : "Register webhook"}</button>
         <h3>Recent events</h3>${d.events.length ? `<ul>${d.events.map((e) => `<li>${esc((e.at || "").slice(0, 16).replace("T", " "))} · ${esc(e.event)}${e.flow ? ` · ${esc(e.flow)}` : ""}${e.step ? ` · ${esc(e.step)}` : ""}</li>`).join("")}</ul>` : `<p class="muted">None received yet.</p>`}</div>
@@ -557,6 +560,13 @@ document.addEventListener("click", async (e) => {
     try { const r = await api(`/api/evoflows/push/${push.dataset.evoPush}`, { method: "POST" }); out.textContent = JSON.stringify(r.results, null, 1); }
     catch (err) { out.textContent = err.message; }
     push.disabled = false; return;
+  }
+  const test = e.target.closest("[data-evo-test]");
+  if (test) {
+    const to = ($("#evo-test-to").value || "").trim(); test.disabled = true;
+    try { const r = await api(`/api/evoflows/test/${test.dataset.evoTest}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to }) }); test.textContent = r.status < 400 ? "Sent" : `Failed (${r.status})`; }
+    catch (err) { alertInline(test, err.message); }
+    return;
   }
   if (e.target.id === "evo-webhook") {
     const btn = e.target; btn.disabled = true;

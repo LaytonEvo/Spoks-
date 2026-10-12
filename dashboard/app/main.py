@@ -330,6 +330,7 @@ def api_evoflows(period: str = "30d", fresh: int = 0, user=Depends(auth)):
         return {"enabled": False}
     data = _evo(evoflows.overview, period, bool(fresh))
     return {"enabled": True, **data, "webhook": evoflows.webhook_info(), "events": evoflows.recent_events()[:20],
+            "templates": evoflows.template_keys(),
             "log": evoflows.push_log()}
 
 
@@ -378,3 +379,23 @@ async def evoflows_hook(request: Request):
     except ValueError:
         raise HTTPException(400, "not JSON")
     return {"ok": True}
+
+
+@app.get("/evoflows/preview/{key}", response_class=HTMLResponse)
+def evoflows_preview(key: str, user=Depends(auth)):
+    if key not in evoflows.template_keys():
+        raise HTTPException(404)
+    status, res = _evo(evoflows.preview, key)
+    html = (res or {}).get("html") if isinstance(res, dict) else None
+    if status >= 400 or not html:
+        return HTMLResponse(f"<pre>{status} {json.dumps(res)[:2000]}</pre>", status_code=502)
+    return HTMLResponse(html, headers={"Content-Security-Policy": "script-src 'none'"})
+
+
+@app.post("/api/evoflows/test/{key}")
+async def api_evoflows_test(key: str, request: Request, user=Depends(auth)):
+    if key not in evoflows.template_keys():
+        raise HTTPException(404)
+    to = (await request.json()).get("to", "")
+    status, res = _evo(evoflows.test_send, key, to, user)
+    return {"status": status, "response": res}
