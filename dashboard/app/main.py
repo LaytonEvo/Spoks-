@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import builder, config, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -95,7 +95,7 @@ def index(user=Depends(auth)):
     old copy in the browser's cache."""
     import hashlib
     html = (STATIC / "index.html").read_text()
-    for name in ("app.css", "app.js", "pages.js", "sim.js"):
+    for name in ("app.css", "app.js", "pages.js", "sim.js", "builder.js"):
         v = hashlib.sha1((STATIC / name).read_bytes()).hexdigest()[:10]
         html = html.replace(f'"/static/{name}"', f'"/static/{name}?v={v}"')
     return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
@@ -139,6 +139,8 @@ def api_refresh(user=Depends(auth)):
 @app.get("/render/{message_id}", response_class=HTMLResponse)
 def render(message_id: str, user=Depends(auth)):
     evo = evoflows.OUT / "previews" / f"{_check_id(message_id)}.html"
+    if evo.exists() and builder.live(message_id).get("status") == "published":  # edited in the builder
+        return HTMLResponse(builder.preview(message_id), headers={"Content-Security-Policy": "script-src 'none'"})
     if evo.exists():  # Evoflows templates: the approved build's preview (sample basket, the name "Sam")
         return HTMLResponse(snapshot.fill_tags(evo.read_text()), headers={"Content-Security-Policy": "script-src 'none'"})
     p = snapshot.RENDERS / f"{message_id}.html"
@@ -449,3 +451,67 @@ async def api_evoflows_test(key: str, request: Request, user=Depends(auth)):
     to = (await request.json()).get("to", "")
     status, res = _evo(evoflows.test_send, key, to, user)
     return {"status": status, "response": res}
+
+
+# ---------- email builder (Evoflows templates): draft -> approve -> publish ----------
+def _tpl_key(key):
+    if key not in evoflows.manifest()["templates"]:
+        raise HTTPException(404)
+    return key
+
+
+def _b(fn, *a):
+    try:
+        return fn(*a)
+    except KeyError:
+        raise HTTPException(404, "No such version")
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except evoflows.EvoflowsError as e:
+        raise HTTPException(502, str(e))
+
+
+@app.get("/api/builder/{key}")
+def api_builder(key: str, user=Depends(auth)):
+    return _b(builder.doc, _tpl_key(key))
+
+
+@app.post("/api/builder/{key}/save")
+async def api_builder_save(key: str, request: Request, user=Depends(auth)):
+    return _b(builder.save, _tpl_key(key), await request.json(), user)
+
+
+@app.post("/api/builder/{key}/approve/{n}")
+def api_builder_approve(key: str, n: int, user=Depends(auth)):
+    return _b(builder.approve, _tpl_key(key), n, user)
+
+
+@app.post("/api/builder/{key}/publish/{n}")
+def api_builder_publish(key: str, n: int, user=Depends(auth)):
+    res = _b(builder.publish, _tpl_key(key), n, user)
+    threading.Thread(target=evosnap.build, daemon=True).start()
+    return res
+
+
+@app.post("/api/builder/{key}/restore-build")
+def api_builder_restore(key: str, user=Depends(auth)):
+    res = _b(builder.restore_build, _tpl_key(key), user)
+    threading.Thread(target=evosnap.build, daemon=True).start()
+    return res
+
+
+@app.post("/api/builder/{key}/test/{n}")
+async def api_builder_test(key: str, n: int, request: Request, user=Depends(auth)):
+    return _b(builder.test, _tpl_key(key), n, str((await request.json()).get("to", "")).strip(), user)
+
+
+@app.post("/builder/{key}/preview", response_class=HTMLResponse)
+async def builder_preview(key: str, request: Request, user=Depends(auth)):
+    body = await request.json()
+    _tpl_key(key)
+    html = body.get("html")
+    if html is not None:
+        head, _, tail = builder.split(builder.live(key)["html"])
+        html = head + html + tail
+    out = _b(builder.preview, key, body.get("n"), body.get("audience", "non"), html)
+    return HTMLResponse(out, headers={"Content-Security-Policy": "script-src 'none'"})

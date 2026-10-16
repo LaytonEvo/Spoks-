@@ -151,7 +151,8 @@ def push_flow(key, who):
         raise EvoflowsError("Not a built flow")
     results = []
     for t in m["templates"]:
-        st, res = _call("PUT", f"/templates/{t}", _out(f"templates/{t}.json"))
+        from . import builder  # an email edited and published in the builder replaces the repo build
+        st, res = _call("PUT", f"/templates/{t}", builder.template_body(t))
         results.append({"call": f"PUT /templates/{t}", "status": st, "response": res})
         if st >= 400:
             break

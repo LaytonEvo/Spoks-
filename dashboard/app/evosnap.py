@@ -102,10 +102,18 @@ def steps_from(defn_steps, manifest, step_metrics):
         elif t == "email":
             key = s.get("template")
             tm = manifest["templates"].get(key, {})
+            try:  # published builder edits win over the repo build
+                from . import builder
+                lv = builder.live(key)
+                if lv.get("status") == "published":
+                    tm = {**tm, "subject": lv["subject"], "preview_text": lv["preview_text"], "from_name": lv["from_name"],
+                          "edited": f"v{lv['n']}"}
+            except Exception:
+                pass
             m = {"kind": "email", "action_id": s["id"], "message_id": key, "name": tm.get("name") or key, "status": None,
                  "subject": _subject(tm.get("subject")), "preview_text": tm.get("preview_text"), "from_label": tm.get("from_name"),
                  "template_id": key, "utm": True, "smart_sending": s.get("max_per_contact_hours") != 0,
-                 "only_if": label(s.get("when")), "platform": "evoflows", "rendered": (OUT / "previews" / f"{key}.html").exists()}
+                 "only_if": label(s.get("when")), "platform": "evoflows", "edited": tm.get("edited"), "rendered": (OUT / "previews" / f"{key}.html").exists()}
             if s.get("max_per_contact_hours") == 0:
                 m["cap_note"] = "Always sends straight away (past the 16-hour cap)"
             m["metrics"] = {}

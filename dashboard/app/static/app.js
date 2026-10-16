@@ -263,7 +263,7 @@ function msgCard(m) {
       ${m.status && m.status !== "live" ? pill(m.status) : ""}${(m.photos || []).map((k) => `<span class="photo-chip">Photo ${esc(k)}</span>`).join("")}${m.from_label && m.kind === "email" ? `<span class="msg-from">from ${esc(m.from_label)}</span>` : ""}</div>
     ${body}${m.only_if ? `<p class="msg-cond">Only if: ${esc(m.only_if)}</p>` : ""}${m.cap_note ? `<p class="msg-cond">${esc(m.cap_note)}</p>` : ""}
     ${m.draft ? "" : metricRow(m) + messageTrend(m) + abTable(m)}${flagList(flags, true)}
-    ${m.kind === "email" ? `<div class="msg-actions"><button type="button" class="link-btn" data-preview="${esc(m.message_id)}">Preview email →</button></div>` : ""}
+    ${m.kind === "email" ? `<div class="msg-actions"><button type="button" class="link-btn" data-preview="${esc(m.message_id)}">Preview email →</button>${m.platform === "evoflows" && !state.draftId ? `<a class="link-btn" href="#edit/${esc(m.message_id)}">Edit email</a>` : ""}${m.edited ? `<span class="photo-chip">edited ${esc(m.edited)}</span>` : ""}</div>` : ""}
   </article>`;
 }
 function pathName(steps, fallback) {
@@ -457,7 +457,8 @@ function render() {
   document.querySelectorAll("#period button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tf === state.tf)));
   document.querySelectorAll("#period button").forEach((b) => { b.disabled = !state.snap.timeframes.includes(b.dataset.tf); b.title = b.disabled ? "Not in this snapshot yet" : ""; });
   renderSidebar();
-  if (state.page === "evoflows") renderEvoflows();
+  if (state.page === "edit") renderBuilder();
+  else if (state.page === "evoflows") renderEvoflows();
   else if (state.page === "flowmap") renderFlowMap();
   else if (state.page === "drafts") (state.draftId ? renderDraft() : renderDrafts());
   else if (state.page === "fixes") renderFixes();
@@ -470,6 +471,9 @@ function render() {
 function route() {
   const pg = /^#(\w+)$/.exec(location.hash);
   state.page = pg && PAGES[pg[1]] ? pg[1] : null;
+  const em = /^#edit\/([a-z0-9_]+)/.exec(location.hash);
+  state.editKey = em ? em[1] : null;
+  if (state.editKey) state.page = "edit";
   const dm = /^#draft\/([a-z0-9_-]+)/.exec(location.hash);
   state.draftId = dm ? dm[1] : null;
   if (state.draftId) state.page = "drafts";
