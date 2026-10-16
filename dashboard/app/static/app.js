@@ -71,20 +71,21 @@ function renderSidebar() {
   }).join("");
   let html = `<button type="button" class="flow-link" data-id="" ${!state.flowId && !state.page ? 'aria-current="true"' : ""}><span class="fname">All flows overview</span></button>`;
   for (const [k, l] of Object.entries(PAGES)) html += `<a class="flow-link page-link" href="#${k}" ${state.page === k ? 'aria-current="true"' : ""}><span class="fname">${l}</span></a>`;
-  html += section([["evo:live", "Evoflows · live"], ["evo:off", "Evoflows · built, switched off"], ["evo:not_pushed", "Evoflows · not pushed yet"]]);
-  // Klaviyo flows: kept for reference until each is switched off, folded away by default.
-  const kl = state.snap.flows.filter((f) => !isEvo(f) && f.name.toLowerCase().includes(q));
-  if (kl.length) {
-    const viewing = kl.some((f) => f.id === state.flowId);
-    let open = viewing || !!q;
-    try { open = open || localStorage.getItem("eg-kl-open") === "1"; } catch (e) { /* storage unavailable */ }
-    html += `<details class="kl-group" id="kl-group" ${open ? "open" : ""}><summary class="group-label">Klaviyo (being replaced) · ${kl.length}</summary>
-      ${section([["klaviyo:live", "Live"], ["klaviyo:manual", "Manual"]])}</details>`;
-  }
+  // Each platform is a fold-out section; it opens by itself when you're on one of its flows or searching.
+  const fold = (id, label, flows, groups) => {
+    if (!flows.length) return "";
+    let open = flows.some((f) => f.id === state.flowId) || !!q;
+    try { open = open || localStorage.getItem(`eg-${id}-open`) === "1"; } catch (e) { /* storage unavailable */ }
+    return `<details class="nav-group" id="${id}" ${open ? "open" : ""}><summary class="group-label">${label} · ${flows.length}</summary>${section(groups)}</details>`;
+  };
+  html += fold("evo-group", "Evoflows", state.snap.flows.filter((f) => isEvo(f) && f.name.toLowerCase().includes(q)),
+    [["evo:live", "Live"], ["evo:off", "Built, switched off"], ["evo:not_pushed", "Not pushed yet"]]);
+  html += fold("kl-group", "Klaviyo (being replaced)", state.snap.flows.filter((f) => !isEvo(f) && f.name.toLowerCase().includes(q)),
+    [["klaviyo:live", "Live"], ["klaviyo:manual", "Manual"]]);
   nav.innerHTML = html;
 }
 document.addEventListener("toggle", (e) => {
-  if (e.target.id === "kl-group") { try { localStorage.setItem("eg-kl-open", e.target.open ? "1" : "0"); } catch (err) { /* ignore */ } }
+  if (e.target.classList && e.target.classList.contains("nav-group")) { try { localStorage.setItem(`eg-${e.target.id}-open`, e.target.open ? "1" : "0"); } catch (err) { /* ignore */ } }
 }, true);
 
 // ---------- judging performance against the account's own flows ----------

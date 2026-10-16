@@ -35,6 +35,13 @@ TRIGGER = {"checkout_abandoned": "When someone leaves a checkout without buying"
            "order_placed": "When an order is placed", "subscribed": "When someone subscribes to the mailing list"}
 BRANCH = {"annual": "Annual members", "big": "£300 or more", "small": "Under £300", "hardware": "Hardware",
           "everything_else": "Everything else"}
+BRANCH_SUFFIX = {"member": "Members", "offer": "Recent order: 10% credit offer", "old": "Older order: no offer",
+                 "trolley": "Trolley: review at about 2 weeks", "clubs": "Clubs and the rest: review at about 4 weeks",
+                 "remind": "Still not a member: reminder", "skip": "Joined, or order too old: no reminder"}
+
+
+def _branch_label(bid):
+    return BRANCH.get(bid) or BRANCH_SUFFIX.get(bid.rsplit("_", 1)[-1]) or bid.replace("_", " ").capitalize()
 
 
 def label(c):
@@ -115,7 +122,7 @@ def steps_from(defn_steps, manifest, step_metrics):
         elif t == "split":
             branches = []
             for b in s.get("branches", []):
-                branches.append({"label": BRANCH.get(b["id"]) or b["id"].replace("_", " ").capitalize(),
+                branches.append({"label": _branch_label(b["id"]),
                                  "condition": label(b["when"]) if b.get("when") else "everyone not matched above",
                                  "steps": steps_from(b.get("steps", []), manifest, step_metrics)})
             out.append({"kind": "split", "split_type": "evoflows", "label": "First match wins", "branches": branches})
