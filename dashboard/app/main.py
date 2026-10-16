@@ -91,7 +91,14 @@ def health():
 
 @app.get("/", response_class=HTMLResponse)
 def index(user=Depends(auth)):
-    return FileResponse(STATIC / "index.html")
+    """The page, with each script and stylesheet stamped with a hash of its contents, so a deploy is never hidden by an
+    old copy in the browser's cache."""
+    import hashlib
+    html = (STATIC / "index.html").read_text()
+    for name in ("app.css", "app.js", "pages.js"):
+        v = hashlib.sha1((STATIC / name).read_bytes()).hexdigest()[:10]
+        html = html.replace(f'"/static/{name}"', f'"/static/{name}?v={v}"')
+    return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
 
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
