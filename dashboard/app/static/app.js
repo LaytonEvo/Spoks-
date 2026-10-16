@@ -8,7 +8,7 @@ const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", l
 
 const state = { snap: null, status: null, tf: "last_90_days", flowId: null, draftId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "evo", page: null, cmp: null };
 // Klaviyo-only pages (Fixes, A/B tests, Flow map) are retired from the menu; their code stays for reference.
-const PAGES = { drafts: "New flows to approve", programme: "Programme", compare: "Compare", summary: "Monday summary", evoflows: "Engine & events" };
+const PAGES = { drafts: "New flows to approve", media: "Brand & media", programme: "Programme", compare: "Compare", summary: "Monday summary", evoflows: "Engine & events" };
 const isEvo = (f) => f && f.platform === "evoflows";
 const STATUS_LABEL = { live: "live", off: "switched off", not_pushed: "not pushed", manual: "manual", draft: "draft" };
 const WIDE = window.matchMedia("(min-width: 1200px)");
@@ -459,6 +459,7 @@ function render() {
   renderSidebar();
   if (state.page === "edit") renderBuilder();
   else if (state.page === "evoflows") renderEvoflows();
+  else if (state.page === "media") renderMedia();
   else if (state.page === "flowmap") renderFlowMap();
   else if (state.page === "drafts") (state.draftId ? renderDraft() : renderDrafts());
   else if (state.page === "fixes") renderFixes();

@@ -28,7 +28,11 @@ function textToSubj(t) { let s = t; for (const [label, tok] of B.subjMap) s = s.
 function blockHtml(b) { return b.segs.map((x) => x[1]).join(""); }
 function displayHtml(b, bi) {
   return b.segs.map(([k, v], si) => {
-    if (k === "tag") return v.replace(/src="\{\{[^"]*\}\}"/g, `src="${PH_IMG}"`).replace(/href="[^"]*"/g, 'href="#"');
+    if (k === "tag") {
+      let out = v.replace(/src="\{\{[^"]*\}\}"/g, `src="${PH_IMG}"`).replace(/href="[^"]*"/g, 'href="#"');
+      if (/^<img\b/i.test(v) && /src="https?:/.test(v) && !/eg-email-logo/.test(v)) out = out.replace(/^<img/i, `<img data-img="${bi}:${si}" title="Click to swap this image"`);
+      return out;
+    }
     if (k === "ctl") return "";
     if (k === "tok") return `<span class="tokchip" contenteditable="false" title="Filled in for each customer">${esc(bTokLabel(v))}</span>`;
     return `<span class="edt" contenteditable="true" spellcheck="true" data-b="${bi}" data-s="${si}">${esc(unesc(v))}</span>`;
@@ -139,6 +143,18 @@ document.addEventListener("paste", (e) => {  // plain text only, so no markup sn
 document.addEventListener("click", async (e) => {
   if (state.page !== "edit") return;
   if (e.target.closest("#b-canvas a")) e.preventDefault();
+  const im = e.target.closest("img[data-img]");
+  if (im && B.mode === "edit") {
+    const [bi, si] = im.dataset.img.split(":").map(Number), seg = B.blocks[bi].segs[si];
+    const cur = { src: (seg[1].match(/src="([^"]*)"/) || [])[1], alt: (seg[1].match(/alt="([^"]*)"/) || [])[1] || "" };
+    const pick = await pickImage(cur);
+    if (pick) {
+      const attr = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+      seg[1] = seg[1].replace(/src="[^"]*"/, `src="${attr(pick.src)}"`).replace(/alt="[^"]*"/, `alt="${attr(pick.alt)}"`);
+      B.dirty = true; drawBuilder();
+    }
+    return;
+  }
   const blk = e.target.closest(".bblock");
   const op = e.target.closest("[data-bop]");
   if (op) {

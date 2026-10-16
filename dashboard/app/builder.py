@@ -367,6 +367,16 @@ def save(key, body, who):
             raise ValueError("Personalisation or a condition inside a block was changed; only words can be edited.")
         if _tags(src) != _tags(b["html"]):
             raise ValueError("A block's layout was changed; only words can be edited.")
+        from . import media
+        known = None
+        for tag_new, tag_old in zip(re.findall(r"<img\b[^>]*>", b["html"]), re.findall(r"<img\b[^>]*>", src)):
+            new_src = (re.search(r'src="([^"]*)"', tag_new) or [None, ""])[1]
+            if tag_new != tag_old and new_src != (re.search(r'src="([^"]*)"', tag_old) or [None, ""])[1]:
+                known = known or media.known_urls()
+                if new_src not in known:
+                    raise ValueError("Images can only be swapped for ones in the Brand & media library.")
+                if not (re.search(r'alt="([^"]*)"', tag_new) or [None, ""])[1].strip():
+                    raise ValueError("A swapped image needs alt text.")
     from_name = body.get("from_name") if body.get("from_name") in SENDERS else live(key)["from_name"]
     cur = live(key)
     head, _, tail = split(cur["html"])
@@ -388,7 +398,8 @@ def save(key, body, who):
 
 
 def _tags(s):
-    return re.findall(r"<[^>]+>", s)
+    """Tags with image src/alt blanked: swapping a picture from the library is allowed, other layout changes aren't."""
+    return [re.sub(r'\b(src|alt)="[^"]*"', r'\1=""', t) if t[:4].lower() == "<img" else t for t in re.findall(r"<[^>]+>", s)]
 
 
 def _version(rec, n):

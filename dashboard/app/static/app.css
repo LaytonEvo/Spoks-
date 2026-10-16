@@ -416,3 +416,20 @@ iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; bo
 .b-versions { list-style: none; padding: 0; margin: 0; font-size: 13px; } .b-versions li { padding: 6px 0; border-bottom: 1px solid #F0ECE3; }
 .bv-actions { display: inline-flex; gap: 10px; margin-left: 6px; }
 .msg-actions a.link-btn { margin-left: 14px; text-decoration: none; }
+
+/* brand & media */
+.m-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; } @media (max-width: 900px) { .m-grid2 { grid-template-columns: 1fr; } }
+.m-swatches { display: grid; gap: 6px; } .m-sw { display: grid; grid-template-columns: 26px 120px 80px 1fr; gap: 8px; align-items: center; font-size: 13px; }
+.m-sw span:first-child { width: 26px; height: 26px; border-radius: 4px; border: 1px solid #DDD7CA; }
+.m-form { display: grid; grid-template-columns: 1.2fr 1fr 2fr auto; gap: 10px; align-items: end; } @media (max-width: 900px) { .m-form { grid-template-columns: 1fr; } }
+.m-form label, .m-altrow { font-size: 13px; color: var(--muted); } .m-form input:not([type=file]), .m-form select, .m-altrow input { display: block; width: 100%; margin-top: 3px; padding: 7px 9px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; background: #fff; }
+.m-upload { margin-bottom: 18px; }
+.m-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.m-card { margin: 0; background: #fff; border: 1px solid #E6E2D8; border-radius: 8px; overflow: hidden; }
+.m-thumb { height: 130px; display: flex; align-items: center; justify-content: center; background: #fff; border-bottom: 1px solid #F0ECE3; }
+.m-thumb img { max-width: 100%; max-height: 130px; } .m-card:has(img[src*="logo-white"]) .m-thumb { background: #0F3B2A; }
+.m-card figcaption { padding: 8px 10px; display: grid; gap: 3px; font-size: 13px; word-break: break-word; }
+.m-picker { max-width: 900px; } .m-altrow { display: block; margin: 0 0 12px; }
+.m-pick { background: #fff; border: 1px solid #E6E2D8; border-radius: 6px; padding: 6px; cursor: pointer; display: grid; gap: 4px; text-align: left; }
+.m-pick img { width: 100%; height: 110px; object-fit: contain; } .m-pick.on, .m-pick:hover { border-color: var(--green); }
+.bblock img[data-img] { cursor: pointer; outline: 2px dashed transparent; } .bblock img[data-img]:hover { outline-color: #B2893F; }

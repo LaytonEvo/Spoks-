@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import builder, config, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import builder, config, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -95,7 +95,7 @@ def index(user=Depends(auth)):
     old copy in the browser's cache."""
     import hashlib
     html = (STATIC / "index.html").read_text()
-    for name in ("app.css", "app.js", "pages.js", "sim.js", "builder.js"):
+    for name in ("app.css", "app.js", "pages.js", "sim.js", "builder.js", "media.js"):
         v = hashlib.sha1((STATIC / name).read_bytes()).hexdigest()[:10]
         html = html.replace(f'"/static/{name}"', f'"/static/{name}?v={v}"')
     return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
@@ -515,3 +515,19 @@ async def builder_preview(key: str, request: Request, user=Depends(auth)):
         html = head + html + tail
     out = _b(builder.preview, key, body.get("n"), body.get("audience", "non"), html)
     return HTMLResponse(out, headers={"Content-Security-Policy": "script-src 'none'"})
+
+
+# ---------- brand and media library ----------
+@app.get("/api/media")
+def api_media(user=Depends(auth)):
+    return {"brand": media.BRAND, "images": media.catalog(), "can_upload": bool(media.SHOPIFY_STORE and media.SHOPIFY_TOKEN)}
+
+
+@app.post("/api/media/upload")
+async def api_media_upload(request: Request, user=Depends(auth)):
+    body = await request.json()
+    kind = body.get("kind") if body.get("kind") in ("photo", "cutout", "product", "icon", "logo") else "photo"
+    try:
+        return media.upload(str(body.get("name", "image"))[:120], body.get("data", ""), str(body.get("alt", ""))[:250], kind, user)
+    except Exception as e:
+        raise HTTPException(502, f"Upload failed: {str(e)[:300]}")
