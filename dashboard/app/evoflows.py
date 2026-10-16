@@ -136,7 +136,8 @@ def manifest():
 
 
 def validate_flow(key):
-    body = _out(f"flows/{key}.json")
+    from . import abtest  # a running A/B test changes the flow; keep it
+    body = abtest.definition(key)
     status, res = _call("POST", f"/flows/{key}/validate", body)
     ok = status < 400 and bool((res or {}).get("valid")) and not (res or {}).get("problems")
     missing = [w for w in (res or {}).get("warnings", []) if "template_missing" in str(w)]
@@ -160,7 +161,8 @@ def push_flow(key, who):
         v = validate_flow(key)
         results.append({"call": f"POST /flows/{key}/validate", "status": v["status"], "response": v["response"]})
         if v["ok"] and not v["templates_missing"]:
-            body = _out(f"flows/{key}.json")
+            from . import abtest
+            body = abtest.definition(key)
             body.pop("enabled", None)  # never switch on from here
             st, res = _call("PUT", f"/flows/{key}", body)
             results.append({"call": f"PUT /flows/{key}", "status": st, "response": res})

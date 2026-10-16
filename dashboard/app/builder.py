@@ -256,7 +256,46 @@ def _save(key, rec):
     tmp.replace(_path(key))
 
 
+def variants():
+    try:
+        return json.loads((STORE / "_variants.json").read_text())
+    except Exception:
+        return {}
+
+
+def is_template(key):
+    return key in evoflows.manifest()["templates"] or key in variants()
+
+
+def create_variant(key):
+    """A/B test version B of an email: starts as a copy of what customers get now, edited like any email."""
+    vkey = f"{key}_b"
+    with _lock:
+        v = variants()
+        v[vkey] = key
+        STORE.mkdir(parents=True, exist_ok=True)
+        (STORE / "_variants.json").write_text(json.dumps(v, indent=1))
+    return vkey
+
+
+def adopt_variant(key, vkey, who):
+    """B won: publish B's content under the original email as a new version."""
+    b = live(vkey)
+    with _lock:
+        rec = _load(key)
+        n = max([v["n"] for v in rec["versions"]] + [0]) + 1
+        rec["versions"].append({"n": n, "status": "approved", "subject": b["subject"], "preview_text": b["preview_text"], "from_name": b["from_name"],
+                                "html": b["html"], "by": who, "at": _now(), "note": f"A/B test winner (from {vkey})",
+                                "approved_by": who, "approved_at": _now()})
+        _save(key, rec)
+    return publish(key, n, who)
+
+
 def base(key):
+    parent = variants().get(key)
+    if parent:  # a test version starts from what customers get now
+        p = live(parent)
+        return {**p, "n": 0, "status": "approved build", "name": f"{p['name']} (test version B)", "by": "copy of the live email", "at": None}
     body = json.loads((OUT / "templates" / f"{key}.json").read_text())
     return {"n": 0, "status": "approved build", "subject": body["subject"], "preview_text": body["preview_text"],
             "from_name": body.get("from_name") or SENDERS[0], "name": body.get("name", key), "html": body["html"],

@@ -64,7 +64,7 @@ function quickChecks() {
 }
 function drawBuilder() {
   const d = B.doc, f = flowOf(B.key), ed = d.editing;
-  const st = { "approved build": ["skip", "Approved build"], draft: ["todo", "Draft, waiting for approval"], approved: ["draft", "Approved, not published"], published: ["live", "Published"] }[ed.status] || ["skip", ed.status];
+  const st = { "approved build": ["skip", B.key.endsWith("_b") ? "Test version B, not edited yet" : "Approved build"], draft: ["todo", "Draft, waiting for approval"], approved: ["draft", "Approved, not published"], published: ["live", "Published"] }[ed.status] || ["skip", ed.status];
   const vrow = (v) => `<li><b>v${v.n}</b> <span class="stat ${{ draft: "todo", approved: "draft", published: "live" }[v.status] || "skip"}">${esc(v.status)}</span>
       <span class="muted small">saved by ${esc(v.by)} ${esc((v.at || "").slice(0, 16).replace("T", " "))}${v.approved_by ? ` · approved by ${esc(v.approved_by)}` : ""}${v.published_by ? ` · published by ${esc(v.published_by)} ${esc((v.published_at || "").slice(0, 16).replace("T", " "))}` : ""}</span>
       <span class="bv-actions"><button type="button" class="link-btn" data-bv-preview="${v.n}">Preview</button>
@@ -96,7 +96,7 @@ function drawBuilder() {
         <div class="panel"><h3>Send a test</h3><input id="b-test-to" type="email" placeholder="you@evolutiongolf.co.uk" style="width:100%">
           <p class="muted small">Sends the last saved version (save first). Staff addresses only.</p><button type="button" class="btn-line" id="b-test">Send test</button><p id="b-test-out" class="muted small"></p></div>
         <div class="panel"><h3>Versions</h3><ul class="b-versions">${d.versions.map(vrow).join("") || `<li class="muted">No edits yet.</li>`}
-          <li><b>Approved build</b> <span class="muted small">the version signed off in the copy docs</span> <span class="bv-actions"><button type="button" class="link-btn" data-bv-preview="0">Preview</button>${d.published_n ? `<button type="button" class="link-btn" id="b-restore">Go back to this</button>` : ""}</span></li></ul>
+          <li><b>${B.key.endsWith("_b") ? "Starting copy" : "Approved build"}</b> <span class="muted small">${B.key.endsWith("_b") ? "a copy of the email customers get now" : "the version signed off in the copy docs"}</span> <span class="bv-actions"><button type="button" class="link-btn" data-bv-preview="0">Preview</button>${d.published_n ? `<button type="button" class="link-btn" id="b-restore">Go back to this</button>` : ""}</span></li></ul>
           <p class="muted small">Publishing replaces the email on Evoflows; live flows use it from their next send. Every version is kept.</p></div>
       </aside></div>`;
   drawCanvas();

@@ -54,6 +54,7 @@ function stateAt(f, sc, t) {
     "checkout.total": +sc.basket, "order.total": +sc.basket, "order.age_days": +sc.order_age + Math.floor((t - sc.t0) / DAY),
     "order.source": sc.till ? "pos" : "web", "customer.orders_count": orders,
     "event.data.tier": sc.tier === "annual" ? "annual_pro" : sc.tier, "contact.consent": unsub ? "blocklisted" : "ok",
+    "contact.uuid": sc.group === "b" ? "f0000000" : "00000000",  // A/B tests split on the contact's random ID
   };
 }
 
@@ -238,6 +239,7 @@ function simControls(f, sc) {
   if ((f.definition.trigger || {}).type && /^order_/.test(f.definition.trigger.type)) ctl.push(`<label class="chk"><input type="checkbox" data-sim="till" ${sc.till ? "checked" : ""}> Bought in the shop (till order)</label>`);
   if (fields.has("customer.orders_count")) ctl.push(`<label class="chk"><input type="checkbox" data-sim="ordered_before" ${sc.ordered_before ? "checked" : ""}> Has ordered before</label>`);
   if (f.definition.consent === "newsletter_only") ctl.push(`<label class="chk"><input type="checkbox" data-sim="opted_in" ${sc.opted_in ? "checked" : ""}> Opted in to marketing</label>`);
+  if (fields.has("contact.uuid")) ctl.push(`<label>A/B test group <select data-sim="group"><option value="a" ${sc.group !== "b" ? "selected" : ""}>Group A (current email)</option><option value="b" ${sc.group === "b" ? "selected" : ""}>Group B (test version)</option></select></label>`);
   ctl.push(`<label class="chk"><input type="checkbox" data-sim="first_name" ${sc.first_name ? "checked" : ""}> We have their first name</label>`);
   const evs = sc.events.map((e, i) => `<div class="sim-ev"><select data-sim-ev="${i}" data-k="type">${Object.entries(EVENT_TYPES).map(([k, l]) => `<option value="${k}" ${e.type === k ? "selected" : ""}>${l}</option>`).join("")}</select>
       <label>day <input type="number" min="0" max="400" data-sim-ev="${i}" data-k="day" value="${esc(e.day)}"></label><input type="time" data-sim-ev="${i}" data-k="time" value="${esc(e.time)}">

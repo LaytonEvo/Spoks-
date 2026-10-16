@@ -433,3 +433,9 @@ iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; bo
 .m-pick { background: #fff; border: 1px solid #E6E2D8; border-radius: 6px; padding: 6px; cursor: pointer; display: grid; gap: 4px; text-align: left; }
 .m-pick img { width: 100%; height: 110px; object-fit: contain; } .m-pick.on, .m-pick:hover { border-color: var(--green); }
 .bblock img[data-img] { cursor: pointer; outline: 2px dashed transparent; } .bblock img[data-img]:hover { outline-color: #B2893F; }
+
+/* A/B tests */
+.ab-form { grid-template-columns: 1fr 1.4fr 1fr 1.2fr auto; }
+.ab-steps { list-style: none; padding: 0; margin: 8px 0; } .ab-steps li { margin: 6px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ab-steps li.done { color: var(--muted); } .ab-steps .tick { width: 18px; font-weight: 700; color: var(--green); }
+.ab-res tr.lead td { background: #EEF5F1; font-weight: 600; }

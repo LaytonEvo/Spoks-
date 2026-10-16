@@ -313,3 +313,35 @@
   - every page loads without script errors;
   - validate returns ok for F9;
   - the 5 flows show "switched off · v1", matching the approved builds.
+
+### 16 Oct 2026: dashboard tools (Layton: approve-then-publish, brand blocks only)
+- **Test a journey** (`static/sim.js`):
+  - simulates the flow definition with the engine's rules: step-time conditions, waits, send-at times, quiet hours,
+    the 16-hour gap (delays, never skips), exit conditions, purchase exit for checkout flows, and unsubscribe;
+  - shows a timeline, branch reasons, the highlighted route, and a pinned comparison.
+- **Email builder** (`app/builder.py`, `static/builder.js`):
+  - blocks are card rows cut losslessly from the template;
+  - text edits only, with tokens shown as chips; image swaps only to library images, with alt text;
+  - add blocks from a library cut from approved emails;
+  - checks: unsubscribe present, if/end balanced, Shopify-hosted images only, no codes or urgency, one button and one
+    panel;
+  - flow: draft, approve, publish (`PUT /templates/{key}`); test sends go via `draft_<key>`;
+  - a Python renderer of our Go-template subset matches Go on all 174 template × audience × name cases;
+  - flow approvals and previews use the published edit;
+  - `evoflows.py push templates` now skips emails changed on Evoflows since its last push (`--force` only with Layton's
+    say-so).
+- **Brand & media** (`app/media.py`):
+  - catalogue of every image in use and where;
+  - brand rules;
+  - Pillow checks (format, size, dimensions, alt text; transparent cut-outs flattened onto white, coloured backgrounds
+    refused);
+  - Shopify Files upload once `SHOPIFY_STORE` and `SHOPIFY_ADMIN_TOKEN` are set.
+- **A/B tests** (`app/abtest.py`):
+  - version B = builder variant `<key>_b`;
+  - a test replaces the email step with a split on `contact.uuid` (A if it sorts below the cut; 50/25/75%);
+  - results from per-step metrics with a two-proportion confidence check;
+  - ending keeps A, or publishes B's content under A;
+  - flow changes are stored as overrides, and flow approvals keep them.
+  - The validator accepts the split. Luke is asked to confirm string comparison and stable uuids (requirements item 18)
+    before any live test.
+- Requirements doc items 18–20 added: the A/B split, live template edits, and the image upload key.

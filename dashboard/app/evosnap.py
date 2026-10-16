@@ -28,12 +28,13 @@ FIELD = {  # condition fields in plain words
     "flags.has_clubs": "order has clubs", "flags.has_shoes": "order has shoes", "checkout.total": "basket value",
     "order.total": "order value", "order.age_days": "order age (days)", "order.source": "order source",
     "customer.orders_count": "orders placed", "event.data.tier": "membership tier", "contact.consent": "consent",
+    "contact.uuid": "test group (random ID)",
 }
 OPS = {"eq": "is", "ne": "is not", "gt": "over", "gte": "at least", "lt": "under", "lte": "at most", "in": "is one of",
        "nin": "is none of", "contains": "includes", "not_contains": "doesn't include", "exists": "is set"}
 TRIGGER = {"checkout_abandoned": "When someone leaves a checkout without buying", "order_fulfilled": "When an order is fulfilled",
            "order_placed": "When an order is placed", "subscribed": "When someone subscribes to the mailing list"}
-BRANCH = {"annual": "Annual members", "big": "£300 or more", "small": "Under £300", "hardware": "Hardware",
+BRANCH = {"variant_a": "A/B test: version A", "variant_b": "A/B test: version B", "annual": "Annual members", "big": "£300 or more", "small": "Under £300", "hardware": "Hardware",
           "everything_else": "Everything else"}
 BRANCH_SUFFIX = {"member": "Members", "offer": "Recent order: 10% credit offer", "old": "Older order: no offer",
                  "trolley": "Trolley: review at about 2 weeks", "clubs": "Clubs and the rest: review at about 4 weeks",
@@ -105,6 +106,8 @@ def steps_from(defn_steps, manifest, step_metrics):
             try:  # published builder edits win over the repo build
                 from . import builder
                 lv = builder.live(key)
+                if not tm:  # an A/B test version (not in the repo manifest)
+                    tm = {"name": lv["name"], "subject": lv["subject"], "preview_text": lv["preview_text"], "from_name": lv["from_name"]}
                 if lv.get("status") == "published":
                     tm = {**tm, "subject": lv["subject"], "preview_text": lv["preview_text"], "from_name": lv["from_name"],
                           "edited": f"v{lv['n']}"}
@@ -210,7 +213,8 @@ def build():
         flows = []
         for key, meta in man["flows"].items():
             status["step"] = f"Reading {meta['name']}"
-            built = json.loads((OUT / "flows" / f"{key}.json").read_text())
+            from . import abtest  # a running A/B test is the expected version
+            built = abtest.definition(key)
             eng = listed.get(key)
             live_def, differs = None, False
             if eng:

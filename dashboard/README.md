@@ -33,6 +33,26 @@ push approved builds, which land switched off (Luke switches them on after a sta
   - **Check with Evoflows:** validates it.
   - **Approve:** uploads its emails and the flow, switched off, after validation. Logged with who approved.
   - **Send me a test of every email:** staff addresses only.
+- **Test a journey** (tab on each Evoflows flow): a pretend customer and timed events (orders, membership changes,
+  unsubscribes, checkouts). Shows each email with its send time (waits, send-at times, quiet hours, the 16-hour gap),
+  the reason for each branch, the exit, and the route through the flow. A result can be pinned to compare.
+- **Email builder** (Edit email, on any Evoflows email):
+  - edit the words in place, swap images from the library, and move, duplicate or remove blocks;
+  - add brand blocks cut from approved emails;
+  - preview as a non-member, Free or annual member;
+  - save a draft, approve it (named), then publish it to Evoflows. Every version is kept; you can go back to the build.
+  - Layout and personalisation are locked: the server refuses changed tags or `{{ }}` tokens.
+- **Brand & media:**
+  - brand colours, fonts and rules;
+  - every image in the emails and where it's used;
+  - checked uploads to Shopify Files: JPG/PNG, size, alt text, white background. Uploading needs `SHOPIFY_STORE` and
+    `SHOPIFY_ADMIN_TOKEN`.
+- **A/B tests:**
+  - version B is edited in the builder;
+  - a test splits one email step on the contact's random ID;
+  - results are orders and revenue per version, with a confidence check;
+  - ending it keeps A or publishes B under the original email.
+  - Waiting on Luke to confirm the split before the first live test.
 - **Programme:** the Build Pack flows (F1–F13) with status from Evoflows, what each replaces, and what each is waiting
   on (`app/programme.json`).
 - **Compare:** a new Evoflows flow against the Klaviyo flow it replaces. After launch, the weeks since launch are set

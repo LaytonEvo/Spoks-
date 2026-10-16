@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import builder, config, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, builder, config, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -95,7 +95,7 @@ def index(user=Depends(auth)):
     old copy in the browser's cache."""
     import hashlib
     html = (STATIC / "index.html").read_text()
-    for name in ("app.css", "app.js", "pages.js", "sim.js", "builder.js", "media.js"):
+    for name in ("app.css", "app.js", "pages.js", "sim.js", "builder.js", "media.js", "abtests.js"):
         v = hashlib.sha1((STATIC / name).read_bytes()).hexdigest()[:10]
         html = html.replace(f'"/static/{name}"', f'"/static/{name}?v={v}"')
     return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
@@ -455,7 +455,7 @@ async def api_evoflows_test(key: str, request: Request, user=Depends(auth)):
 
 # ---------- email builder (Evoflows templates): draft -> approve -> publish ----------
 def _tpl_key(key):
-    if key not in evoflows.manifest()["templates"]:
+    if not builder.is_template(key):
         raise HTTPException(404)
     return key
 
@@ -531,3 +531,50 @@ async def api_media_upload(request: Request, user=Depends(auth)):
         return media.upload(str(body.get("name", "image"))[:120], body.get("data", ""), str(body.get("alt", ""))[:250], kind, user)
     except Exception as e:
         raise HTTPException(502, f"Upload failed: {str(e)[:300]}")
+
+
+# ---------- A/B tests ----------
+def _ab(fn, *a):
+    try:
+        return fn(*a)
+    except KeyError:
+        raise HTTPException(404, "No such test")
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except evoflows.EvoflowsError as e:
+        raise HTTPException(502, str(e))
+
+
+@app.get("/api/abtests")
+def api_abtests(user=Depends(auth)):
+    snap = {f["id"]: f for f in snapshot.merged()["flows"] if f.get("platform") == "evoflows"}
+    tests = [{**t, "results": abtest.results(t, snap.get(t["flow"])) if t["status"] in ("running", "ended") else None} for t in abtest.all_tests()]
+    flows = [{"key": k, "name": m["name"], "emails": abtest.candidates(k)} for k, m in evoflows.manifest()["flows"].items()]
+    return {"tests": tests[::-1], "flows": flows, "splits": list(abtest.SPLITS)}
+
+
+@app.post("/api/abtests")
+async def api_abtest_create(request: Request, user=Depends(auth)):
+    b = await request.json()
+    return {"id": _ab(abtest.create, str(b.get("flow", "")), str(b.get("step", "")), str(b.get("share", "50")), user, str(b.get("name", ""))[:80])}
+
+
+@app.post("/api/abtests/{tid}/{action}")
+async def api_abtest_action(tid: str, action: str, request: Request, user=Depends(auth)):
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+    if action == "approve":
+        return _ab(abtest.approve, tid, user)
+    if action == "start":
+        res = _ab(abtest.start, tid, user)
+    elif action == "end":
+        res = _ab(abtest.end, tid, str(body.get("winner", "")), user)
+    elif action == "cancel":
+        return _ab(abtest.cancel, tid, user)
+    else:
+        raise HTTPException(404)
+    threading.Thread(target=evosnap.build, daemon=True).start()
+    return res
