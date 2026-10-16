@@ -365,3 +365,29 @@ iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; bo
 .nav-group[open] > summary::before { content: "▾ "; }
 .nav-group .group-label:not(summary) { padding-left: 12px; }
 .nav-tech { margin-top: 16px; border-top: 1px solid #E6E2D8; padding-top: 4px; }
+
+/* journey simulator */
+.sim-wrap { display: grid; grid-template-columns: minmax(260px, 320px) 1fr; gap: 18px; align-items: start; }
+@media (max-width: 900px) { .sim-wrap { grid-template-columns: 1fr; } }
+.sim-controls label { display: block; margin: 8px 0; font-size: 14px; }
+.sim-controls label input:not([type=checkbox]), .sim-controls select { display: block; width: 100%; margin-top: 3px; padding: 6px 8px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; background: #fff; }
+.sim-controls label.chk { display: flex; gap: 8px; align-items: center; }
+.sim-controls fieldset { border: 1px solid #E6E2D8; border-radius: 6px; margin: 8px 0; padding: 6px 10px; }
+.sim-controls h3 { margin: 14px 0 4px; }
+.sim-ev { display: grid; grid-template-columns: 1fr 110px 20px; gap: 6px; align-items: end; margin: 8px 0; padding-bottom: 8px; border-bottom: 1px solid #F0ECE3; }
+.sim-ev select { grid-column: 1 / -1; }
+.sim-ev label { margin: 0; font-size: 12px; } .sim-ev select, .sim-ev input { padding: 5px 6px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 13px; width: 100%; }
+.sim-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+.sim-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sim-col h3 { margin: 0; } .sim-col > .muted { margin: 2px 0 8px; }
+.sim-timeline { list-style: none; margin: 0 0 18px; padding: 0 0 0 14px; border-left: 2px solid #E6E2D8; }
+.sim-item { position: relative; margin: 0 0 10px; padding-left: 12px; font-size: 14px; }
+.sim-item::before { content: ""; position: absolute; left: -21px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #CFC8B8; border: 2px solid #fff; }
+.sim-item.k-email::before, .sim-item.k-end::before { background: var(--green); } .sim-item.k-exit::before, .sim-item.k-notenter::before { background: #B3261E; }
+.sim-when { display: block; font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+.sim-card { background: #fff; border: 1px solid #E6E2D8; border-radius: 8px; padding: 10px 12px; }
+.sim-item.k-skip { color: var(--muted); } .sim-item.k-exit div, .sim-item.k-notenter div { font-weight: 600; color: #8C1D18; } .sim-item.k-end div { font-weight: 600; }
+.sim-tree ul { list-style: none; margin: 4px 0 4px 6px; padding-left: 12px; border-left: 1px dashed #D9D4C7; font-size: 13px; }
+.sim-tree li, .sim-tree .t-branch { color: #A9A397; margin: 3px 0; }
+.sim-tree .on { color: var(--ink, #1E2A24); } .sim-tree li.t-email.on { font-weight: 600; color: var(--green); }
+.sim-tree .t-branch.on > .t-bname { font-weight: 700; color: var(--green); }

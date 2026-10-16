@@ -254,6 +254,9 @@ def build():
                 "consent": defn.get("consent"), "reentry": None, "summary": meta.get("summary"),
                 "replaces": meta.get("replaces", []), "deviations": meta.get("deviations", []), "differs": differs,
                 "steps": steps_from(defn.get("steps", []), man, step_metrics), "totals": totals, "weekly": weekly,
+                # the raw definition (what's on Evoflows, else the approved build), for the journey simulator
+                "definition": {k: defn.get(k) for k in ("trigger", "entry", "exit", "consent", "send_window", "steps",
+                                                        "max_per_contact_hours")},
             }
             for m in _iter_emails(flow["steps"]):
                 try:

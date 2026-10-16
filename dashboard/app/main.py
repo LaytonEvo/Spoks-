@@ -95,7 +95,7 @@ def index(user=Depends(auth)):
     old copy in the browser's cache."""
     import hashlib
     html = (STATIC / "index.html").read_text()
-    for name in ("app.css", "app.js", "pages.js"):
+    for name in ("app.css", "app.js", "pages.js", "sim.js"):
         v = hashlib.sha1((STATIC / name).read_bytes()).hexdigest()[:10]
         html = html.replace(f'"/static/{name}"', f'"/static/{name}?v={v}"')
     return HTMLResponse(html, headers={"Cache-Control": "no-cache"})

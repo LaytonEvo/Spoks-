@@ -342,7 +342,7 @@ function renderFlow() {
     ${flowTrendPanel(f)}
     ${(f.flags[state.tf] || []).length ? `<div class="panel"><h3>Flow checks</h3>${flagList(f.flags[state.tf])}</div>` : ""}
     <div class="tabs" role="tablist">
-      ${[["journey", "Journey"], ...(evo ? [["people", "People in it"]] : []), ["review", "Review"], ["notes", "Notes"]].map(([k, l]) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${l}</button>`).join("")}
+      ${[["journey", "Journey"], ...(evo ? [["simulate", "Test a journey"], ["people", "People in it"]] : []), ["review", "Review"], ["notes", "Notes"]].map(([k, l]) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${l}</button>`).join("")}
     </div>
     <section id="tab-body"></section>`;
   renderTab(f);
@@ -363,6 +363,7 @@ async function renderTab(f) {
     if (state.pvId) showInPane(state.pvId);
     return;
   }
+  if (state.tab === "simulate") { renderSim(f, el); return; }
   if (state.tab === "people") {
     el.innerHTML = `<p class="muted">Loading…</p>`;
     let r;
