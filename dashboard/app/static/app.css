@@ -439,3 +439,40 @@ iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; bo
 .ab-steps { list-style: none; padding: 0; margin: 8px 0; } .ab-steps li { margin: 6px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .ab-steps li.done { color: var(--muted); } .ab-steps .tick { width: 18px; font-weight: 700; color: var(--green); }
 .ab-res tr.lead td { background: #EEF5F1; font-weight: 600; }
+
+/* live journey view */
+.vz-panel { margin-bottom: 16px; padding-bottom: 8px; }
+.vz-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: flex-start; }
+.vz-head h3 { margin: 0; } .vz-head p { margin: 2px 0 0; }
+.vz-ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.vz-clock { font: 600 13px/1 Inter, Arial, sans-serif; background: #0F3B2A; color: #fff; padding: 8px 10px; border-radius: 6px; min-width: 210px; text-align: center; font-variant-numeric: tabular-nums; }
+.vz-ticker { margin: 10px 0 6px; padding: 8px 12px; border-left: 3px solid #CFC8B8; background: #FAF8F3; font-size: 14px; min-height: 20px; }
+.vz-ticker.k-email { border-color: var(--green); background: #EEF5F1; font-weight: 600; }
+.vz-ticker.k-exit, .vz-ticker.k-notenter { border-color: #B3261E; background: #FBEDEC; color: #8C1D18; font-weight: 600; }
+.vz-ticker.k-end { border-color: var(--green); font-weight: 600; }
+.vz-scroll { overflow-x: auto; border-radius: 8px; background: radial-gradient(circle, #E9E5DB 1px, transparent 1.2px) 0 0 / 18px 18px, #FCFBF8; border: 1px solid #ECE8DE; }
+svg.vz { display: block; margin: 0 auto; font-family: Inter, Arial, sans-serif; }
+.vz-edge { fill: none; stroke: #DCD6C9; stroke-width: 1.6; }
+.vz-edge.vz-route { stroke: #B9CDBF; stroke-width: 2.4; }
+.vz-edge.flow { stroke: #0F3B2A; stroke-dasharray: 7 7; animation: vzflow .6s linear infinite; }
+.vz-edge.done { stroke: #1E6A4A; }
+@keyframes vzflow { to { stroke-dashoffset: -14; } }
+.vz-blabel, .vz-bcond { paint-order: stroke; stroke: #FCFBF8; stroke-width: 5px; stroke-linejoin: round; }
+.vz-blabel { font-size: 11px; font-weight: 600; fill: #A9A397; } .vz-blabel.on { fill: #0F3B2A; }
+.vz-bcond { font-size: 10px; fill: #B5AFA2; }
+.vz-node rect { fill: #fff; stroke: #DCD6C9; stroke-width: 1.4; transition: fill .3s, stroke .3s; }
+.vz-node text { fill: #A9A397; transition: fill .3s; } .vz-t1 { font-size: 12px; font-weight: 600; } .vz-t2 { font-size: 11px; }
+.vz-stub rect { fill: #F6F4EF; stroke-dasharray: 4 3; }
+.vz-enter rect, .vz-end rect { fill: #F3F6F4; stroke: #9DB8A8; } .vz-enter text { fill: #0F3B2A; }
+.vz-split rect { fill: #EFECE5; stroke: #CFC8B8; }
+.vz-node.lit rect { stroke: #1E6A4A; } .vz-node.lit text { fill: #1E2A24; }
+.vz-email.lit rect { fill: #EEF5F1; stroke: #0F3B2A; stroke-width: 2; } .vz-split.lit rect { fill: #0F3B2A; stroke: #0F3B2A; }
+.vz-node.skipped rect { fill: #F6F4EF; stroke: #B2893F; stroke-dasharray: 4 3; } .vz-node.skipped text { fill: #8A6A2E; }
+.vz-node.now rect { filter: drop-shadow(0 0 6px rgba(15,59,42,.45)); }
+.vz-email.now rect { animation: vzpulse 1s ease-out; }
+@keyframes vzpulse { 0% { stroke-width: 6; } 100% { stroke-width: 2; } }
+.vz-exit rect { fill: #FBEDEC; stroke: #D9A7A3; } .vz-exit text { fill: #B07E7A; }
+.vz-exit.lit rect { fill: #B3261E; stroke: #B3261E; } .vz-exit.lit text { fill: #fff; }
+.vz-end.lit rect { fill: #0F3B2A; stroke: #0F3B2A; } .vz-end.lit text { fill: #fff; }
+#vz-dot { fill: #2BB673; stroke: #fff; stroke-width: 2.5; }
+@media (prefers-reduced-motion: reduce) { .vz-edge.flow { animation: none; stroke-dasharray: none; } .vz-email.now rect { animation: none; } }

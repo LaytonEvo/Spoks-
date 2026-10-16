@@ -107,11 +107,12 @@ function simulate(f, raw) {
   const def = f.definition, msgs = Object.fromEntries([...messages(f.steps)].map((m) => [m.message_id, m]));
   const t0 = toLocal(raw.start).getTime();
   const sc = { ...raw, t0, events: raw.events.map((e) => ({ ...e, at: t0 + (+e.day) * DAY + (() => { const [h, m] = (e.time || "12:00").split(":").map(Number); const base = new Date(t0); base.setHours(0, 0, 0, 0); return base.getTime() + h * 36e5 + m * 6e4 - t0; })() })).sort((a, b) => a.at - b.at) };
-  const items = [], visited = new Set();
+  const items = [], visited = new Set(), trail = [];  // trail: [node id, time, kind] in the order the customer reaches them
   const trig = def.trigger || {};
   const st0 = stateAt(f, sc, t0);
   items.push({ t: t0, kind: "enter", text: f.trigger });
-  if (trig.when && !evalC(trig.when, st0)) return { entered: false, items: [{ t: t0, kind: "notenter", text: `Doesn't enter: needs ${f.flow_filter}.` }], visited, sends: 0 };
+  trail.push(["__enter", t0, "enter"]);
+  if (trig.when && !evalC(trig.when, st0)) return { entered: false, items: [{ t: t0, kind: "notenter", text: `Doesn't enter: needs ${f.flow_filter}.` }], visited, sends: 0, trail: [["__enter", t0, "enter"], ["__exit", t0, "notenter"]] };
   const capFlow = def.max_per_contact_hours ?? 16, newsletter = def.consent === "newsletter_only";
   const checkoutFlow = /checkout|cart/.test(trig.type || "");
   let t = t0, last = null, done = null, sends = 0;
@@ -133,6 +134,7 @@ function simulate(f, raw) {
       if (done) return;
       if (s.type === "wait") {
         const next = addWait(t, s, stateAt(f, sc, t));
+        trail.push([s.id, t, "wait", next]);
         const ex = exitBy(next); if (ex) { done = ex; return; }
         visited.add(s.id); t = next; continue;
       }
@@ -140,7 +142,7 @@ function simulate(f, raw) {
         const st = stateAt(f, sc, t);
         visited.add(s.id);
         const m = msgs[s.template] || { name: s.template, subject: "" };
-        if (s.when && !evalC(s.when, st)) { items.push({ t, kind: "skip", text: `Skips “${m.name}”: only sent if ${m.only_if || "its condition is met"}.` }); continue; }
+        if (s.when && !evalC(s.when, st)) { trail.push([s.id, t, "skip"]); items.push({ t, kind: "skip", text: `Skips “${m.name}”: only sent if ${m.only_if || "its condition is met"}.` }); continue; }
         const cap = s.max_per_contact_hours ?? capFlow;
         let send = t;
         const why = [];
@@ -148,10 +150,11 @@ function simulate(f, raw) {
         const q = quiet(send, def); if (q !== send) { send = q; why.push("moved out of quiet hours (21:00–08:00)"); }
         const ex = send > t ? exitBy(send) : null; if (ex) { done = ex; return; }
         t = send;
-        if (newsletter && !sc.opted_in) { items.push({ t, kind: "skip", text: `“${m.name}” not sent: they haven't opted in to marketing, so Evoflows refuses it.` }); continue; }
+        if (newsletter && !sc.opted_in) { trail.push([s.id, t, "skip"]); items.push({ t, kind: "skip", text: `“${m.name}” not sent: they haven't opted in to marketing, so Evoflows refuses it.` }); continue; }
         if (stateAt(f, sc, t)["contact.consent"] !== "ok") { done = { t, text: "Unsubscribed: nothing more is sent." }; return; }
         items.push({ t, kind: "email", key: s.template, name: m.name, from: m.from_label, preview: m.preview_text,
           subject: (m.subject || "").replace("[, first name]", sc.first_name ? ", Sam" : ""), why: why.join(" and ") });
+        trail.push([s.id, t, "email", m.name]);
         last = t; sends += 1; continue;
       }
       if (s.type === "split") {
@@ -160,6 +163,7 @@ function simulate(f, raw) {
         visited.add(s.id);
         if (!branch) continue;
         visited.add(`${s.id}:${branch.id}`);
+        trail.push([s.id, t, "split", branch.id]);
         items.push({ t, kind: "split", text: `Goes down “${simBranchName(f, s, branch)}”`, because: branch.when ? simBranchCond(f, s, branch) : "nothing earlier matched" });
         run(branch.steps);
         continue;
@@ -170,7 +174,8 @@ function simulate(f, raw) {
   };
   run(def.steps);
   items.push(done ? { t: done.t, kind: "exit", text: done.text } : { t, kind: "end", text: `Reaches the end of the flow after ${sends} email${sends === 1 ? "" : "s"}.` });
-  return { entered: true, items, visited, sends };
+  trail.push(done ? ["__exit", done.t, "exit", done.text] : ["__end", t, "end"]);
+  return { entered: true, items, visited, sends, trail };
 }
 
 // branch labels and conditions come from the display steps (same order as the definition)
@@ -257,10 +262,12 @@ function renderSim(f, el) {
   const sc = SIM.byFlow[f.id] || (SIM.byFlow[f.id] = simDefaults(f));
   const res = simulate(f, sc);
   const pin = SIM.pinned[f.id];
+  if (typeof vizStop === "function") vizStop();
   el.innerHTML = `<p class="muted" style="max-width:90ch">Set up a pretend customer and what they do, and see which emails they'd get, when, and why. It follows this flow's rules as they are on Evoflows: send times, quiet hours (21:00–08:00), the 16-hour gap between emails, and the reasons someone leaves. It shows what should happen; Luke's staff tests confirm the engine does it.</p>
     <div class="sim-wrap">${simControls(f, sc)}
-      <div class="sim-results">${pin ? `<div class="sim-compare">${simTimeline(f, res, sc, "This customer")}${simTimeline(f, pin.res, pin.sc, "Pinned")}</div>` : simTimeline(f, res, sc, "This customer")}
-        ${simTree(f, res.visited)}</div></div>`;
+      <div class="sim-results">${typeof vizRender === "function" ? vizRender(f, res, sc) : ""}${pin ? `<div class="sim-compare">${simTimeline(f, res, sc, "This customer")}${simTimeline(f, pin.res, pin.sc, "Pinned")}</div>` : simTimeline(f, res, sc, "This customer")}
+        </div></div>`;
+  if (typeof vizReset === "function") { vizReset(); setTimeout(() => { if ($("#vz-play")) vizPlay(); }, 250); }
 }
 
 function simRerender() {
