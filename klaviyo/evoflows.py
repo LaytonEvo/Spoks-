@@ -176,7 +176,7 @@ def pack_templates(pack, prefix, skip=()):
         html = (ROOT.parent / "dashboard/app/drafts/html" / t["file"]).read_text()
         out[f"{prefix}_{t['key']}"] = {"name": f"{prefix.upper()} {t['name']}", "subject": translate(t["subject"]),
                                        "preview_text": translate(t["preview"]), "html": translate(html),
-                                       **({"from_name": t["sender"]} if t["sender"] != "⛳ Evolution Golf" else {})}
+                                       "from_name": t["sender"]}  # always explicit: "⛳ Evolution Golf" or "Alex at Evolution Golf"
     return out
 
 
@@ -261,7 +261,8 @@ def f9_flow():
     }
 
 
-COMMON = {"consent": "soft_opt_in", "send_window": {"timezone": "Europe/London", "quiet_hours": ["21:00", "08:00"]}}
+# F1/F2 (and F12/F13 when built) only reach people opted into marketing (Evoflows, 13 Oct 2026); F3/F9 stay soft_opt_in.
+COMMON = {"consent": "newsletter_only", "send_window": {"timezone": "Europe/London", "quiet_hours": ["21:00", "08:00"]}}
 
 
 def f1_flow():
@@ -313,7 +314,8 @@ def f2_annual_flow():
     Every email after the welcome checks they're still annual when due (Klaviyo: leaves if they stop being annual)."""
     annual = {"field": "flags.is_annual", "eq": True}
     A = lambda k, i=None: {**E("f2", k, i), "when": annual}
-    steps = [E("f2", "pe1"), W("w3", days=3, at="09:30"), A("pe2"), W("w27", days=27, at="09:30"), A("pe3"),
+    # The welcome always goes straight out: past the 16-hour cap (Klaviyo: Smart Sending off on this email only).
+    steps = [{**E("f2", "pe1"), "max_per_contact_hours": 0}, W("w3", days=3, at="09:30"), A("pe2"), W("w27", days=27, at="09:30"), A("pe3"),
              W("w30", days=30, at="09:30"), A("pe4")]
     for i in range(1, 9):  # months 3 to 10: the monthly 10% reminder
         steps += [W(f"wm{i}", days=30, at="09:30"), A("pem", f"pm{i}")]

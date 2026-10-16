@@ -17,7 +17,7 @@
  "entry": {
   "one_active_per_contact": true
  },
- "consent": "soft_opt_in",
+ "consent": "newsletter_only",
  "send_window": {
   "timezone": "Europe/London",
   "quiet_hours": [
@@ -34,7 +34,8 @@
   {
    "id": "pe1",
    "type": "email",
-   "template": "f2_pe1"
+   "template": "f2_pe1",
+   "max_per_contact_hours": 0
   },
   {
    "id": "w3",

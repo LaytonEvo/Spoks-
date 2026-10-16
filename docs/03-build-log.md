@@ -268,3 +268,16 @@
 - Field probe via validate. Missing: customer.collections, contact.emails_received / last_open_at / last_click_at, any
   "checkout started" or "active in flow" field.
 - Requirements for Luke (17 numbered items): Claude Doc https://claude.ai/code/artifact/15cd837c-d77f-4584-a38c-7f7bb4c3ec1e
+
+### 16 Oct 2026: after the F3 seed test (passed 13 Oct)
+- **Sender:** every template now carries `from_name`: "⛳ Evolution Golf", or "Alex at Evolution Golf" for f3_e3h,
+  f1_e3, f9_rvh and f9_rve. All 29 templates re-pushed (200, no warnings). Test sends report the From lines
+  "Alex at Evolution Golf <info@evolutiongolf.co.uk>" (reply-to info@) and "⛳ Evolution Golf <info@evolutiongolf.co.uk>".
+  F12 E2 is not built yet; its builder sets it.
+- **Consent:** f1_welcome, f2_free and f2_annual are now `newsletter_only`; validated and re-pushed, all still disabled.
+  F12/F13 will use it when built. F3/F9 stay `soft_opt_in`.
+- **Cap:** `max_per_contact_hours: 0` on the f2_annual welcome only (as in reply 2: Smart Sending was off on that email).
+  Everything else keeps the 16-hour cap (it delays, not skips). Layton to confirm or ask for F3's 09:30 follow-ups to
+  hold their slot.
+- **Open before F3 goes live:** item 1 (Klaviyo unsubscribes/bounces in Listmonk) is still unanswered, and Layton has
+  not yet given the go-live hour.

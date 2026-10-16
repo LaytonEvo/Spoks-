@@ -16,7 +16,7 @@
  "entry": {
   "one_active_per_contact": true
  },
- "consent": "soft_opt_in",
+ "consent": "newsletter_only",
  "send_window": {
   "timezone": "Europe/London",
   "quiet_hours": [
