@@ -70,7 +70,9 @@ function renderSidebar() {
     return flows.length ? `<p class="group-label">${label} · ${flows.length}</p>${flows.map(link).join("")}` : "";
   }).join("");
   let html = `<button type="button" class="flow-link" data-id="" ${!state.flowId && !state.page ? 'aria-current="true"' : ""}><span class="fname">All flows overview</span></button>`;
-  for (const [k, l] of Object.entries(PAGES)) html += `<a class="flow-link page-link" href="#${k}" ${state.page === k ? 'aria-current="true"' : ""}><span class="fname">${l}</span></a>`;
+  const pageLink = (k) => `<a class="flow-link page-link" href="#${k}" ${state.page === k ? 'aria-current="true"' : ""}><span class="fname">${PAGES[k]}</span></a>`;
+  const TECH = ["evoflows"];  // operational pages sit at the bottom, below the flows
+  for (const k of Object.keys(PAGES).filter((k) => !TECH.includes(k))) html += pageLink(k);
   // Each platform is a fold-out section; it opens by itself when you're on one of its flows or searching.
   const fold = (id, label, flows, groups) => {
     if (!flows.length) return "";
@@ -82,6 +84,7 @@ function renderSidebar() {
     [["evo:live", "Live"], ["evo:off", "Built, switched off"], ["evo:not_pushed", "Not pushed yet"]]);
   html += fold("kl-group", "Klaviyo (being replaced)", state.snap.flows.filter((f) => !isEvo(f) && f.name.toLowerCase().includes(q)),
     [["klaviyo:live", "Live"], ["klaviyo:manual", "Manual"]]);
+  html += `<div class="nav-tech"><p class="group-label">Technical</p>${TECH.map(pageLink).join("")}</div>`;
   nav.innerHTML = html;
 }
 document.addEventListener("toggle", (e) => {

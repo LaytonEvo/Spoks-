@@ -364,3 +364,4 @@ iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; bo
 .nav-group > summary::before { content: "▸ "; }
 .nav-group[open] > summary::before { content: "▾ "; }
 .nav-group .group-label:not(summary) { padding-left: 12px; }
+.nav-tech { margin-top: 16px; border-top: 1px solid #E6E2D8; padding-top: 4px; }
