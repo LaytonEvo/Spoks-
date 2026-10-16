@@ -358,3 +358,9 @@ iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; bo
 .photo-spec dt { font-weight: 600; } .photo-spec dd { margin: 0; }
 
 .flow-head h1 .stat { font: 600 12px/18px var(--body); vertical-align: middle; }
+.kl-group { margin-top: 10px; border-top: 1px solid #E6E2D8; padding-top: 4px; }
+.kl-group > summary { cursor: pointer; list-style: none; }
+.kl-group > summary::-webkit-details-marker { display: none; }
+.kl-group > summary::before { content: "▸ "; }
+.kl-group[open] > summary::before { content: "▾ "; }
+.kl-group .group-label:not(summary) { padding-left: 12px; }

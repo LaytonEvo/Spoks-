@@ -6,7 +6,7 @@ const pct = (v) => (v == null ? "–" : (v * 100).toFixed(1) + "%");
 const gbp = (v, dp = 0) => (v == null ? "–" : "£" + v.toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp }));
 const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", last_365_days: "last 12 months" };
 
-const state = { snap: null, status: null, tf: "last_90_days", flowId: null, draftId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "all", page: null, cmp: null };
+const state = { snap: null, status: null, tf: "last_90_days", flowId: null, draftId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "evo", page: null, cmp: null };
 // Klaviyo-only pages (Fixes, A/B tests, Flow map) are retired from the menu; their code stays for reference.
 const PAGES = { drafts: "New flows to approve", programme: "Programme", compare: "Compare", summary: "Monday summary", evoflows: "Engine & events" };
 const isEvo = (f) => f && f.platform === "evoflows";
@@ -55,24 +55,37 @@ function flagList(list, inline) {
 function renderSidebar() {
   const nav = $("#flow-list");
   const q = state.search.toLowerCase();
-  const groups = [["evo:live", "Evoflows · live"], ["evo:off", "Evoflows · built, switched off"], ["evo:not_pushed", "Evoflows · not pushed yet"],
-    ["klaviyo:live", "Klaviyo (being replaced) · live"], ["klaviyo:manual", "Klaviyo · manual"]];
   const grp = (f) => `${isEvo(f) ? "evo" : "klaviyo"}:${f.status}`;
+  const emailCount = (f) => new Set([...messages(f.steps)].filter((m) => m.kind === "email").map((m) => m.message_id)).size;
+  const link = (f) => {
+    const t = totals(f);
+    const meta = isEvo(f) && f.status !== "live"
+      ? `${f.status === "off" ? "Switched off" : "Not pushed yet"} · ${emailCount(f)} emails`
+      : `${n(t.recipients)} sends · ${gbp(t.revenue)}${f.replaced_by ? ` · → ${esc(f.replaced_by.name.split(" ")[0])}` : ""}`;
+    return `<button type="button" class="flow-link" data-id="${esc(f.id)}" ${state.flowId === f.id ? 'aria-current="true"' : ""}>
+      <span class="fname">${esc(f.name)}</span><span class="fmeta num">${meta}${dots(counts(f))}</span></button>`;
+  };
+  const section = (groups) => groups.map(([key, label]) => {
+    const flows = state.snap.flows.filter((f) => grp(f) === key && f.name.toLowerCase().includes(q));
+    return flows.length ? `<p class="group-label">${label} · ${flows.length}</p>${flows.map(link).join("")}` : "";
+  }).join("");
   let html = `<button type="button" class="flow-link" data-id="" ${!state.flowId && !state.page ? 'aria-current="true"' : ""}><span class="fname">All flows overview</span></button>`;
   for (const [k, l] of Object.entries(PAGES)) html += `<a class="flow-link page-link" href="#${k}" ${state.page === k ? 'aria-current="true"' : ""}><span class="fname">${l}</span></a>`;
-  for (const [status, label] of groups) {
-    const flows = state.snap.flows.filter((f) => grp(f) === status && f.name.toLowerCase().includes(q));
-    if (!flows.length) continue;
-    html += `<p class="group-label">${label} · ${flows.length}</p>`;
-    for (const f of flows) {
-      const t = totals(f);
-      html += `<button type="button" class="flow-link" data-id="${esc(f.id)}" ${state.flowId === f.id ? 'aria-current="true"' : ""}>
-        <span class="fname">${esc(f.name)}</span>
-        <span class="fmeta num">${n(t.recipients)} sends · ${gbp(t.revenue)}${f.replaced_by ? ` · → ${esc(f.replaced_by.name.split(" ")[0])}` : ""}${dots(counts(f))}</span></button>`;
-    }
+  html += section([["evo:live", "Evoflows · live"], ["evo:off", "Evoflows · built, switched off"], ["evo:not_pushed", "Evoflows · not pushed yet"]]);
+  // Klaviyo flows: kept for reference until each is switched off, folded away by default.
+  const kl = state.snap.flows.filter((f) => !isEvo(f) && f.name.toLowerCase().includes(q));
+  if (kl.length) {
+    const viewing = kl.some((f) => f.id === state.flowId);
+    let open = viewing || !!q;
+    try { open = open || localStorage.getItem("eg-kl-open") === "1"; } catch (e) { /* storage unavailable */ }
+    html += `<details class="kl-group" id="kl-group" ${open ? "open" : ""}><summary class="group-label">Klaviyo (being replaced) · ${kl.length}</summary>
+      ${section([["klaviyo:live", "Live"], ["klaviyo:manual", "Manual"]])}</details>`;
   }
   nav.innerHTML = html;
 }
+document.addEventListener("toggle", (e) => {
+  if (e.target.id === "kl-group") { try { localStorage.setItem("eg-kl-open", e.target.open ? "1" : "0"); } catch (err) { /* ignore */ } }
+}, true);
 
 // ---------- judging performance against the account's own flows ----------
 const MIN_SENDS = 50;
@@ -148,7 +161,9 @@ function trendCell(f) {
 
 // ---------- overview ----------
 function renderOverview() {
-  const live = state.snap.flows.filter((f) => f.status === "live");
+  // Headline numbers and "needs attention" follow the platform filter (Evoflows by default).
+  const scope = state.show === "evo" ? state.snap.flows.filter(isEvo) : state.show === "klaviyo" ? state.snap.flows.filter((f) => !isEvo(f)) : state.snap.flows;
+  const live = scope.filter((f) => f.status === "live");
   const sum = (k) => live.reduce((a, f) => a + (totals(f)[k] || 0), 0);
   const sends = sum("recipients"), revenue = sum("revenue"), orders = sum("conversions");
   const highs = [];
@@ -185,10 +200,10 @@ function renderOverview() {
   }).join("");
   const nAttention = state.snap.flows.filter((f) => rated.get(f.id).attention).length;
   $("#main").innerHTML = `
-    <p class="eyebrow">All flows · ${esc(TF_LABEL[state.tf])}</p>
+    <p class="eyebrow">${{ evo: "Evoflows", klaviyo: "Klaviyo (being replaced)" }[state.show] || "All flows"} · ${esc(TF_LABEL[state.tf])}</p>
     <h1>How the flows are doing</h1>
     <div class="kpis">
-      <div class="kpi"><div class="label">Live flows</div><div class="value">${live.length}</div><div class="kpi-sub">${live.filter(isEvo).length} on Evoflows · ${live.filter((f) => !isEvo(f)).length} on Klaviyo</div></div>
+      <div class="kpi"><div class="label">Live flows</div><div class="value">${live.length}</div><div class="kpi-sub">${state.show === "evo" ? `${scope.length - live.length} built, switched off` : `${live.filter(isEvo).length} on Evoflows · ${live.filter((f) => !isEvo(f)).length} on Klaviyo`}</div></div>
       <div class="kpi"><div class="label">Sends</div><div class="value">${n(sends)}</div></div>
       <div class="kpi"><div class="label">Orders attributed</div><div class="value">${n(orders)}</div></div>
       <div class="kpi"><div class="label">Revenue attributed</div><div class="value">${gbp(revenue)}</div></div>
