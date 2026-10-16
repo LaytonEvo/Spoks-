@@ -28,7 +28,8 @@ function simFields(def) {
 function simDefaults(f) {
   const d = new Date(); d.setDate(d.getDate() + ((2 - d.getDay() + 7) % 7 || 7)); d.setHours(18, 40, 0, 0);  // next Tuesday 18:40
   const custom = (f.definition.trigger || {}).type === "custom";
-  return { start: d.toISOString().slice(0, 16), tier: custom && /annual/.test(f.id) ? "annual" : custom ? "free" : "none",
+  const pad = (x) => String(x).padStart(2, "0");  // local time for the date-time box (toISOString would give UTC)
+  return { start: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`, tier: custom && /annual/.test(f.id) ? "annual" : custom ? "free" : "none",
     basket: 129, items: { trolley: false, moto: false, clubs: false, used: false, shoes: false }, order_age: 1, till: false,
     ordered_before: false, first_name: true, opted_in: true, events: [] };
 }
