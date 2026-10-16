@@ -3,7 +3,7 @@
 // library, preview it as different customers, then save a draft -> approve -> publish. Layout and personalisation are
 // locked (the server refuses a block whose tags or {{ }} tokens changed).
 
-const B = { key: null, doc: null, blocks: [], subject: "", preview: "", from: "", mode: "edit", previewN: null, audience: "non", width: "600", sel: null, dirty: false, subjMap: [] };
+const B = { key: null, doc: null, blocks: [], subject: "", preview: "", from: "", mode: "edit", previewN: null, audience: "non", width: "600", sel: null, dirty: false, subjMap: [], overrides: {}, theme: null, vals: {} };
 
 const unesc = (s) => { const t = document.createElement("textarea"); t.innerHTML = s; return t.value; };
 const escText = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -29,7 +29,7 @@ function blockHtml(b) { return b.segs.map((x) => x[1]).join(""); }
 function displayHtml(b, bi) {
   return b.segs.map(([k, v], si) => {
     if (k === "tag") {
-      let out = v.replace(/src="\{\{[^"]*\}\}"/g, `src="${PH_IMG}"`).replace(/href="[^"]*"/g, 'href="#"');
+      let out = dsFill(v, B.vals).replace(/src="\{\{[^"]*\}\}"/g, `src="${PH_IMG}"`).replace(/href="[^"]*"/g, 'href="#"');
       if (/^<img\b/i.test(v) && /src="https?:/.test(v) && !/eg-email-logo/.test(v)) out = out.replace(/^<img/i, `<img data-img="${bi}:${si}" title="Click to swap this image"`);
       return out;
     }
@@ -50,7 +50,14 @@ async function renderBuilder() {
 async function loadBuilder(key) {
   const d = await api(`/api/builder/${encodeURIComponent(key)}`);
   Object.assign(B, { key, doc: d, blocks: d.editing.blocks.map((x) => ({ src: x.src, segs: x.segments, meta: x.meta })), subject: subjToText(d.editing.subject),
-    preview: d.editing.preview_text, from: d.editing.from_name, dirty: false, sel: null });
+    preview: d.editing.preview_text, from: d.editing.from_name, dirty: false, sel: null, overrides: d.design.overrides || {} });
+  bTheme();
+}
+function bTheme() {
+  const ds = B.doc.design;
+  B.theme = dsMerge(ds.brand, B.overrides);
+  B.vals = dsValues(B.theme, ds.stacks);
+  dsLoadFonts(B.theme, ds.stacks.families);
 }
 function flowOf(key) { return state.snap.flows.find((f) => isEvo(f) && [...messages(f.steps)].some((m) => m.message_id === key)); }
 function quickChecks() {
@@ -58,7 +65,7 @@ function quickChecks() {
   const n = (re) => (html.match(re) || []).length;
   const w = [];
   if (n(/display:inline-block;padding:15px 30px/g) > 1) w.push(`${n(/display:inline-block;padding:15px 30px/g)} buttons: the design allows one primary button.`);
-  if (n(/bgcolor="#F1F3F1"/g) > 1) w.push(`${n(/bgcolor="#F1F3F1"/g)} stone panels: the design allows at most one.`);
+  if (n(/bgcolor="\[\[c:stone\]\]"/g) > 1) w.push(`${n(/bgcolor="\[\[c:stone\]\]"/g)} stone panels: the design allows at most one.`);
   if (!B.subject.trim()) w.push("The subject line is empty.");
   return w;
 }
@@ -91,6 +98,11 @@ function drawBuilder() {
       <div class="b-canvas" id="b-canvas" style="max-width:${B.width}px"></div>
       <aside class="b-side">
         ${checks.errors.length || checks.warnings.length || qc.length ? `<div class="panel"><h3>Checks</h3>${checks.errors.map((x) => `<div class="flag high">${esc(x)}</div>`).join("")}${[...new Set([...checks.warnings, ...qc])].map((x) => `<div class="flag medium">${esc(x)}</div>`).join("")}</div>` : ""}
+        <details class="panel ds-panel" ${Object.keys(B.overrides).length ? "open" : ""}><summary><h3 style="display:inline">Design</h3> <span class="muted small">${Object.keys(B.overrides).length ? "this email has its own design" : "uses the brand theme"}</span></summary>
+          <p class="muted small">Changes here apply to this email only and win over the <a href="#theme">brand theme</a>.</p>
+          ${dsControls(B.theme, d.design.options, d.design.brand, "email")}
+          ${Object.keys(B.overrides).length ? `<button type="button" class="btn-line" id="b-ds-brand">Use the brand theme again</button>` : ""}
+          <div id="b-ds-checks"></div></details>
         <div class="panel"><h3>Add a block</h3><p class="muted small">Brand blocks cut from approved emails. Added ${B.sel != null ? "after the selected block" : "above the footer"}.</p>
           ${d.library.filter((l) => !l.context || (l.context === "checkout" && f && f.trigger_type === "checkout_abandoned")).map((l) => `<button type="button" class="lib-item" data-lib="${esc(l.id)}"><b>${esc(l.name)}</b><span class="muted small">${esc(l.meta.summary.slice(0, 60))}</span></button>`).join("")}</div>
         <div class="panel"><h3>Send a test</h3><input id="b-test-to" type="email" placeholder="you@evolutiongolf.co.uk" style="width:100%">
@@ -107,7 +119,7 @@ function drawCanvas() {
   c.style.maxWidth = B.width + "px";
   if (B.mode !== "edit") {
     c.innerHTML = `<iframe id="b-frame" title="Preview" sandbox="" style="width:${B.width}px;height:1400px;border:0;background:#fff"></iframe>`;
-    previewInto($("#b-frame"), B.previewN != null ? { n: B.previewN } : { html: B.blocks.map(blockHtml).join("") });
+    previewInto($("#b-frame"), B.previewN != null ? { n: B.previewN } : { html: B.blocks.map(blockHtml).join(""), overrides: B.overrides });
     return;
   }
   c.innerHTML = B.blocks.map((b, i) => {
@@ -135,6 +147,15 @@ document.addEventListener("input", (e) => {
   if (t.id === "b-preview") { B.preview = t.value; markDirty(); }
   if (t.id === "b-from") { B.from = t.value; markDirty(); }
 });
+document.addEventListener("change", (e) => {
+  if (state.page !== "edit" || !e.target.closest('[data-ds-scope="email"]')) return;
+  bSetTheme(dsRead(e.target.closest(".ds-controls"), B.theme));
+});
+function bSetTheme(t) {
+  B.overrides = dsDiff(t, B.doc.design.brand); bTheme(); B.dirty = true; drawBuilder();
+  api("/api/design/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ theme: B.theme }) })
+    .then((c) => { const el = $("#b-ds-checks"); if (el) el.innerHTML = dsChecksHtml(c); }).catch(() => {});
+}
 document.addEventListener("keydown", (e) => { if (state.page === "edit" && e.target.classList && e.target.classList.contains("edt") && e.key === "Enter") e.preventDefault(); });
 document.addEventListener("paste", (e) => {  // plain text only, so no markup sneaks in
   if (state.page !== "edit" || !(e.target.classList && e.target.classList.contains("edt"))) return;
@@ -155,6 +176,9 @@ document.addEventListener("click", async (e) => {
     }
     return;
   }
+  const rs = e.target.closest("[data-ds-reset]");
+  if (rs && rs.closest('[data-ds-scope="email"]')) { bSetTheme(dsReset(B.theme, B.doc.design.brand, rs.dataset.dsReset)); return; }
+  if (e.target.id === "b-ds-brand") { bSetTheme(JSON.parse(JSON.stringify(B.doc.design.brand))); return; }
   const blk = e.target.closest(".bblock");
   const op = e.target.closest("[data-bop]");
   if (op) {
@@ -184,7 +208,7 @@ document.addEventListener("click", async (e) => {
     const btn = e.target; btn.disabled = true; btn.textContent = "Saving…";
     try {
       await api(`/api/builder/${encodeURIComponent(B.key)}/save`, { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: textToSubj(B.subject), preview_text: B.preview, from_name: B.from, blocks: B.blocks.map((b) => ({ src: b.src, html: blockHtml(b) })) }) });
+        body: JSON.stringify({ subject: textToSubj(B.subject), preview_text: B.preview, from_name: B.from, overrides: B.overrides, blocks: B.blocks.map((b) => ({ src: b.src, html: blockHtml(b) })) }) });
       await loadBuilder(B.key); drawBuilder();
     } catch (err) { alertInline(btn, err.message); btn.textContent = "Save draft"; }
     return;

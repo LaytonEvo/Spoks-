@@ -12,7 +12,7 @@ import json
 import re
 import threading
 
-from . import config, evoflows
+from . import config, design, evoflows
 
 STORE = config.DATA_DIR / "builder"
 OUT = evoflows.OUT
@@ -22,7 +22,7 @@ TOK = re.compile(r"\{\{.*?\}\}", re.S)
 SPLIT = re.compile(r"(<table\b|</table>|</tr>|\{\{-?\s*(?:if|range|with)\b.*?\}\}|\{\{-?\s*end\s*-?\}\})", re.S)
 SEG = re.compile(r"(<[^>]+>|\{\{.*?\}\})", re.S)
 BUTTON_SIG = "display:inline-block;padding:15px 30px"
-PANEL_SIG = 'bgcolor="#F1F3F1"'
+PANEL_SIG = 'bgcolor="[[c:stone]]"'  # emails are stored tokenised (see design.py)
 IMG_SRC = re.compile(r'<img[^>]+src="([^"]*)"', re.I)
 CODE_RE = re.compile(r"coupon_code|discount_code|/discount/|\bcode\s+[A-Z0-9]{4,}\b")
 URGENCY_RE = re.compile(r"ends tonight|expires? (in|tomorrow|today|soon)|last chance|only \d+ (left|hours)|hurry|don't miss out", re.I)
@@ -285,10 +285,27 @@ def adopt_variant(key, vkey, who):
         rec = _load(key)
         n = max([v["n"] for v in rec["versions"]] + [0]) + 1
         rec["versions"].append({"n": n, "status": "approved", "subject": b["subject"], "preview_text": b["preview_text"], "from_name": b["from_name"],
-                                "html": b["html"], "by": who, "at": _now(), "note": f"A/B test winner (from {vkey})",
+                                "html_t": b["html_t"], "overrides": b["overrides"], "html": b["html"], "by": who, "at": _now(), "note": f"A/B test winner (from {vkey})",
                                 "approved_by": who, "approved_at": _now()})
         _save(key, rec)
     return publish(key, n, who)
+
+
+def _ht(v):
+    return v.get("html_t") or design.tokenize(v["html"])
+
+
+def _theme(v):
+    return design.merge(design.brand(), v.get("overrides") or {})
+
+
+def _final(v):
+    """The email as customers get it: tokens filled from the brand theme plus this version's own overrides."""
+    return design.render(_ht(v), _theme(v))
+
+
+def all_keys():
+    return sorted(set(evoflows.manifest()["templates"]) | set(variants()))
 
 
 def base(key):
@@ -297,9 +314,10 @@ def base(key):
         p = live(parent)
         return {**p, "n": 0, "status": "approved build", "name": f"{p['name']} (test version B)", "by": "copy of the live email", "at": None}
     body = json.loads((OUT / "templates" / f"{key}.json").read_text())
+    ht = design.tokenize(body["html"])
     return {"n": 0, "status": "approved build", "subject": body["subject"], "preview_text": body["preview_text"],
-            "from_name": body.get("from_name") or SENDERS[0], "name": body.get("name", key), "html": body["html"],
-            "by": "approved build (repo)", "at": None}
+            "from_name": body.get("from_name") or SENDERS[0], "name": body.get("name", key), "html_t": ht, "overrides": {},
+            "html": design.render(ht, design.brand()), "by": "approved build (repo)", "at": None}
 
 
 def live(key):
@@ -307,7 +325,8 @@ def live(key):
     rec = _load(key)
     if rec.get("published"):
         v = next(x for x in rec["versions"] if x["n"] == rec["published"])
-        return {**base(key), **{k: v[k] for k in ("n", "subject", "preview_text", "from_name", "html", "by", "at")}, "status": "published"}
+        return {**base(key), **{k: v[k] for k in ("n", "subject", "preview_text", "from_name", "by", "at")}, "status": "published",
+                "html_t": _ht(v), "overrides": v.get("overrides") or {}, "html": _final(v)}
     return base(key)
 
 
@@ -327,7 +346,7 @@ def library():
     out = []
     for name, key, needle, context in picks:
         try:
-            _, blocks, _ = split(base(key)["html"])
+            _, blocks, _ = split(base(key)["html_t"])
         except Exception:
             continue
         b = next((x for x in blocks if needle in htmllib.unescape(re.sub(r"<[^>]+>", " ", x))), None)
@@ -341,15 +360,21 @@ def doc(key):
     cur = live(key)
     latest = rec["versions"][-1] if rec["versions"] else None
     start = latest if latest and latest["status"] in ("draft", "approved") else cur
-    head, blocks, tail = split(start["html"])
+    head, blocks, tail = split(_ht(start))
+    br = design.brand()
+    opts = design.theme_doc()["options"]
     return {"key": key, "name": cur["name"], "senders": SENDERS, "published_n": rec.get("published"),
+            "design": {"brand": br, "overrides": start.get("overrides") or {}, "options": opts,
+                       "stacks": {"head": {k: v[1] for k, v in design.FONTS["head"].items()}, "body": {k: v[1] for k, v in design.FONTS["body"].items()},
+                                  "h1": design.H1, "radius": design.RADIUS, "fixed": design.FIXED,
+                                  "families": {k: v[0] for k, v in {**design.FONTS["head"], **design.FONTS["body"]}.items()}}},
             "editing": {"n": start["n"], "status": start["status"], "subject": start["subject"], "preview_text": start["preview_text"],
                         "from_name": start["from_name"],
                         "blocks": [{"src": f"v{start['n']}:{i}", "html": b, "meta": block_meta(b), "segments": segments(b)} for i, b in enumerate(blocks)]},
             "versions": [{k: v.get(k) for k in ("n", "status", "subject", "by", "at", "note", "approved_by", "approved_at", "published_by", "published_at")}
                          for v in rec["versions"]][::-1],
             "library": [{**x, "segments": segments(x["html"])} for x in library()],
-            "checks": checks(start["html"], start["subject"])}
+            "checks": checks(_final(start), start["subject"])}
 
 
 def _source_block(key, src):
@@ -364,7 +389,7 @@ def _source_block(key, src):
     v = base(key) if n == 0 else next((x for x in _load(key)["versions"] if x["n"] == n), None)
     if not v:
         return None
-    _, blocks, _ = split(v["html"])
+    _, blocks, _ = split(_ht(v))
     return blocks[i] if i < len(blocks) else None
 
 
@@ -386,10 +411,11 @@ def checks(html, subject):
         errors.append("Looks like a discount code: codes aren't allowed in flows.")
     if URGENCY_RE.search(text):
         errors.append("Deadline or urgency wording: only allowed with a real expiry (DMCC Act).")
+    ht = design.tokenize(html)
+    if ht.count(PANEL_SIG) > 1:
+        warnings.append(f"{ht.count(PANEL_SIG)} stone panels: the design allows at most one.")
     if html.count(BUTTON_SIG) > 1:
         warnings.append(f"{html.count(BUTTON_SIG)} buttons: the design allows one primary button per email.")
-    if html.count(PANEL_SIG) > 1:
-        warnings.append(f"{html.count(PANEL_SIG)} stone panels: the design allows at most one.")
     return {"errors": errors, "warnings": warnings}
 
 
@@ -418,8 +444,11 @@ def save(key, body, who):
                     raise ValueError("A swapped image needs alt text.")
     from_name = body.get("from_name") if body.get("from_name") in SENDERS else live(key)["from_name"]
     cur = live(key)
-    head, _, tail = split(cur["html"])
-    html = head + "".join(b["html"] for b in blocks) + tail
+    head, _, tail = split(cur["html_t"])
+    html_t = head + "".join(b["html"] for b in blocks) + tail
+    br = design.brand()
+    overrides = design.diff(design.merge(br, body.get("overrides") or {}), br)  # only what differs from the brand theme
+    html = design.render(html_t, design.merge(br, overrides))
     subject = str(body.get("subject", "")).strip()[:200]
     preview = str(body.get("preview_text", "")).strip()[:250]
     if tokens(subject) and not set(tokens(subject)) <= set(tokens(cur["subject"])):
@@ -431,7 +460,8 @@ def save(key, body, who):
             if v["status"] in ("draft", "approved"):
                 v["status"] = "replaced"
         rec["versions"].append({"n": n, "status": "draft", "subject": subject, "preview_text": preview, "from_name": from_name,
-                                "html": html, "by": who, "at": _now(), "note": str(body.get("note", ""))[:300]})
+                                "html_t": html_t, "overrides": overrides, "html": html, "by": who, "at": _now(),
+                                "note": str(body.get("note", ""))[:300]})
         _save(key, rec)
     return {"n": n, "checks": checks(html, subject)}
 
@@ -452,7 +482,7 @@ def approve(key, n, who):
     with _lock:
         rec = _load(key)
         v = _version(rec, n)
-        c = checks(v["html"], v["subject"])
+        c = checks(_final(v), v["subject"])
         if c["errors"]:
             raise ValueError("Fix these first: " + " ".join(c["errors"]))
         if v["status"] not in ("draft", "superseded", "replaced"):
@@ -471,6 +501,7 @@ def publish(key, n, who):
             raise ValueError("Approve this version first.")
         if v["status"] == "superseded" and not v.get("approved_by"):
             raise ValueError("Approve this version first.")
+        v["html"] = _final(v)
         body = {"name": base(key)["name"], "subject": v["subject"], "preview_text": v["preview_text"], "html": v["html"], "from_name": v["from_name"]}
         status, res = evoflows._call("PUT", f"/templates/{key}", body)
         if status >= 400:
@@ -510,7 +541,7 @@ def test(key, n, to, who):
     v = base(key) if n == 0 else _version(rec, n)
     tkey = f"draft_{key}"
     st, res = evoflows._call("PUT", f"/templates/{tkey}", {"name": f"DRAFT {base(key)['name']}", "subject": v["subject"],
-                                                          "preview_text": v["preview_text"], "html": v["html"], "from_name": v["from_name"]})
+                                                          "preview_text": v["preview_text"], "html": _final(v), "from_name": v["from_name"]})
     if st >= 400:
         raise ValueError(f"Evoflows refused the draft ({st}): {json.dumps(res)[:200]}")
     st, res = evoflows._call("POST", f"/templates/{tkey}/test", {"to": to, "sample": evoflows.sample_for(key)})
@@ -518,9 +549,26 @@ def test(key, n, to, who):
     return {"status": st, "response": res}
 
 
-def preview(key, n=None, audience="non", html=None, subject=None):
-    if html is None:
+def preview(key, n=None, audience="non", html_t=None, overrides=None, theme=None):
+    """html_t: tokenised blocks from the editor (with head/tail); theme: a whole theme (brand theme drafts)."""
+    if html_t is None:
         rec = _load(key)
         v = live(key) if n is None else (base(key) if n == 0 else _version(rec, n))
-        html = v["html"]
-    return render(html, sample(audience))
+        html_t, overrides = _ht(v), v.get("overrides") if overrides is None else overrides
+    th = design.merge(theme if theme is not None else design.brand(), overrides or {})
+    return render(design.render(html_t, th), sample(audience))
+
+
+def republish_for_theme(key, who, note):
+    """After a brand theme change: re-publish what customers get, re-rendered with the new theme (their own overrides kept)."""
+    cur = live(key)
+    with _lock:
+        rec = _load(key)
+        n = max([v["n"] for v in rec["versions"]] + [0]) + 1
+        v = {"n": n, "status": "approved", "subject": cur["subject"], "preview_text": cur["preview_text"], "from_name": cur["from_name"],
+             "html_t": cur["html_t"], "overrides": cur.get("overrides") or {}, "by": who, "at": _now(), "note": note,
+             "approved_by": who, "approved_at": _now()}
+        v["html"] = _final(v)
+        rec["versions"].append(v)
+        _save(key, rec)
+    return publish(key, n, who)

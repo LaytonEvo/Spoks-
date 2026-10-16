@@ -476,3 +476,17 @@ svg.vz { display: block; margin: 0 auto; font-family: Inter, Arial, sans-serif; 
 .vz-end.lit rect { fill: #0F3B2A; stroke: #0F3B2A; } .vz-end.lit text { fill: #fff; }
 #vz-dot { fill: #2BB673; stroke: #fff; stroke-width: 2.5; }
 @media (prefers-reduced-motion: reduce) { .vz-edge.flow { animation: none; stroke-dasharray: none; } .vz-email.now rect { animation: none; } }
+/* design controls (brand theme page + editor Design panel) */
+.ds-wrap { display: grid; grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1000px) { .ds-wrap { grid-template-columns: 1fr; } }
+.ds-controls label { display: block; font-size: 13px; color: var(--muted); margin: 0 0 9px; }
+.ds-controls select { width: 100%; padding: 6px 8px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; background: #fff; color: var(--ink); }
+.ds-row { display: flex; gap: 8px; align-items: center; margin-top: 3px; }
+.ds-col { display: flex !important; gap: 8px; align-items: center; }
+.ds-col input[type=color] { width: 34px; height: 26px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: #fff; flex: none; }
+.ds-col span { flex: 1; }
+.ds-sub { font-weight: 600; margin: 12px 0 6px; font-size: 13px; }
+.ds-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.ds-panel summary { cursor: pointer; list-style: none; }
+.link-btn.small { font-size: 12px; }
+#th-key { padding: 6px 8px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; background: #fff; max-width: 320px; }

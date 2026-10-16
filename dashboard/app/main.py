@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import abtest, builder, config, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, builder, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -95,7 +95,7 @@ def index(user=Depends(auth)):
     old copy in the browser's cache."""
     import hashlib
     html = (STATIC / "index.html").read_text()
-    for name in ("app.css", "app.js", "pages.js", "sim.js", "simviz.js", "builder.js", "media.js", "abtests.js"):
+    for name in ("app.css", "app.js", "pages.js", "sim.js", "simviz.js", "design.js", "builder.js", "media.js", "abtests.js"):
         v = hashlib.sha1((STATIC / name).read_bytes()).hexdigest()[:10]
         html = html.replace(f'"/static/{name}"', f'"/static/{name}?v={v}"')
     return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
@@ -511,9 +511,9 @@ async def builder_preview(key: str, request: Request, user=Depends(auth)):
     _tpl_key(key)
     html = body.get("html")
     if html is not None:
-        head, _, tail = builder.split(builder.live(key)["html"])
+        head, _, tail = builder.split(builder.live(key)["html_t"])
         html = head + html + tail
-    out = _b(builder.preview, key, body.get("n"), body.get("audience", "non"), html)
+    out = _b(builder.preview, key, body.get("n"), body.get("audience", "non"), html, body.get("overrides"))
     return HTMLResponse(out, headers={"Content-Security-Policy": "script-src 'none'"})
 
 
@@ -578,3 +578,45 @@ async def api_abtest_action(tid: str, action: str, request: Request, user=Depend
         raise HTTPException(404)
     threading.Thread(target=evosnap.build, daemon=True).start()
     return res
+
+
+# ---------- brand theme (design system) ----------
+@app.get("/api/design")
+def api_design(user=Depends(auth)):
+    d = design.theme_doc()
+    br = design.brand()
+    d["emails"] = [{"key": k, "name": builder.live(k)["name"], "overrides": builder.live(k).get("overrides") or {}} for k in builder.all_keys()]
+    d["stacks"] = {"head": {k: v[1] for k, v in design.FONTS["head"].items()}, "body": {k: v[1] for k, v in design.FONTS["body"].items()},
+                   "families": {k: v[0] for k, v in {**design.FONTS["head"], **design.FONTS["body"]}.items()}}
+    return d
+
+
+@app.post("/api/design/save")
+async def api_design_save(request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _b(design.save_theme, b.get("theme") or {}, user, str(b.get("note", "")))
+
+
+@app.post("/api/design/check")
+async def api_design_check(request: Request, user=Depends(auth)):
+    return design.checks((await request.json()).get("theme") or {})
+
+
+@app.post("/api/design/approve/{n}")
+def api_design_approve(n: int, user=Depends(auth)):
+    return _b(design.approve_theme, n, user)
+
+
+@app.post("/api/design/publish/{n}")
+def api_design_publish(n: int, user=Depends(auth)):
+    res = _b(design.publish_theme, n, user)
+    threading.Thread(target=evosnap.build, daemon=True).start()
+    return res
+
+
+@app.post("/design/preview", response_class=HTMLResponse)
+async def design_preview(request: Request, user=Depends(auth)):
+    b = await request.json()
+    key = _tpl_key(str(b.get("key", "")))
+    out = _b(builder.preview, key, None, b.get("audience", "non"), None, None, design.merge(design.DEFAULT, b.get("theme") or {}))
+    return HTMLResponse(out, headers={"Content-Security-Policy": "script-src 'none'"})

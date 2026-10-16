@@ -345,3 +345,14 @@
   - The validator accepts the split. Luke is asked to confirm string comparison and stable uuids (requirements item 18)
     before any live test.
 - Requirements doc items 18–20 added: the A/B split, live template edits, and the image upload key.
+
+## 16 Oct 2026 — Design system foundation (brand theme + per-email design)
+
+- Emails are now stored "tokenised" (`dashboard/app/design.py`): colours, fonts, headline size and button corners are named
+  tokens filled from a **brand theme**. With the original theme all 29 emails render byte-identical to the approved builds (checked).
+- New **Brand theme** page: headline/body fonts (email-safe Google Fonts with Georgia/Arial backups), headline size, button
+  corners, the eight brand colours, contrast checks (WCAG 4.5:1), preview of any email as each audience, versions
+  (save → approve → publish). Publishing re-publishes every email to Evoflows in the new look (0.25s apart).
+- Email editor gains a **Design** panel: per-email overrides that win over the theme, shown in the canvas and preview,
+  with "reset" per setting and "Use the brand theme again". Overrides are stored as the difference from the brand.
+- Nothing published or pushed by this change; the theme is still the original brand.
