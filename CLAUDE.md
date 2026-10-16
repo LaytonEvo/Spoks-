@@ -3,6 +3,8 @@
 > **Current route (12 Oct 2026): every `EG ·` flow moves to Evoflows** (self-hosted engine, `klaviyo/evoflows.py`,
 > contract `docs/source/FLOW_API.md`). None of the flows we built will run on Klaviyo; the Klaviyo `EG ·` drafts stay off
 > (Layton deletes them when he chooses). Never call Evoflows `enable`: Luke switches flows on. Earlier route: Klaviyo drafts (29 Sep).
+> Emails can be edited in the dashboard's builder (draft -> approve -> publish, stored on the app volume). `evoflows.py push
+> templates` skips any email changed on Evoflows since its last push; never use `--force` without Layton's say-so.
 > Spoks was tested and parked (see `docs/00-spoks-capabilities.md` and the decision PDF). Read `docs/HANDOFF.md` first.
 
 Source brief: `docs/source/CLAUDE_CODE_PROMPT_spoks_flow_build.md` (Layton). Source of truth for flow logic and copy:

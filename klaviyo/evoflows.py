@@ -11,6 +11,7 @@ Build: python3 klaviyo/evoflows.py            (after build_f3.py)
 Push:  EVOFLOWS_TOKEN=... python3 klaviyo/evoflows.py push [flags|templates|validate|flow|all] [flow key]
        Never enables a flow: Luke runs the staff seed test and enables it himself. The token is never written to disk.
 """
+import hashlib
 import json
 import os
 import pathlib
@@ -423,10 +424,25 @@ def push(what, only=None):
     if what in ("flags", "all"):
         print("PUT /flags", call("PUT", "/flags", json.loads((OUT / "flags.json").read_text())))
     if what in ("templates", "all"):
+        # Emails can be edited and published in the dashboard's builder (saved on the app's volume, not in this repo).
+        # Never overwrite those: skip any template whose live HTML is neither this build nor what this script last pushed.
+        hashes_f = OUT / "pushed_hashes.json"
+        hashes = json.loads(hashes_f.read_text()) if hashes_f.exists() else {}
         for f in sorted((OUT / "templates").glob("*.json")):
             if only and not f.stem.startswith(only.split("_")[0] + "_"):
                 continue
-            print(f"PUT /templates/{f.stem}", call("PUT", f"/templates/{f.stem}", json.loads(f.read_text())))
+            body = json.loads(f.read_text())
+            st, live = call("GET", f"/templates/{f.stem}")
+            # the engine stores links with its tracking token added; ignore that when comparing
+            h = lambda x: hashlib.sha256(re.sub(r"[?&](?:amp;)?\{\{ \.Tx\.Data\.link_qs \}\}", "", x or "").encode()).hexdigest()
+            if st == 200 and live and h(live.get("html")) not in (h(body["html"]), hashes.get(f.stem)) and "--force" not in sys.argv:
+                print(f"SKIP {f.stem}: changed on Evoflows since the last push (edited in the dashboard builder?). Use --force to overwrite.")
+                continue
+            res = call("PUT", f"/templates/{f.stem}", body)
+            print(f"PUT /templates/{f.stem}", res)
+            if res[0] < 400:
+                hashes[f.stem] = h(body["html"])
+        hashes_f.write_text(json.dumps(hashes, indent=1))
     for f in sorted((OUT / "flows").glob("*.json")):
         if only and f.stem != only:
             continue
