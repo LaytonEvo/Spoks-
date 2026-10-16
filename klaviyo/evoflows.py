@@ -167,6 +167,9 @@ def translate(text):
 
 
 # ---------------- templates (F3, F9) ----------------
+PREVIEWS = {}  # template key -> preview HTML (the builders' sample render where there is one, else the template), Shopify images
+
+
 def pack_templates(pack, prefix, skip=()):
     pk = json.loads((ROOT.parent / "dashboard/app/drafts" / f"{pack}.json").read_text())
     out = {}
@@ -174,6 +177,11 @@ def pack_templates(pack, prefix, skip=()):
         if t["key"] in skip:
             continue
         html = (ROOT.parent / "dashboard/app/drafts/html" / t["file"]).read_text()
+        pv = ROOT.parent / "dashboard/app/drafts/html" / (t.get("preview_file") or t["file"])
+        pv_html = pv.read_text() if pv.exists() else html
+        for k, v in IMAGES.items():
+            pv_html = pv_html.replace(k, v)
+        PREVIEWS[f"{prefix}_{t['key']}"] = pv_html
         out[f"{prefix}_{t['key']}"] = {"name": f"{prefix.upper()} {t['name']}", "subject": translate(t["subject"]),
                                        "preview_text": translate(t["preview"]), "html": translate(html),
                                        "from_name": t["sender"]}  # always explicit: "⛳ Evolution Golf" or "Alex at Evolution Golf"
@@ -340,6 +348,25 @@ def _emails(steps):
             yield from _emails(b["steps"])
 
 
+# For the dashboard: which programme flow each Evoflows flow is, the live Klaviyo flows it replaces (switch those off in
+# the same hour it goes on) and where it deviates from the approved Klaviyo version.
+FLOW_META = {
+    "f3_checkout": {"programme": "F3", "pack": "f3-checkout",
+                    "replaces": ["NEW: Abandoned Checkout (category-routed)"],
+                    "deviations": ["Day-2 text on all three paths dropped (no SMS channel)."]},
+    "f9_after_delivery": {"programme": "F9", "pack": "f9-after-delivery-v3", "replaces": ["NEW: Post-Fulfillment"], "deviations": []},
+    "f1_welcome": {"programme": "F1", "pack": "f1-welcome-v3", "replaces": ["1. SM: Welcome Sequence"],
+                   "deviations": ["Welcome text after Email 1 dropped (no SMS channel).",
+                                  "Everyone gets E2 Everything else: E2 Hardware needs product views (Evoflows phase 2).",
+                                  "Email 1 A/B test dropped (no A/B tests in Evoflows).",
+                                  "Leaves on an order, not yet on starting a checkout (no such field yet)."]},
+    "f2_free": {"programme": "F2", "pack": "f2-free", "replaces": ["FLOW: Welcome - Evolution Free"],
+                "deviations": ["Starts on the portal's membership_changed event (not sent yet), not a Klaviyo segment."]},
+    "f2_annual": {"programme": "F2", "pack": "f2-annual",
+                  "replaces": ["FLOW: Welcome — Club Access Member", "FLOW: Welcome — Evolution Pro", "FLOW: Welcome — Evolution Pro Annual"],
+                  "deviations": ["Starts on the portal's membership_changed event (not sent yet), not a Klaviyo segment."]},
+}
+
 FLOWS = {"f3_checkout": (lambda: pack_templates("f3-checkout", "f3"), lambda: f3_flow()),
          "f9_after_delivery": (lambda: pack_templates("f9-after-delivery-v3", "f9"), lambda: f9_flow()),
          "f1_welcome": (lambda: pack_templates("f1-welcome-v3", "f1", skip=("e2h", "e1b")), lambda: f1_flow()),
@@ -350,8 +377,9 @@ FLOWS = {"f3_checkout": (lambda: pack_templates("f3-checkout", "f3"), lambda: f3
 def build():
     (OUT / "templates").mkdir(parents=True, exist_ok=True)
     (OUT / "flows").mkdir(parents=True, exist_ok=True)
+    (OUT / "previews").mkdir(parents=True, exist_ok=True)
     (OUT / "flags.json").write_text(json.dumps(FLAGS, indent=1))
-    n = 0
+    n, manifest = 0, {"flows": {}, "templates": {}}
     for key, (tpl_fn, flow_fn) in FLOWS.items():
         tpls, flow = tpl_fn(), flow_fn()
         for k, body in tpls.items():
@@ -364,6 +392,14 @@ def build():
         assert len(ids) == len(set(ids)), "duplicate step ids"
         (OUT / "flows" / f"{key}.json").write_text(json.dumps(flow, indent=1, ensure_ascii=False))
         n += len(tpls)
+        pk = json.loads((ROOT.parent / "dashboard/app/drafts" / f"{FLOW_META[key]['pack']}.json").read_text())
+        manifest["flows"][key] = {**FLOW_META[key], "name": flow["name"], "summary": flow["description"], "pack_title": pk["title"],
+                                  "templates": sorted(set(used))}
+        for k, body in tpls.items():
+            manifest["templates"][k] = {"name": body["name"], "subject": body["subject"], "preview_text": body["preview_text"],
+                                        "from_name": body["from_name"]}
+            (OUT / "previews" / f"{k}.html").write_text(PREVIEWS[k])
+    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False))
     print("evoflows: flags", len(FLAGS), "· templates", n, "· flows", len(FLOWS))
 
 

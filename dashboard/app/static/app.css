@@ -64,6 +64,13 @@ main { padding: 24px 28px 64px; min-width: 0; outline: none; }
 .pill.live { background: var(--good-bg); color: var(--good); }
 .pill.manual { background: var(--med-bg); color: var(--med); }
 .pill.draft { background: var(--info-bg); color: var(--info); }
+.pill.off, .pill.not_pushed { background: #F1EFEA; color: var(--muted); }
+.plat { display: inline-block; padding: 1px 6px; border-radius: 4px; font: 600 10px/16px var(--body); letter-spacing: .04em; text-transform: uppercase; vertical-align: 1px; }
+.plat.evo { background: var(--green); color: #fff; }
+.plat.kl { background: #F1EFEA; color: var(--muted); }
+.msg-cond { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.note-panel { margin-bottom: 14px; }
+.small { font-size: 12px; }
 .flag { display: flex; gap: 8px; align-items: flex-start; padding: 6px 10px; border-radius: 6px; font-size: 13px; margin: 4px 0; }
 .flag::before { content: ""; flex: 0 0 8px; height: 8px; border-radius: 50%; margin-top: 6px; }
 .flag.high { background: var(--high-bg); } .flag.high::before { background: var(--high); }
@@ -349,3 +356,5 @@ iframe.flowmap { width: 100%; height: calc(100vh - 150px); min-height: 600px; bo
 .photo-where { font-size: 13px; color: var(--muted); }
 .photo-spec { display: grid; grid-template-columns: 70px 1fr; gap: 4px 10px; margin: 8px 0 0; font-size: 13px; }
 .photo-spec dt { font-weight: 600; } .photo-spec dd { margin: 0; }
+
+.flow-head h1 .stat { font: 600 12px/18px var(--body); vertical-align: middle; }

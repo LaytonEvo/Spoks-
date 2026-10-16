@@ -27,6 +27,8 @@ def _messages(steps):
 
 
 def _weekly(flow, key):
+    if flow.get("weekly"):  # Evoflows: weekly figures are per flow
+        return (flow["weekly"].get(key) or [])[:] or None
     out = None
     for m in _messages(flow["steps"]):
         vals = (m.get("weekly") or {}).get(key)
@@ -68,7 +70,7 @@ def _highs(snap):
 
 
 def build(snap=None):
-    snap = snap or snapshot.load()
+    snap = snap or snapshot.merged()
     if not snap:
         return None
     weeks = snap.get("weeks") or []
@@ -161,7 +163,8 @@ def to_slack(s, base_url=""):
     if s["actions"]:
         lines.append("\n*Top actions*")
         lines += [f"{n}. {link(x['flow_id'], x['flow'])}{' · ' + x['message'] if x.get('message') else ''}: {x['text']}" for n, x in enumerate(s["actions"], 1)]
-    lines.append("\nRevenue is Klaviyo-attributed from Placed Order. Sends are messages delivered, not unique people.")
+    lines.append("\nRevenue: Evoflows counts orders placed after one of its emails; Klaviyo attributes from Placed Order. "
+                 "Sends are emails delivered, not unique people.")
     return "\n".join(lines)
 
 

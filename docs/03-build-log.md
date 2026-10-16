@@ -281,3 +281,35 @@
   hold their slot.
 - **Open before F3 goes live:** item 1 (Klaviyo unsubscribes/bounces in Listmonk) is still unanswered, and Layton has
   not yet given the go-live hour.
+
+### 16 Oct 2026: dashboard moved onto Evoflows (Layton: keep Klaviyo as legacy, replace and retire the Klaviyo-only pages)
+- **New `dashboard/app/evosnap.py`:**
+  - Reads Evoflows (`/flows`, `/flows/{key}`, `/metrics` by step for 30/90/365 days and by week) plus the approved
+    builds in `app/evoflows_out/`.
+  - Writes `data/evosnap.json` every 15 minutes and on Refresh, in the same shape as the Klaviyo snapshot, so every page
+    works off one list.
+  - Flags: switched on but not sending; differs from the approved build; unsubscribe, bounce and complaint limits; send
+    errors; people entering without consent.
+  - Discount checks flag real codes only, because membership's "5%/10% off" isn't a code.
+- **`snapshot.merged()`:**
+  - Evoflows flows first, then live and manual Klaviyo flows marked "being replaced by …". Klaviyo `EG ·` drafts are hidden.
+  - Evoflows weekly figures are aligned to the dashboard's week axis.
+  - Without a Klaviyo key, the Klaviyo side drops out; it doesn't fall back to test data.
+- **`klaviyo/evoflows.py`** now writes `manifest.json` (programme id, the Klaviyo flows each one replaces, deviations,
+  template meta) and `previews/<key>.html` (sample renders with Shopify images) for the dashboard.
+- **Pages:**
+  - **Overview:** platform tags, Evoflows/Klaviyo filters, opens and clicks shown as n/a for Evoflows.
+  - **Flow pages:** Evoflows KPIs (people entered, sends, orders after an email, revenue, unsubscribe and bounce rates);
+    who enters and who leaves; consent; the switch-off reminder; deviations; a new **People in it** tab (runs, email
+    addresses shortened).
+  - **New flows to approve:** now the Evoflows builds. Check with Evoflows (validate), Approve (push templates + flow,
+    switched off, logged with who), and test every email to a staff address.
+  - **Programme:** status comes from Evoflows.
+  - **Compare:** presets for F1, F2 Free, F3 and F9 against the Klaviyo flows they replace.
+  - **Engine & events:** the old Evoflows page.
+  - Fixes, A/B tests and the flow map are out of the menu; their code is kept.
+- **Monday summary and reviews** read the merged list. The review prompt knows Evoflows has no opens or clicks yet.
+- Tested locally against the live engine with Klaviyo test data:
+  - every page loads without script errors;
+  - validate returns ok for F9;
+  - the 5 flows show "switched off · v1", matching the approved builds.

@@ -128,6 +128,49 @@ def push(what, who):
     return [{"call": c, "status": s, "response": r} for c, s, r in results]
 
 
+def manifest():
+    try:
+        return json.loads((OUT / "manifest.json").read_text())
+    except Exception:
+        return {"flows": {}, "templates": {}}
+
+
+def validate_flow(key):
+    body = _out(f"flows/{key}.json")
+    status, res = _call("POST", f"/flows/{key}/validate", body)
+    ok = status < 400 and bool((res or {}).get("valid")) and not (res or {}).get("problems")
+    missing = [w for w in (res or {}).get("warnings", []) if "template_missing" in str(w)]
+    return {"ok": ok, "status": status, "response": res, "templates_missing": len(missing)}
+
+
+def push_flow(key, who):
+    """Approve one built flow: push its templates, validate, then push the flow definition. It lands SWITCHED OFF
+    (the engine never enables on PUT, and `enabled` is stripped). Stops at the first failure. Logged with who approved."""
+    m = manifest()["flows"].get(key)
+    if not m:
+        raise EvoflowsError("Not a built flow")
+    results = []
+    for t in m["templates"]:
+        st, res = _call("PUT", f"/templates/{t}", _out(f"templates/{t}.json"))
+        results.append({"call": f"PUT /templates/{t}", "status": st, "response": res})
+        if st >= 400:
+            break
+    else:
+        v = validate_flow(key)
+        results.append({"call": f"POST /flows/{key}/validate", "status": v["status"], "response": v["response"]})
+        if v["ok"] and not v["templates_missing"]:
+            body = _out(f"flows/{key}.json")
+            body.pop("enabled", None)  # never switch on from here
+            st, res = _call("PUT", f"/flows/{key}", body)
+            results.append({"call": f"PUT /flows/{key}", "status": st, "response": res})
+    ok = all(r["status"] < 400 for r in results) and results[-1]["call"].startswith("PUT /flows/")
+    _log({"at": _now(), "by": who, "push": f"approve {key}", "ok": ok,
+          "results": [{"call": r["call"], "status": r["status"]} for r in results]})
+    with _lock:
+        _cache.clear()
+    return {"ok": ok, "results": results}
+
+
 def register_webhook(url, who):
     status, res = _call("PUT", "/webhooks", {"url": url, "events": ["*"]})
     if status < 400 and res and res.get("secret"):
@@ -210,11 +253,20 @@ def preview(key, sample="checkout"):
     return _call("POST", f"/templates/{key}/preview", {"sample": sample})
 
 
-def test_send(key, to, who, sample="checkout"):
+def sample_for(key):
+    """Evoflows' sample data: an order for after-purchase emails, otherwise a checkout basket."""
+    for f, meta in manifest()["flows"].items():
+        if key in meta["templates"]:
+            trig = (_out(f"flows/{f}.json").get("trigger") or {}).get("type", "")
+            return "order" if trig.startswith("order_") else "checkout"
+    return "checkout"
+
+
+def test_send(key, to, who, sample=None):
     """Real render to a staff inbox (Evoflows only allows @evolutiongolf.co.uk). Logged with who asked."""
     if not to.lower().endswith("@evolutiongolf.co.uk"):
         raise EvoflowsError("Test sends go to @evolutiongolf.co.uk addresses only.")
-    status, res = _call("POST", f"/templates/{key}/test", {"to": to, "sample": sample})
+    status, res = _call("POST", f"/templates/{key}/test", {"to": to, "sample": sample or sample_for(key)})
     _log({"at": _now(), "by": who, "push": f"test {key} → {to}", "status": status})
     return status, res
 

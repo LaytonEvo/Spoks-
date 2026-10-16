@@ -1,4 +1,4 @@
-"""Evolution Golf flow dashboard: a read-only view of Klaviyo flows, performance and reviews."""
+"""Evolution Golf flow dashboard: our flows on Evoflows (the new engine), the Klaviyo flows they're replacing, reviews."""
 import datetime as dt
 from contextlib import asynccontextmanager
 import json
@@ -12,12 +12,12 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import config, digest, drafts, evoflows, fixes, review, snapshot
+from . import config, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
 NOTES = config.DATA_DIR / "notes"
-ID_RE = re.compile(r"^[A-Za-z0-9]{4,12}$")
+ID_RE = re.compile(r"^[A-Za-z0-9_]{4,40}$")  # Klaviyo ids (6 chars) and Evoflows keys (f3_checkout, f9_e1h)
 FIX_RE = re.compile(r"^[A-Za-z0-9-]{4,80}$")
 
 
@@ -46,6 +46,8 @@ def _check_id(value):
 def _refresh_in_background():
     if not snapshot.status["running"]:
         threading.Thread(target=snapshot.build, daemon=True).start()
+    if not evosnap.status["running"]:
+        threading.Thread(target=evosnap.build, daemon=True).start()
 
 
 def _auto_refresh():
@@ -75,6 +77,7 @@ def _auto_refresh():
 @asynccontextmanager
 async def lifespan(_app):
     threading.Thread(target=_auto_refresh, daemon=True).start()
+    threading.Thread(target=evosnap.loop, daemon=True).start()
     yield
 
 
@@ -97,16 +100,19 @@ app.mount("/static", StaticFiles(directory=STATIC), name="static")
 @app.get("/api/status")
 def api_status(user=Depends(auth)):
     snap = snapshot.load()
+    evo = evosnap.load()
     return {**snapshot.status, "source": "fixtures" if config.USE_FIXTURES else "klaviyo",
             "generated_at": snap["generated_at"] if snap else None,
-            "reviews_enabled": bool(config.ANTHROPIC_API_KEY), "slack_enabled": bool(config.SLACK_WEBHOOK_URL),
+            "evoflows": {"enabled": evoflows.enabled(), **evosnap.status, "generated_at": evo["generated_at"] if evo else None,
+                         "admin_url": config.EVOFLOWS_BASE.replace("/api/v1", "/admin")},
+            "show_klaviyo": config.SHOW_KLAVIYO, "reviews_enabled": bool(config.ANTHROPIC_API_KEY), "slack_enabled": bool(config.SLACK_WEBHOOK_URL),
             "writes_enabled": bool(config.KLAVIYO_WRITE_KEY), "user": user}
 
 
 @app.get("/api/snapshot")
 def api_snapshot(user=Depends(auth)):
-    snap = snapshot.load()
-    if not snap:
+    snap = snapshot.merged()
+    if not snap["flows"]:
         return JSONResponse({"flows": [], "timeframes": [], "generated_at": None})
     def strip(o):  # plain-text copies of emails are only for reviews
         if isinstance(o, dict):
@@ -125,7 +131,10 @@ def api_refresh(user=Depends(auth)):
 
 @app.get("/render/{message_id}", response_class=HTMLResponse)
 def render(message_id: str, user=Depends(auth)):
-    p = snapshot.RENDERS / f"{_check_id(message_id)}.html"
+    evo = evoflows.OUT / "previews" / f"{_check_id(message_id)}.html"
+    if evo.exists():  # Evoflows templates: the approved build's preview (sample basket, the name "Sam")
+        return HTMLResponse(snapshot.fill_tags(evo.read_text()), headers={"Content-Security-Policy": "script-src 'none'"})
+    p = snapshot.RENDERS / f"{message_id}.html"
     if not p.exists():
         return HTMLResponse("<p style='font:14px system-ui;color:#555;padding:24px'>No preview yet. "
                             "It appears after the next refresh from Klaviyo.</p>")
@@ -133,7 +142,7 @@ def render(message_id: str, user=Depends(auth)):
 
 
 def _find_flow(flow_id):
-    snap = snapshot.load() or {"flows": []}
+    snap = snapshot.merged()
     for f in snap["flows"]:
         if f["id"] == flow_id:
             return f
@@ -390,6 +399,40 @@ def evoflows_preview(key: str, user=Depends(auth)):
     if status >= 400 or not html:
         return HTMLResponse(f"<pre>{status} {json.dumps(res)[:2000]}</pre>", status_code=502)
     return HTMLResponse(html, headers={"Content-Security-Policy": "script-src 'none'"})
+
+
+@app.get("/api/evoflows/builds")
+def api_evoflows_builds(user=Depends(auth)):
+    """The approved builds (app/evoflows_out) with where each stands on the engine, for New flows to approve."""
+    man = evoflows.manifest()
+    evo = {f["id"]: f for f in (snapshot.merged()["flows"]) if f.get("platform") == "evoflows"}
+    log = evoflows.push_log()
+    out = []
+    for key, meta in man["flows"].items():
+        f = evo.get(key) or {}
+        last = next((l for l in log if l.get("push") == f"approve {key}"), None)
+        out.append({"key": key, **meta, "status": f.get("status", "unknown"), "version": f.get("version"),
+                    "differs": f.get("differs", False), "trigger": f.get("trigger"), "flow_filter": f.get("flow_filter"),
+                    "exit": f.get("exit"), "reentry_text": f.get("reentry_text"), "consent": f.get("consent"),
+                    "steps": f.get("steps", []), "last_push": last})
+    return {"enabled": evoflows.enabled(), "builds": out, "user": user}
+
+
+@app.post("/api/evoflows/validate/{key}")
+def api_evoflows_validate(key: str, user=Depends(auth)):
+    if key not in evoflows.manifest()["flows"]:
+        raise HTTPException(404)
+    return _evo(evoflows.validate_flow, key)
+
+
+@app.post("/api/evoflows/approve/{key}")
+def api_evoflows_approve(key: str, user=Depends(auth)):
+    """Approve a build: push its templates and flow to Evoflows, switched off. Never enables."""
+    if key not in evoflows.manifest()["flows"]:
+        raise HTTPException(404)
+    res = _evo(evoflows.push_flow, key, user)
+    threading.Thread(target=evosnap.build, daemon=True).start()
+    return res
 
 
 @app.post("/api/evoflows/test/{key}")

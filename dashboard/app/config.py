@@ -30,7 +30,11 @@ DASHBOARD_USERS = dict(pair.split(":", 1) for pair in os.getenv("DASHBOARD_USERS
 DATA_DIR = pathlib.Path(os.getenv("DATA_DIR", BASE_DIR / "data"))
 
 # Use saved test data instead of calling Klaviyo (development, or before a key is set).
-USE_FIXTURES = os.getenv("USE_FIXTURES", "").lower() in ("1", "true", "yes") or not KLAVIYO_API_KEY
+FIXTURES_ASKED = os.getenv("USE_FIXTURES", "").lower() in ("1", "true", "yes")
+USE_FIXTURES = FIXTURES_ASKED or not KLAVIYO_API_KEY
+# Klaviyo flows are shown (as the flows being replaced) only with a real key, or when test data is asked for explicitly.
+# Once Klaviyo is switched off, remove KLAVIYO_API_KEY and the dashboard runs on Evoflows alone.
+SHOW_KLAVIYO = bool(KLAVIYO_API_KEY) or FIXTURES_ASKED
 FIXTURE_DIR = pathlib.Path(os.getenv("FIXTURE_DIR", BASE_DIR / "fixtures"))
 
 # Drafts are shown only when their name starts with one of these prefixes (new EG builds).

@@ -23,7 +23,8 @@ function sumWeekly(msgs, channel) {
   }
   return Object.keys(out).length ? out : null;
 }
-const flowWeekly = (f, channel) => sumWeekly([...messages(f.steps)], channel);
+// Evoflows reports weekly figures per flow (f.weekly); Klaviyo per message.
+const flowWeekly = (f, channel) => (f.weekly && !channel ? f.weekly : sumWeekly([...messages(f.steps)], channel));
 const sumRange = (arr, a, b) => { let s = 0; for (let i = Math.max(a, 0); i <= b; i += 1) s += (arr && arr[i]) || 0; return s; };
 function change(cur, prev) {
   if (!prev) return cur ? { pct: null, label: "new" } : { pct: null, label: "–" };
@@ -111,6 +112,7 @@ document.addEventListener("mousemove", (e) => {
 // ---------- flow page trend panel ----------
 function flowTrendPanel(f) {
   const w = flowWeekly(f), weeks = state.snap.weeks || [];
+  if (isEvo(f) && !(w && w.recipients.some((v) => v))) return `<p class="muted">Week-by-week figures start with its first send on Evoflows.</p>`;
   if (!w || !weeks.length) return state.snap.source === "klaviyo" && !weeks.length
     ? `<p class="muted">Week-by-week figures appear after the next refresh from Klaviyo.</p>` : "";
   const N = TF_WEEKS[state.tf] || 13, last = weeks.length - 1, from = Math.max(0, weeks.length - 2 * N);
@@ -134,6 +136,7 @@ function messageTrend(m) {
 
 // ---------- flow paths (for comparisons) ----------
 function topPaths(f) {
+  if (isEvo(f)) return [];  // Evoflows weekly figures are per flow, so compare whole flows
   const split = f.steps.find((s) => s.kind === "split");
   if (!split) return [];
   if (split.split_type === "trigger-split") return flattenChain(split);
@@ -143,7 +146,7 @@ function topPaths(f) {
 function compareOptions() {
   const out = [];
   for (const f of state.snap.flows) {
-    out.push({ key: f.id, label: f.name, flow: f, steps: f.steps });
+    out.push({ key: f.id, label: `${f.name}${isEvo(f) ? " (Evoflows)" : " (Klaviyo)"}`, flow: f, steps: f.steps, weekly: f.weekly });
     for (const p of topPaths(f)) out.push({ key: `${f.id}:${p.name}`, label: `${f.name} › ${p.name}`, flow: f, steps: p.steps, path: p.name });
   }
   return out;
@@ -152,8 +155,8 @@ const norm = (s) => String(s || "").toLowerCase().replace(/[\s—–-]+/g, " ").
 function findOption(opts, spec) {
   return opts.find((o) => norm(o.flow.name) === norm(spec.flow) && (spec.path ? norm(o.path) === norm(spec.path) : !o.path));
 }
-function stats(msgs, a, b) {
-  const all = sumWeekly(msgs), em = sumWeekly(msgs, "email");
+function stats(msgs, a, b, weekly) {
+  const all = weekly || sumWeekly(msgs), em = weekly ? null : sumWeekly(msgs, "email");
   if (!all) return null;
   const S = (w, k) => sumRange(w && w[k], a, b);
   const sends = S(all, "recipients"), del = S(all, "delivered"), rev = S(all, "conversion_value");
@@ -178,10 +181,10 @@ async function renderCompare() {
   const sel = (id, cur) => `<select id="${id}">${opts.map((o) => `<option value="${esc(o.key)}" ${o.key === cur ? "selected" : ""}>${esc(o.label)}</option>`).join("")}</select>`;
   let body = "";
   const weeks = state.snap.weeks || [], last = lastWeekIdx();
-  if (!weeks.length || last == null) body = `<p class="muted">Comparisons need week-by-week figures, which arrive with the next refresh from Klaviyo.</p>`;
+  if (!weeks.length || last == null) body = `<p class="muted">Comparisons need week-by-week figures, which arrive with the next refresh.</p>`;
   else if (A && B) {
     const aMsgs = [...messages(A.steps)], bMsgs = [...messages(B.steps)];
-    const aw = sumWeekly(aMsgs), bw = sumWeekly(bMsgs);
+    const aw = A.weekly || sumWeekly(aMsgs), bw = B.weekly || sumWeekly(bMsgs);
     const first = aw ? aw.recipients.findIndex((v) => v > 0) : -1;
     const bBefore = bw && first > 0 ? sumRange(bw.recipients, 0, first - 1) : 0;
     let aRange, bRange, how;
@@ -194,7 +197,7 @@ async function renderCompare() {
       aRange = bRange = [last - N + 1, last];
       how = `Both over the same ${N} full weeks (${weekLabel(weeks[last - N + 1])} to ${weekLabel(weeks[last])}).${first < 0 ? ` <b>${esc(A.label)}</b> hasn't sent anything yet, so this shows the baseline it has to beat.` : ""}`;
     }
-    const sa = stats(aMsgs, ...aRange), sb = stats(bMsgs, ...bRange);
+    const sa = stats(aMsgs, ...aRange, A.weekly), sb = stats(bMsgs, ...bRange, B.weekly);
     const row = (label, k, f, up = true) => {
       const va = sa && sa[k], vb = sb && sb[k];
       return `<tr><td>${label}</td><td>${va == null ? "–" : f(va)}</td><td>${vb == null ? "–" : f(vb)}</td><td>${va != null && vb != null ? chip({ ...change(va, vb), weeks: 13 }, up, "A compared with B") : "–"}</td></tr>`;
@@ -212,7 +215,7 @@ async function renderCompare() {
       <div class="panel" style="margin-top:14px">${lines({ name: "A", color: SERIES.now, values: pick(aw, aRange) }, { name: "B", color: SERIES.before, values: pick(bw, bRange) }, lab, { title: "Revenue per week" })}</div>`;
   }
   $("#main").innerHTML = `<p class="eyebrow">Compare</p><h1>Before and after</h1>
-    <p class="muted" style="max-width:80ch">Pick a new flow or path (A) and the one it replaces (B). Once A has started sending, A's weeks since launch are set against the same number of weeks of B just before launch, so both cover similar conditions.</p>
+    <p class="muted" style="max-width:80ch">Pick a new flow on Evoflows (A) and the Klaviyo flow it replaces (B). Evoflows doesn't track opens or clicks yet, so those rows stay blank for it, and its revenue counts orders after one of its emails. Once A has started sending, A's weeks since launch are set against the same number of weeks of B just before launch, so both cover similar conditions.</p>
     ${presets.length ? `<div class="presets">${presets.map((p) => p.a && p.b ? `<button type="button" class="btn-soft" data-preset="${esc(p.a)}|${esc(p.b)}">${esc(p.label)}</button>` : `<span class="muted">${esc(p.label)}: can't find “${esc(p.missing)}”</span>`).join("")}</div>` : ""}
     <div class="pickers"><label>A (new) ${sel("cmp-a", state.cmp.a)}</label><label>B (old / before) ${sel("cmp-b", state.cmp.b)}</label></div>${body}`;
 }
@@ -228,8 +231,10 @@ async function renderProgramme() {
   const counts = { live: 0, draft: 0, todo: 0, skip: 0 };
   const rows = order.map((id, idx) => {
     const p = byId[id];
-    const built = state.snap.flows.filter((f) => f.name.startsWith(p.match));
-    const st = built.some((f) => f.status === "live") ? ["live", "Live"] : built.length ? ["draft", "Draft in Klaviyo"] : p.not_building ? ["skip", "Not in this build"] : ["todo", "Not started"];
+    const built = state.snap.flows.filter((f) => isEvo(f) && f.programme === p.id);
+    const st = built.some((f) => f.status === "live") ? ["live", built.every((f) => f.status === "live") ? "Live on Evoflows" : "Partly live"]
+      : built.some((f) => f.status === "off") ? ["draft", "On Evoflows, switched off"] : built.length ? ["draft", "Approved, not pushed"]
+      : p.not_building ? ["skip", "Not in this build"] : ["todo", p.waiting || "Not built yet"];
     counts[st[0]] += 1;
     const olds = (p.replaces || []).map((name) => {
       const f = state.snap.flows.find((x) => norm(x.name) === norm(name));
@@ -246,9 +251,9 @@ async function renderProgramme() {
       <div class="prog-body">
         ${p.not_building ? `<p>${esc(p.not_building)}</p>` : ""}${p.gate ? `<p><b>Gate:</b> ${esc(p.gate)}</p>` : ""}${p.note ? `<p class="muted">${esc(p.note)}</p>` : ""}
         ${p.paths ? `<p><b>Paths:</b> ${p.paths.map(esc).join(" · ")}</p>` : ""}
-        ${drafts ? `<h4>In Klaviyo</h4><ul>${drafts}</ul>` : ""}
+        ${drafts ? `<h4>On Evoflows</h4><ul>${drafts}</ul>` : ""}
         ${olds ? `<h4>Replaces</h4><ul>${olds}</ul>` : ""}
-        ${p.todos ? `<h4>To do in Klaviyo</h4><ul>${p.todos.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+        ${p.todos ? `<h4>To do</h4><ul>${p.todos.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
         ${qs.length ? `<h4>Waiting on</h4><ul>${qs.map((q) => `<li><b>${esc(q.id)}</b> ${esc(q.text)}${q.answer ? ` <span class="muted">(${esc(q.answer)})</span>` : ""}</li>`).join("")}</ul>` : ""}
       </div></details>`;
   }).join("");
@@ -257,13 +262,13 @@ async function renderProgramme() {
   $("#main").innerHTML = `<p class="eyebrow">Programme</p><h1>Build Pack progress</h1>
     <div class="kpis">
       <div class="kpi"><div class="label">Live</div><div class="value">${counts.live}</div></div>
-      <div class="kpi"><div class="label">Draft in Klaviyo</div><div class="value">${counts.draft}</div></div>
-      <div class="kpi"><div class="label">Not started</div><div class="value">${counts.todo}</div></div>
+      <div class="kpi"><div class="label">On Evoflows, switched off</div><div class="value">${counts.draft}</div></div>
+      <div class="kpi"><div class="label">Not built yet</div><div class="value">${counts.todo}</div></div>
       <div class="kpi"><div class="label">Not in this build</div><div class="value">${counts.skip}</div></div>
       <div class="kpi"><div class="label">Open questions</div><div class="value">${open.length}</div></div>
     </div>
     ${gaps.length ? `<div class="panel" style="margin-bottom:16px"><h3>Gaps right now</h3>${gaps.map((f) => `<div class="flag high"><span><a href="#flow/${esc(f.id)}"><b>${esc(f.name)}</b></a> is live but sent nothing in the ${esc(TF_LABEL[state.tf])}.</span></div>`).join("")}</div>` : ""}
-    <p class="muted">Numbered in the pack's build order. Status comes from Klaviyo: a flow counts as built when its name starts with “EG · F<i>n</i>”. Click a row for details.</p>
+    <p class="muted">Numbered in the pack's build order. Status comes from Evoflows: built means pushed to the engine (switched off until Luke switches it on). “Replaces” lists the live Klaviyo flows to switch off in the same hour. Click a row for details.</p>
     <div class="prog-list">${rows}</div>
     <h2 style="margin-top:28px">Open questions</h2>
     <div class="panel table-wrap"><table class="qs"><thead><tr><th>#</th><th>Question</th><th>Affects</th><th>Status</th></tr></thead><tbody>
@@ -400,59 +405,56 @@ document.addEventListener("click", async (e) => {
   renderFixes();
 });
 
-// ---------- new flows to approve: the app creates them in Klaviyo as drafts ----------
-let draftState = { data: null, current: null, photos: true };
-const DRAFT_BADGE = { ready: ["skip", "Waiting for approval"], creating: ["draft", "Creating in Klaviyo…"], created: ["live", "Created in Klaviyo (switched off)"], failed: ["flag high", "Stopped: see below"] };
-const draftStatus = (p) => (p.running ? "creating" : p.status);
-function draftActions(p, d) {
-  const st = draftStatus(p);
-  if (st === "ready" || st === "failed") return d.writes_enabled
-    ? `<div class="fix-actions"><button type="button" class="btn" data-draft-approve="${esc(p.id)}">${st === "failed" ? "Try again" : "Approve: create in Klaviyo as a draft"}</button>
-       <span class="muted">Creates ${p.emails.length} emails and the flow “${esc(p.flow_name)}”, switched off. Nothing sends.</span></div>`
-    : `<p class="muted">The app has no Klaviyo write key, so it can't create drafts.</p>`;
-  if (st === "creating") return `<p class="muted">Creating the emails and the flow. This takes a minute.</p>`;
-  return `<div class="fix-actions"><a class="btn" href="${esc(p.klaviyo_url)}" target="_blank" rel="noopener">Open the draft in Klaviyo ↗</a>
-      ${p.verify ? `<span class="${p.verify.ok ? "muted" : "flag high"}">Checked in Klaviyo: status ${esc(p.verify.status)}, ${esc(p.verify.steps)} of ${esc(p.verify.expected)} steps.</span>` : ""}</div>
-      ${p.dropped && p.dropped.length ? `<p class="flag">Klaviyo didn't accept some settings, so set these in the editor: ${esc(p.dropped.join(", "))}.</p>` : ""}`;
+// ---------- new flows to approve: approved builds → validate → push to Evoflows (switched off) ----------
+let draftState = { data: null, current: null, photos: false };
+const BUILD_BADGE = { not_pushed: ["skip", "Waiting for approval"], off: ["draft", "On Evoflows, switched off"], live: ["live", "Live on Evoflows"], unknown: ["skip", "Can't reach Evoflows"] };
+function buildBadge(b) {
+  if (b.differs) return `<span class="stat todo">Changed since it was pushed: approve again</span>`;
+  const [cls, label] = BUILD_BADGE[b.status] || ["skip", b.status];
+  return `<span class="stat ${cls}">${esc(label)}${b.version ? ` · v${esc(b.version)}` : ""}</span>`;
 }
-const draftHist = (p) => (p.history || []).map((h) => `<li>${esc(h.at.slice(0, 16).replace("T", " "))} · ${esc(h.by)} · ${esc(h.action)}${h.detail ? ` – ${esc(h.detail)}` : ""}</li>`).join("");
+const lastPush = (b) => (b.last_push ? `<span class="muted">Last approved ${esc(b.last_push.at.slice(0, 16).replace("T", " "))} UTC by ${esc(b.last_push.by)}${b.last_push.ok === false ? " (stopped: see the result)" : ""}</span>` : "");
 async function renderDrafts() {
-  draftState.data = await api("/api/drafts");
+  draftState.data = await api("/api/evoflows/builds");
   const d = draftState.data;
-  const card = (p) => {
-    const [cls, label] = DRAFT_BADGE[draftStatus(p)] || ["skip", p.status];
-    return `<article class="panel fix"><div class="fix-head"><span class="fix-kind">New flow</span><h3><a href="#draft/${esc(p.id)}">${esc(p.title)}</a></h3><span class="stat ${cls}">${esc(label)}</span></div>
-      <p>${esc(p.summary)}</p>${p.replaces ? `<p class="muted">${esc(p.replaces)}</p>` : ""}
-      <div class="fix-actions"><a class="btn${p.status === "created" ? "-line" : ""}" href="#draft/${esc(p.id)}">See the full flow and emails →</a>
-      <span class="muted">${p.emails.length} emails · ${esc(p.trigger)}</span></div>
-      ${p.error ? `<p class="flag high">${esc(p.error)}</p>` : ""}</article>`;
-  };
-  const waiting = d.packs.filter((p) => p.status !== "created"), made = d.packs.filter((p) => p.status === "created");
-  $("#main").innerHTML = `<p class="eyebrow">New flows</p><h1>Approve, and the app builds them in Klaviyo</h1>
-    <p class="muted" style="max-width:88ch">Open a flow to see every step and preview each email, laid out like your live flows. <b>Approve</b> creates the emails and the flow in Klaviyo as a draft, switched off. Nothing sends until you switch it on in Klaviyo yourself. The app can't switch flows on, change existing flows or delete anything.</p>
+  if (!d.enabled) { $("#main").innerHTML = `<h1>New flows to approve</h1><p>Evoflows isn't connected. Add <code>EVOFLOWS_TOKEN</code> in Railway Variables.</p>`; return; }
+  const card = (b) => `<article class="panel fix"><div class="fix-head"><span class="fix-kind">${esc(b.programme)}</span><h3><a href="#draft/${esc(b.key)}">${esc(b.name)}</a></h3>${buildBadge(b)}</div>
+      <p>${esc(b.summary)}</p>
+      ${(b.replaces || []).length ? `<p class="muted">Replaces in Klaviyo: ${b.replaces.map(esc).join(", ")}. Switch ${b.replaces.length === 1 ? "it" : "them"} off in the same hour this goes on.</p>` : ""}
+      <div class="fix-actions"><a class="btn${b.status === "not_pushed" || b.differs ? "" : "-line"}" href="#draft/${esc(b.key)}">See the flow and emails →</a>
+      <span class="muted">${b.templates.length} emails · ${esc(b.trigger || "")}</span>${lastPush(b)}</div></article>`;
+  const waiting = d.builds.filter((b) => b.status === "not_pushed" || b.differs), pushed = d.builds.filter((b) => !waiting.includes(b));
+  $("#main").innerHTML = `<p class="eyebrow">New flows</p><h1>Approve, and the app puts them on Evoflows</h1>
+    <p class="muted" style="max-width:88ch">Each flow here is an approved build: the copy and design you signed off, checked against Evoflows. Open one to see every step and preview each email. <b>Approve</b> uploads its emails and the flow to Evoflows, switched off, after Evoflows has checked it. Nothing sends: Luke runs a staff test and switches it on. The app can't switch flows on, send to customers or delete anything.</p>
     <h2 class="fix-h">Waiting for approval <span class="muted">(${waiting.length})</span></h2>${waiting.length ? waiting.map(card).join("") : `<p class="muted">Nothing waiting.</p>`}
-    <h2 class="fix-h">Created in Klaviyo <span class="muted">(${made.length})</span></h2>${made.length ? made.map(card).join("") : `<p class="muted">Nothing created yet.</p>`}`;
-  if (d.packs.some((p) => p.running || p.status === "creating")) setTimeout(() => { if (state.page === "drafts" && !state.draftId) renderDrafts(); }, 3000);
+    <h2 class="fix-h">On Evoflows <span class="muted">(${pushed.length})</span></h2>${pushed.length ? pushed.map(card).join("") : `<p class="muted">Nothing pushed yet.</p>`}`;
 }
 async function renderDraft() {
-  draftState.data = await api("/api/drafts");
-  const d = draftState.data, p = d.packs.find((x) => x.id === state.draftId);
-  if (!p) { location.hash = "#drafts"; return; }
-  draftState.current = p;
-  const [cls, label] = DRAFT_BADGE[draftStatus(p)] || ["skip", p.status];
-  const emails = [...messages(p.steps)].filter((m) => m.kind === "email");
+  draftState.data = await api("/api/evoflows/builds");
+  const b = draftState.data.builds.find((x) => x.key === state.draftId);
+  if (!b) { location.hash = "#drafts"; return; }
+  draftState.current = { flow_name: b.name, steps: b.steps };
+  const emails = [...messages(b.steps)].filter((m) => m.kind === "email");
   if (!emails.some((m) => m.message_id === state.pvId)) state.pvId = emails[0] ? emails[0].message_id : null;
-  const hist = draftHist(p);
+  const canPush = b.status === "not_pushed" || b.differs;
   $("#main").innerHTML = `
     <p class="eyebrow"><a href="#drafts">← New flows to approve</a></p>
-    <div class="flow-head"><div><h1>${esc(p.flow_name)} <span class="stat ${cls}">${esc(label)}</span></h1>
-      <p class="meta">${esc(p.trigger)}.${p.flow_filter ? ` Only if: ${esc(p.flow_filter)}.` : ""}</p></div></div>
-    <div class="panel draft-top"><p>${esc(p.summary)}</p>${p.replaces ? `<p class="muted">${esc(p.replaces)}</p>` : ""}
-      ${p.error ? `<p class="flag high">${esc(p.error)}</p>` : ""}${draftActions(p, d)}
-      ${p.status === "created" && (p.after || []).length ? `<details class="fix-steps"><summary>Before you switch it on</summary><ol>${p.after.map((x) => `<li>${esc(x)}</li>`).join("")}</ol></details>` : ""}
-      ${hist ? `<details class="fix-steps"><summary>History</summary><ul class="fix-hist">${hist}</ul></details>` : ""}</div>
-    ${photoPanel(p)}
-    <div class="journey-wrap"><div class="journey">${renderSteps(p.steps)}</div>
+    <div class="flow-head"><div><h1>${esc(b.name)} ${buildBadge(b)}</h1>
+      <p class="meta">${esc(b.trigger || "")}.${b.flow_filter ? ` Only if: ${esc(b.flow_filter)}.` : ""}${b.exit ? ` Leaves if: ${esc(b.exit)}.` : ""} ${esc(b.reentry_text || "")}.</p></div>
+      ${b.status !== "not_pushed" ? `<a href="#flow/${esc(b.key)}">Performance →</a>` : ""}</div>
+    <div class="panel draft-top"><p>${esc(b.summary)}</p>
+      ${(b.replaces || []).length ? `<p class="muted">Replaces in Klaviyo: ${b.replaces.map(esc).join(", ")}.</p>` : ""}
+      ${(b.deviations || []).length ? `<details class="fix-steps"><summary>Differences from the approved Klaviyo version (${b.deviations.length})</summary><ul>${b.deviations.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : ""}
+      <div class="fix-actions">
+        <button type="button" class="btn${canPush ? "" : "-line"}" data-evo-approve="${esc(b.key)}">${canPush ? "Approve: put it on Evoflows (switched off)" : "Push again (switched off)"}</button>
+        <button type="button" class="btn-line" data-evo-validate="${esc(b.key)}">Check with Evoflows</button>${lastPush(b)}</div>
+      <div class="fix-actions"><input id="evo-test-to" type="email" placeholder="you@evolutiongolf.co.uk" style="min-width:260px">
+        <button type="button" class="btn-line" data-evo-tests="${esc(b.key)}">Send me a test of every email</button>
+        <span class="muted">Staff addresses only. Uses Evoflows' example ${b.trigger && b.trigger.includes("order") ? "order" : "basket"}.</span></div>
+      <pre id="evo-result" class="muted" style="white-space:pre-wrap;max-height:260px;overflow:auto"></pre>
+      ${b.status === "off" ? `<details class="fix-steps"><summary>Before it goes live</summary><ol><li>Check the test emails.</li><li>Agree the hour with Luke.</li>${(b.replaces || []).map((r) => `<li>At that hour, switch off “${esc(r)}” in Klaviyo.</li>`).join("")}<li>Luke switches it on in Evoflows; watch the first people go through on its Performance page.</li></ol></details>` : ""}
+    </div>
+    <div class="journey-wrap"><div class="journey">${renderSteps(b.steps)}</div>
       <aside class="pane" aria-label="Email preview">${state.pvId ? `
         <div class="pane-head"><div><p class="eyebrow" id="pane-name"></p><h3 id="pane-subject"></h3></div>
           <div class="seg seg-light" id="pane-width"><button type="button" data-w="600">Desktop</button><button type="button" data-w="375">Phone</button></div></div>
@@ -460,17 +462,36 @@ async function renderDraft() {
         <div class="frame-wrap"><iframe id="pane-frame" title="Email preview" sandbox=""></iframe></div>` : `<p class="muted" style="padding:16px">No emails in this flow.</p>`}
       </aside></div>`;
   if (state.pvId) showInPane(state.pvId);
-  if (draftStatus(p) === "creating") setTimeout(() => { if (state.draftId === p.id) renderDraft(); }, 3000);
 }
+const fmtResults = (r) => (r.results || []).map((x) => `${x.status < 400 ? "✓" : "✗"} ${x.call} (${x.status})${x.status >= 400 || (x.response && x.response.problems && x.response.problems.length) ? "\n   " + JSON.stringify(x.response) : ""}`).join("\n");
 document.addEventListener("click", async (e) => {
-  const b = e.target.closest("[data-draft-approve]");
-  if (!b) return;
-  const p = draftState.data.packs.find((x) => x.id === b.dataset.draftApprove);
-  if (!confirm(`Create “${p.flow_name}” in Klaviyo?\n\n${p.emails.length} emails and the flow are created as a draft, switched off. Nothing sends.`)) return;
-  b.disabled = true; b.textContent = "Starting…";
-  try { await api(`/api/drafts/${encodeURIComponent(p.id)}/approve`, { method: "POST" }); }
-  catch (err) { alertInline(b, err.message); return; }
-  state.draftId ? renderDraft() : renderDrafts();
+  const ap = e.target.closest("[data-evo-approve]"), va = e.target.closest("[data-evo-validate]"), te = e.target.closest("[data-evo-tests]");
+  if (!ap && !va && !te) return;
+  const out = $("#evo-result"), b = draftState.data.builds.find((x) => x.key === (ap || va || te).dataset[ap ? "evoApprove" : va ? "evoValidate" : "evoTests"]);
+  if (ap) {
+    if (!confirm(`Put “${b.name}” on Evoflows?\n\nUploads ${b.templates.length} emails and the flow, after Evoflows checks it. It stays switched off: nothing sends until Luke switches it on.`)) return;
+    ap.disabled = true; out.textContent = "Uploading…";
+    try { const r = await api(`/api/evoflows/approve/${encodeURIComponent(b.key)}`, { method: "POST" }); out.textContent = (r.ok ? "Done: on Evoflows, switched off.\n" : "Stopped:\n") + fmtResults(r); }
+    catch (err) { out.textContent = err.message; }
+    ap.disabled = false; setTimeout(() => { if (state.draftId === b.key) renderDraft(); }, 4000); return;
+  }
+  if (va) {
+    va.disabled = true; out.textContent = "Checking…";
+    try { const r = await api(`/api/evoflows/validate/${encodeURIComponent(b.key)}`, { method: "POST" }); const res = r.response || {};
+      out.textContent = r.ok ? `✓ Evoflows accepts it${r.templates_missing ? ` (${r.templates_missing} emails not uploaded yet: approving uploads them)` : ""}.` : `✗ Problems:\n${JSON.stringify(res.problems || res, null, 1)}`; }
+    catch (err) { out.textContent = err.message; }
+    va.disabled = false; return;
+  }
+  const to = ($("#evo-test-to").value || "").trim();
+  if (!/@evolutiongolf\.co\.uk$/i.test(to)) { out.textContent = "Enter an @evolutiongolf.co.uk address."; return; }
+  te.disabled = true; const lines = [];
+  for (const k of b.templates) {
+    out.textContent = `Sending ${k}…\n` + lines.join("\n");
+    try { const r = await api(`/api/evoflows/test/${encodeURIComponent(k)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to }) });
+      lines.push(`${r.status < 400 ? "✓" : "✗"} ${k}${r.response && r.response.from ? ` · from ${r.response.from}` : ""}`); }
+    catch (err) { lines.push(`✗ ${k}: ${err.message}`); }
+  }
+  out.textContent = lines.join("\n"); te.disabled = false;
 });
 
 // ---------- flow map: the programme on one page (also shared as an artifact) ----------
@@ -518,20 +539,17 @@ async function renderEvoflows(fresh = false) {
       <td>${evoRate(t.conversion_rate)}</td><td>${evoRate(t.unsubscribe_rate)}</td><td>${evoRate(t.bounce_rate)}</td>
       <td class="muted" title="Evoflows v1 doesn't track opens or clicks yet">n/a</td></tr>${m && m.error ? `<tr><td colspan="14" class="flag high">${esc(m.error)}</td></tr>` : ""}`;
   }).join("");
-  $("#main").innerHTML = `<p class="eyebrow">New engine</p><h1>Evoflows</h1>
-    <p class="muted">Flows running on the self-hosted engine (Listmonk + SES). Opens and clicks aren't tracked in v1, so they show as n/a, not zero. This page can push new drafts (always switched off) but can't switch a flow on: Luke does that after the staff seed test.</p>
+  $("#main").innerHTML = `<p class="eyebrow">Evoflows</p><h1>Engine and events</h1>
+    <p class="muted">Every flow on the engine, including Luke's staff tests, straight from Evoflows. Opens and clicks aren't tracked in v1, so they show as n/a, not zero. New flows are approved and pushed from <a href="#drafts">New flows to approve</a>; nothing here can switch a flow on.</p>
     <div class="summary-actions">${["30d", "90d", "365d"].map((p) => `<button type="button" class="btn ${evoState.period === p ? "" : "secondary"}" data-evo-period="${p}">${p}</button>`).join(" ")}
       <button type="button" class="btn secondary" id="evo-refresh">Refresh</button></div>
     <table class="mini"><thead><tr><th>Flow</th><th></th><th>Enrolled</th><th>Active</th><th>Sent</th><th>Finished</th><th>Converted after email</th><th>Revenue</th><th>Refused (no consent)</th><th>Unsubscribed</th><th>Conversion</th><th>Unsub rate</th><th>Bounce rate</th><th>Opens / clicks</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="14" class="muted">No flows yet.</td></tr>`}</tbody></table>
     <div id="evo-runs"></div>
     <div class="summary-grid">
-      <div class="panel"><h3>Push built drafts</h3><p class="muted">From <code>klaviyo/evoflows.py</code>: flags, F3 templates and the F3 flow. The flow is validated first and lands switched off.</p>
-        <div class="fix-actions">${["flags", "templates", "validate", "flow"].map((w) => `<button type="button" class="btn secondary" data-evo-push="${w}">${{ flags: "Push flags", templates: "Push templates", validate: "Validate flow", flow: "Push flow (off)" }[w]}</button>`).join(" ")}</div>
-        <pre id="evo-push-out" class="muted" style="white-space:pre-wrap;max-height:320px;overflow:auto"></pre></div>
-      <div class="panel"><h3>Templates: preview and test</h3><p class="muted">Preview renders Evoflows' sample basket. Test sends one real email to a staff address.</p>
-        <p><input id="evo-test-to" type="email" placeholder="you@evolutiongolf.co.uk" style="width:100%"></p>
-        <table class="mini"><tbody>${(d.templates || []).map((k) => `<tr><td>${esc(k)}</td><td><a href="/evoflows/preview/${esc(k)}" target="_blank" rel="noopener">Preview</a></td><td><button type="button" class="btn secondary" data-evo-test="${esc(k)}">Send test</button></td></tr>`).join("")}</tbody></table></div>
+      <div class="panel"><h3>Basket flags</h3><p class="muted">The collection lists Evoflows uses to tell what's in a basket or order (trolley, clubs, used clubs, shoes). Push again after the lists change in <code>klaviyo/evoflows.py</code>.</p>
+        <div class="fix-actions"><button type="button" class="btn secondary" data-evo-push="flags">Push flags</button></div>
+        <pre id="evo-push-out" class="muted" style="white-space:pre-wrap;max-height:200px;overflow:auto"></pre></div>
       <div class="panel"><h3>Webhook</h3>${d.webhook ? `<p>Registered: <code>${esc(d.webhook.url)}</code><br><span class="muted">${esc(d.webhook.at)} by ${esc(d.webhook.by)}</span></p>` : `<p class="muted">Not registered yet.</p>`}
         <button type="button" class="btn secondary" id="evo-webhook">${d.webhook ? "Re-register" : "Register webhook"}</button>
         <h3>Recent events</h3>${d.events.length ? `<ul>${d.events.map((e) => `<li>${esc((e.at || "").slice(0, 16).replace("T", " "))} · ${esc(e.event)}${e.flow ? ` · ${esc(e.flow)}` : ""}${e.step ? ` · ${esc(e.step)}` : ""}</li>`).join("")}</ul>` : `<p class="muted">None received yet.</p>`}</div>

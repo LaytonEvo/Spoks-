@@ -19,7 +19,9 @@ Ground rules:
 - Use only the numbers in the data you are given. Quote them. Never invent benchmarks, \
 industry averages or figures that are not in the data.
 - Say when a number rests on a small sample (fewer than 100 recipients) and treat it as a hint, not a finding.
-- "Recipients" are sends, not unique people. Revenue is Klaviyo-attributed revenue from Placed Order.
+- "Recipients" are sends, not unique people. Flows run on one of two platforms (see "platform"):
+  - Evoflows (the new engine): revenue = orders placed after one of the flow's emails. Opens and clicks are not tracked yet, so never judge or mention open or click rates for these flows (they are null, not zero).
+  - Klaviyo (being replaced, flow by flow): revenue is Klaviyo-attributed from Placed Order.
 - Judge the copy as well as the numbers: clarity, relevance to the trigger, tone, and whether the \
 email gives a real reason to act.
 
@@ -31,7 +33,7 @@ The business's own rules (flag any breach as high priority):
 - Sender "⛳ Evolution Golf" for brand emails; personal emails come from "Alex at Evolution Golf".
 - SMS must carry opt-out wording and respect quiet hours.
 
-Recommendations must be concrete and doable in Klaviyo (what to change, where). Prefer a few \
+Recommendations must be concrete and doable: for Evoflows flows, a change to the approved build (copy, timing, conditions) that gets rebuilt and pushed; for Klaviyo flows, what to change in the Klaviyo editor. Prefer a few \
 important points over a long list."""
 
 
@@ -55,7 +57,7 @@ def _compact(steps, tf):
     for s in steps:
         if s["kind"] in ("email", "sms"):
             m = {k: s.get(k) for k in ("kind", "name", "status", "subject", "preview_text", "from_label", "body",
-                                       "smart_sending", "utm", "opt_out")}
+                                       "smart_sending", "utm", "opt_out", "only_if", "cap_note")}
             m["metrics"] = (s.get("metrics") or {}).get(tf)
             m["checks"] = [f["text"] for f in (s.get("flags") or {}).get(tf, [])]
             if s.get("_text"):
@@ -74,6 +76,9 @@ def _compact(steps, tf):
 
 def _weekly_totals(flow):
     """Flow-level sends and revenue per week for the last 13 weeks (latest week may be part-week)."""
+    if flow.get("weekly"):  # Evoflows: per-flow weekly figures
+        w = flow["weekly"]
+        return {"sends": w["recipients"][-13:], "revenue": [round(x, 2) for x in w["conversion_value"][-13:]]}
     sends = rev = None
     stack = list(flow["steps"])
     while stack:
@@ -94,7 +99,9 @@ def generate(flow, tf):
     if not config.ANTHROPIC_API_KEY:
         raise RuntimeError("Set ANTHROPIC_API_KEY to generate reviews.")
     payload = {
-        "flow": flow["name"], "status": flow["status"], "trigger": flow["trigger"], "flow_filter": flow["flow_filter"],
+        "flow": flow["name"], "platform": flow.get("platform", "klaviyo"), "status": flow["status"],
+        "trigger": flow["trigger"], "flow_filter": flow["flow_filter"],
+        **({k: flow[k] for k in ("exit", "reentry_text", "consent", "replaces", "deviations") if flow.get(k)}),
         "re_entry": flow.get("reentry"), "period": tf.replace("_", " "), "totals": flow["totals"].get(tf),
         "flow_checks": [f["text"] for f in flow["flags"].get(tf, [])], "journey": _compact(flow["steps"], tf),
         "weekly_last_13_weeks_latest_may_be_part_week": _weekly_totals(flow),

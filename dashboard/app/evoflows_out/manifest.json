@@ -1,0 +1,287 @@
+{
+ "flows": {
+  "f3_checkout": {
+   "programme": "F3",
+   "pack": "f3-checkout",
+   "replaces": [
+    "NEW: Abandoned Checkout (category-routed)"
+   ],
+   "deviations": [
+    "Day-2 text on all three paths dropped (no SMS channel)."
+   ],
+   "name": "F3 Checkout abandonment",
+   "summary": "Checkouts worth £30+ that don't complete. Annual members: their 10% can go on it. Non-members £300+: join and 10% comes off this basket, then a note from Alex. Under £300: Free membership's 5%. No codes.",
+   "pack_title": "F3 Checkout abandonment",
+   "templates": [
+    "f3_e1hi",
+    "f3_e1lo",
+    "f3_e1m",
+    "f3_e2hi",
+    "f3_e2lo",
+    "f3_e2m",
+    "f3_e3h",
+    "f3_e3lo"
+   ]
+  },
+  "f9_after_delivery": {
+   "programme": "F9",
+   "pack": "f9-after-delivery-v3",
+   "replaces": [
+    "NEW: Post-Fulfillment"
+   ],
+   "deviations": [],
+   "name": "F9 After delivery",
+   "summary": "Online orders, 3 days after fulfilment. Hardware (trolley, clubs, used clubs): set-up, care, review at ~2 weeks (trolleys) or ~4 weeks (clubs). Everything else: thanks, review at ~10 days. Non-members with a recent order get the 14-day 10% credit offer and one reminder if they still haven't joined. Till orders left out.",
+   "pack_title": "F9 After delivery + review v3",
+   "templates": [
+    "f9_e1e",
+    "f9_e1en",
+    "f9_e1h",
+    "f9_e1hn",
+    "f9_e2h",
+    "f9_rem",
+    "f9_rve",
+    "f9_rvh"
+   ]
+  },
+  "f1_welcome": {
+   "programme": "F1",
+   "pack": "f1-welcome-v3",
+   "replaces": [
+    "1. SM: Welcome Sequence"
+   ],
+   "deviations": [
+    "Welcome text after Email 1 dropped (no SMS channel).",
+    "Everyone gets E2 Everything else: E2 Hardware needs product views (Evoflows phase 2).",
+    "Email 1 A/B test dropped (no A/B tests in Evoflows).",
+    "Leaves on an order, not yet on starting a checkout (no such field yet)."
+   ],
+   "name": "F1 Welcome",
+   "summary": "New subscribers who haven't bought and aren't members. Welcome, the most-asked questions, a note from Alex, then the two ways to pay less (skipped if they joined in the meantime). Leaves when they order.",
+   "pack_title": "F1 Welcome (v3, new look)",
+   "templates": [
+    "f1_e1",
+    "f1_e2e",
+    "f1_e3",
+    "f1_e4"
+   ]
+  },
+  "f2_free": {
+   "programme": "F2",
+   "pack": "f2-free",
+   "replaces": [
+    "FLOW: Welcome - Evolution Free"
+   ],
+   "deviations": [
+    "Starts on the portal's membership_changed event (not sent yet), not a Klaviyo segment."
+   ],
+   "name": "F2 Membership · Free",
+   "summary": "New Free members: you're in, the honest maths on £36 (day 4), the plan in use (day 12). Emails 2 and 3 only if they're still on Free.",
+   "pack_title": "F2 Membership · Free",
+   "templates": [
+    "f2_fe1",
+    "f2_fe2",
+    "f2_fe3"
+   ]
+  },
+  "f2_annual": {
+   "programme": "F2",
+   "pack": "f2-annual",
+   "replaces": [
+    "FLOW: Welcome — Club Access Member",
+    "FLOW: Welcome — Evolution Pro",
+    "FLOW: Welcome — Evolution Pro Annual"
+   ],
+   "deviations": [
+    "Starts on the portal's membership_changed event (not sent yet), not a Klaviyo segment."
+   ],
+   "name": "F2 Membership · Annual",
+   "summary": "New £36 annual members: welcome (day 0), member deals (day 3), first month (day 30), two months in (day 60), the monthly 10% reminder (days 90 to 300), renewal reminder (day 335). Stops if they stop being annual.",
+   "pack_title": "F2 Membership · Annual (£36)",
+   "templates": [
+    "f2_pe1",
+    "f2_pe2",
+    "f2_pe3",
+    "f2_pe4",
+    "f2_pe5",
+    "f2_pem"
+   ]
+  }
+ },
+ "templates": {
+  "f3_e1m": {
+   "name": "F3 E1 Members · Your 10% can go on this",
+   "subject": "Your 10% can go on this order",
+   "preview_text": "If you haven't used this month's 10% yet, it can go on this basket.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f3_e2m": {
+   "name": "F3 E2 Members · Quick checks",
+   "subject": "A few quick checks before you buy",
+   "preview_text": "A few quick checks before you buy. Your 10% can still go on it.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f3_e1hi": {
+   "name": "F3 E1 £300+ · Join and save 10%",
+   "subject": "Your basket's saved{{ if .Tx.Data.first_name }}, {{ .Tx.Data.first_name }}{{ end }}",
+   "preview_text": "Join before you check out and 10% comes off this basket. Then 10% off one order every month.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f3_e2hi": {
+   "name": "F3 E2 £300+ · Quick checks",
+   "subject": "How to be sure it's the right one",
+   "preview_text": "A few quick checks before you buy. Then 10% off this order with membership.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f3_e3h": {
+   "name": "F3 E3 £300+ · From Alex",
+   "subject": "Want a second opinion on that?",
+   "preview_text": "Tell me your course and how you play and I'll tell you if it's the right one.",
+   "from_name": "Alex at Evolution Golf"
+  },
+  "f3_e1lo": {
+   "name": "F3 E1 Under £300 · Join free, 5% off",
+   "subject": "Your basket's saved{{ if .Tx.Data.first_name }}, {{ .Tx.Data.first_name }}{{ end }}",
+   "preview_text": "Your basket's saved, and 5% can come off it.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f3_e2lo": {
+   "name": "F3 E2 Under £300 · 5% off, free",
+   "subject": "5% off this order",
+   "preview_text": "5% off everything, this order included.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f3_e3lo": {
+   "name": "F3 E3 Under £300 · Last nudge",
+   "subject": "Still in your basket",
+   "preview_text": "Your basket's saved, and 5% can come off it with Free membership.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f9_e1h": {
+   "name": "F9 E1 Hardware · Getting set up (with credit offer)",
+   "subject": "Your new kit should be with you. A few things first",
+   "preview_text": "Getting set up, and who to call if anything's not right.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f9_e1hn": {
+   "name": "F9 E1 Hardware · Getting set up",
+   "subject": "Your new kit should be with you. A few things first",
+   "preview_text": "Getting set up, and who to call if anything's not right.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f9_e2h": {
+   "name": "F9 E2 Hardware · Looking after it",
+   "subject": "Looking after your new kit",
+   "preview_text": "A few minutes now keeps it going for years.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f9_e1e": {
+   "name": "F9 E1 Everything else · Thanks (with credit offer)",
+   "subject": "Your order should be with you{{ if .Tx.Data.first_name }}, {{ .Tx.Data.first_name }}{{ end }}",
+   "preview_text": "Thanks for shopping with us. Here's how to reach us if you need anything.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f9_e1en": {
+   "name": "F9 E1 Everything else · Thanks",
+   "subject": "Your order should be with you{{ if .Tx.Data.first_name }}, {{ .Tx.Data.first_name }}{{ end }}",
+   "preview_text": "Thanks for shopping with us. Here's how to reach us if you need anything.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f9_rem": {
+   "name": "F9 Membership reminder · 10% back",
+   "subject": "Still time to get 10% back on your order",
+   "preview_text": "Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f9_rvh": {
+   "name": "F9 Review · Hardware (from Alex)",
+   "subject": "How's it going with the new kit?",
+   "preview_text": "A quick, honest review would help the next golfer choosing.",
+   "from_name": "Alex at Evolution Golf"
+  },
+  "f9_rve": {
+   "name": "F9 Review · Everything else (from Alex)",
+   "subject": "Quick one: how did we do?",
+   "preview_text": "A sentence on Trustpilot is plenty.",
+   "from_name": "Alex at Evolution Golf"
+  },
+  "f1_e1": {
+   "name": "F1 E1 · Welcome",
+   "subject": "Welcome in. Here's how to pay less, no code needed",
+   "preview_text": "10% off your first order with membership, and every month after. No codes to chase.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f1_e2e": {
+   "name": "F1 E2 Everything else · Most asked",
+   "subject": "Three things golfers ask us most",
+   "preview_text": "Spiked or spikeless, staying dry, and which ball. Answered straight.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f1_e3": {
+   "name": "F1 E3 · From Alex",
+   "subject": "Got a golf question? Ask me",
+   "preview_text": "Reply to this email and a real person who plays will answer.",
+   "from_name": "Alex at Evolution Golf"
+  },
+  "f1_e4": {
+   "name": "F1 E4 · Two ways to pay less",
+   "subject": "Two ways to pay less at Evolution Golf",
+   "preview_text": "Your monthly 10%, member deals and a monthly prize draw. No codes to chase.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_fe1": {
+   "name": "F2 Free E1 · You're in",
+   "subject": "You're in: your free Evolution Golf membership",
+   "preview_text": "5% off everything, loyalty points and your own member portal. All live now.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_fe2": {
+   "name": "F2 Free E2 · The honest maths",
+   "subject": "Is the £36 plan worth it? The honest maths",
+   "preview_text": "Compared with Free, one £60 order a month covers the £36. The full sum inside.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_fe3": {
+   "name": "F2 Free E3 · The plan in use",
+   "subject": "What £36 a year actually gets used for",
+   "preview_text": "10% off one order every month, member-only deals and a monthly prize draw. Then it's up to you.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_pe1": {
+   "name": "F2 Annual E1 · Welcome",
+   "subject": "Welcome to Evolution Golf membership",
+   "preview_text": "10% off your first order and one order every month, free returns and more. All live now.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_pe2": {
+   "name": "F2 Annual E2 · Member deals",
+   "subject": "Your member deals, and where to find them",
+   "preview_text": "Instant daily deals and exclusive member deals. Only in your portal.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_pe3": {
+   "name": "F2 Annual E3 · First month",
+   "subject": "Your first month as a member",
+   "preview_text": "Your monthly 10%, this month's prize draw and the member deals.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_pe4": {
+   "name": "F2 Annual E4 · Two months in",
+   "subject": "Two months in: here's what's yours this month",
+   "preview_text": "This month's 10%, the prize draw and member deals. All in your portal.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_pem": {
+   "name": "F2 Annual · Monthly 10% reminder",
+   "subject": "Your 10% for this month is ready",
+   "preview_text": "One order this month gets 10% off. Your code is in your member portal.",
+   "from_name": "⛳ Evolution Golf"
+  },
+  "f2_pe5": {
+   "name": "F2 Annual E5 · Renewal reminder",
+   "subject": "Your membership renews in about a month",
+   "preview_text": "A reminder before your £36 annual membership renews. Nothing to do if you're staying.",
+   "from_name": "⛳ Evolution Golf"
+  }
+ }
+}

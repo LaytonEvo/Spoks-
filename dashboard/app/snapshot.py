@@ -457,3 +457,56 @@ def load():
     if SNAPSHOT.exists():
         return json.loads(SNAPSHOT.read_text())
     return None
+
+
+def _norm(s):
+    return re.sub(r"[\s—–-]+", " ", (s or "").lower()).strip()
+
+
+def _align(weekly, axis):
+    """Put an Evoflows flow's weekly figures (Monday-dated) onto the dashboard's week axis."""
+    if not weekly or not axis:
+        return None
+    starts = [dt.date.fromisoformat(a[:10]) for a in axis]
+    out = {k: [0] * len(axis) for k in ("recipients", "conversion_value", "conversions")}
+    for i, wk in enumerate(weekly.get("weeks") or []):
+        d = dt.date.fromisoformat(wk)
+        for j, a in enumerate(starts):
+            if a <= d < a + dt.timedelta(days=7) or (j == len(starts) - 1 and d >= a):
+                for k in out:
+                    out[k][j] += (weekly.get(k) or [0])[i] or 0
+                break
+    return out
+
+
+def merged():
+    """What every page reads: our flows on Evoflows first, then the live Klaviyo flows they're replacing (read-only,
+    until each is switched off). Klaviyo `EG ·` drafts are left out: the builds live on Evoflows now."""
+    from . import evosnap
+    k = (load() if config.SHOW_KLAVIYO else None) or {"flows": [], "weeks": [], "timeframes": [], "generated_at": None, "source": "none"}
+    e = evosnap.load() or {"flows": [], "generated_at": None}
+    axis = list(k.get("weeks") or [])
+    if not axis:  # Klaviyo gone (or no series yet): a 52-week axis of Mondays ending this week
+        monday = dt.date.today() - dt.timedelta(days=dt.date.today().weekday())
+        axis = [(monday - dt.timedelta(weeks=51 - i)).isoformat() for i in range(52)]
+    replaced_by = {}
+    evo = []
+    for f in e["flows"]:
+        f = dict(f)
+        f["weekly"] = _align(f.get("weekly"), axis)
+        for name in f.get("replaces", []):
+            replaced_by[_norm(name)] = {"id": f["id"], "name": f["name"], "status": f["status"]}
+        evo.append(f)
+    evo.sort(key=lambda x: {"live": 0, "off": 1, "not_pushed": 2}.get(x["status"], 3))
+    legacy = []
+    for f in k["flows"]:
+        if f.get("status") == "draft":
+            continue
+        f = dict(f, platform="klaviyo")
+        if replaced_by.get(_norm(f["name"])):
+            f["replaced_by"] = replaced_by[_norm(f["name"])]
+        legacy.append(f)
+    return {**k, "schema": k.get("schema", SCHEMA), "weeks": axis, "flows": evo + legacy,
+            "timeframes": sorted(set(k.get("timeframes") or []) | set(config.TIMEFRAMES), key=config.TIMEFRAMES.index),
+            "klaviyo_generated_at": k.get("generated_at"), "evoflows_generated_at": e.get("generated_at"),
+            "generated_at": k.get("generated_at") or e.get("generated_at"), "engine_only": e.get("engine_only", [])}
