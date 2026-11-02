@@ -174,5 +174,40 @@ def upload(name, data_b64, alt, kind, who):
     return result
 
 
+CDN_RE = re.compile(r"^https://cdn\.shopify\.com/s/files/[\w./%-]+\.(?:jpe?g|png)(?:\?v=\d+)?$", re.I)
+
+
+def add_url(url, alt, kind, who):
+    """Add an image that's already in Shopify Files (uploaded in Shopify admin > Content > Files) by its CDN link.
+    Until Evoflows' upload route exists this is how new images get in; the same brand checks run on the file."""
+    url = url.strip()
+    if not CDN_RE.match(url):
+        return {"errors": ["Paste the image's Shopify Files link: it starts https://cdn.shopify.com/s/files/ and ends .jpg or .png."],
+                "warnings": [], "info": {}, "uploaded": False}
+    if url in known_urls():
+        return {"errors": ["That image is already in the library."], "warnings": [], "info": {}, "uploaded": False}
+    try:
+        r = httpx.get(url, timeout=30, follow_redirects=False)
+        r.raise_for_status()
+        data = r.content
+    except Exception as e:
+        return {"errors": [f"Couldn't fetch that link ({str(e)[:120]})."], "warnings": [], "info": {}, "uploaded": False}
+    errors, warnings, info, out, mime = check(data, url, alt, kind)
+    if out is not None and out is not data and not errors:  # the checks had to change it (flattened onto white)
+        errors = ["This image has a transparent background. Flatten it onto pure white and upload it to Shopify Files again "
+                  "(or use 'Check and upload' once uploads are on)."]
+    result = {"errors": errors, "warnings": [w for w in warnings if "flattened" not in w], "info": info, "uploaded": False}
+    if errors:
+        return result
+    name = url.split("?")[0].rsplit("/", 1)[-1]
+    rec = _uploads()
+    rec.append({"url": url, "name": name, "alt": alt, "kind": kind, "by": who, "at": _now(), "bytes": len(data), "source": "shopify admin", **info})
+    config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+    STORE.write_text(json.dumps(rec, ensure_ascii=False, indent=1))
+    evoflows._log({"at": _now(), "by": who, "push": f"add image {name} from Shopify Files", "status": 200})
+    result.update(uploaded=True, url=url, name=name)
+    return result
+
+
 def known_urls():
     return {x["url"] for x in catalog()}

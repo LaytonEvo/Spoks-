@@ -1,13 +1,14 @@
 """A/B tests on Evoflows emails.
 
-A test replaces one email step in a flow with a split: group A (contact.uuid sorts below the cut) gets the current email,
+A test replaces one email step in a flow with a split: group A (contact.bucket below the cut) gets the current email,
 group B gets a test version edited in the builder (template key "<key>_b", draft -> approve -> publish like any email).
-Contact uuids are random, so the split is fair and stable (the same person always gets the same version). Results are
+contact.bucket is a fixed 0-99 number per contact (Evoflows, 2 Nov 2026), so the split is fair and stable (the same person
+always gets the same version). Results are
 the two steps' own numbers on Evoflows: sends, orders after the email, revenue. Ending a test puts the flow back to one
 email; if B won, B's content is published under the original email so nothing else changes.
 
 Lifecycle: draft -> approved (named user) -> running (flow pushed, still never switched on by the app) -> ended.
-Engine dependency (asked of Luke, requirements item 18): conditions compare strings in order, or a 0-99 contact.bucket.
+Engine: contact.bucket confirmed by Evoflows on 2 Nov 2026 (requirements item 18).
 """
 import copy
 import datetime as dt
@@ -20,7 +21,7 @@ from . import config, evoflows
 STORE = config.DATA_DIR / "abtests.json"
 OVERRIDES = config.DATA_DIR / "flow_overrides"
 _lock = threading.Lock()
-SPLITS = {"50": "8", "25": "4", "75": "c"}  # share for B -> uuid first-hex cut (B = uuid >= cut)
+SPLITS = {"10": 90, "25": 75, "50": 50, "75": 25, "90": 10}  # share for B -> contact.bucket cut (A = bucket < cut, B the rest)
 
 
 def _now():
@@ -146,7 +147,7 @@ def start(tid, who):
         orig = steps[i]
         cut = SPLITS[t["share_b"]]
         steps[i] = {"id": f"ab_{t['step']}", "type": "split", "branches": [
-            {"id": "variant_a", "when": {"field": "contact.uuid", "lt": cut}, "steps": [orig]},
+            {"id": "variant_a", "when": {"field": "contact.bucket", "lt": cut}, "steps": [orig]},
             {"id": "variant_b", "steps": [{**orig, "id": f"{t['step']}_b", "template": t["template_b"]}]}]}
         res = _push(t["flow"], defn, who, f"start A/B test {t['name']}")
         OVERRIDES.mkdir(parents=True, exist_ok=True)

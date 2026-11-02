@@ -24,13 +24,24 @@ async function renderMedia() {
         <label>What is it? <select id="m-kind"><option value="photo">Photo (lifestyle, full width)</option><option value="product">Product shot (white background)</option><option value="cutout">Cut-out (transparent or white)</option><option value="icon">Icon or logo</option></select></label>
         <label>Alt text <input id="m-alt" placeholder="e.g. A golfer pushing a Motocaddy trolley up the 18th" maxlength="250"></label>
         <button type="button" class="btn" id="m-go">Check and upload</button></div>
-      <div id="m-out"></div>${d.can_upload ? "" : `<p class="flag medium">Uploading needs a Shopify key in Railway (SHOPIFY_STORE and SHOPIFY_ADMIN_TOKEN with write_files). Until then the checks still run, so you can test images.</p>`}</div>
+      <div id="m-out"></div>${d.can_upload ? "" : `<div class="m-addurl"><p class="muted small"><b>Uploading from here comes later</b> (an upload route on Evoflows, after F3 goes live). For now: upload the image in Shopify admin → Content → Files, copy its link, and paste it here. The same checks run before it joins the library. Choosing a file above still checks it without uploading.</p>
+        <div class="m-form"><label>Shopify Files link <input id="m-url" placeholder="https://cdn.shopify.com/s/files/…/eg-email-….jpg" maxlength="500"></label>
+        <button type="button" class="btn-line" id="m-addurl">Check and add</button></div></div>`}</div>
     <h2>Images in use <span class="muted">(${d.images.length})</span></h2>
     <div class="m-images">${d.images.map(img).join("")}</div>`;
 }
 document.addEventListener("click", async (e) => {
   const c = e.target.closest("[data-copy]");
   if (c) { try { await navigator.clipboard.writeText(c.dataset.copy); c.textContent = "Copied"; } catch (err) { c.textContent = c.dataset.copy; } return; }
+  if (e.target.id === "m-addurl") {
+    const out = $("#m-out"); e.target.disabled = true; out.innerHTML = `<p class="muted">Checking…</p>`;
+    try {
+      const r = await api("/api/media/add-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: $("#m-url").value, alt: $("#m-alt").value, kind: $("#m-kind").value }) });
+      out.innerHTML = `${r.info && r.info.width ? `<p class="muted small">${r.info.format} · ${r.info.width} × ${r.info.height} px</p>` : ""}${r.errors.map((x) => `<div class="flag high">${esc(x)}</div>`).join("")}${r.warnings.map((x) => `<div class="flag medium">${esc(x)}</div>`).join("")}${r.uploaded ? `<div class="flag">Added ${esc(r.name)} to the library.</div>` : ""}`;
+      if (r.uploaded) { MEDIA.data = null; setTimeout(renderMedia, 1200); }
+    } catch (err) { out.innerHTML = `<p class="flag high">${esc(err.message)}</p>`; }
+    e.target.disabled = false; return;
+  }
   if (e.target.id !== "m-go") return;
   const f = $("#m-file").files[0], out = $("#m-out");
   if (!f) { out.innerHTML = `<p class="flag medium">Choose an image first.</p>`; return; }

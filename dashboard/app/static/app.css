@@ -490,3 +490,5 @@ svg.vz { display: block; margin: 0 auto; font-family: Inter, Arial, sans-serif; 
 .ds-panel summary { cursor: pointer; list-style: none; }
 .link-btn.small { font-size: 12px; }
 #th-key { padding: 6px 8px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; background: #fff; max-width: 320px; }
+.m-addurl { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+.m-addurl input { width: 100%; }

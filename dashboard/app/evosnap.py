@@ -28,7 +28,7 @@ FIELD = {  # condition fields in plain words
     "flags.has_clubs": "order has clubs", "flags.has_shoes": "order has shoes", "checkout.total": "basket value",
     "order.total": "order value", "order.age_days": "order age (days)", "order.source": "order source",
     "customer.orders_count": "orders placed", "event.data.tier": "membership tier", "contact.consent": "consent",
-    "contact.uuid": "test group (random ID)",
+    "contact.uuid": "test group (random ID)", "contact.bucket": "test group (0-99)",
 }
 OPS = {"eq": "is", "ne": "is not", "gt": "over", "gte": "at least", "lt": "under", "lte": "at most", "in": "is one of",
        "nin": "is none of", "contains": "includes", "not_contains": "doesn't include", "exists": "is set"}

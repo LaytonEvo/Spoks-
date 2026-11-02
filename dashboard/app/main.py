@@ -533,6 +533,13 @@ async def api_media_upload(request: Request, user=Depends(auth)):
         raise HTTPException(502, f"Upload failed: {str(e)[:300]}")
 
 
+@app.post("/api/media/add-url")
+async def api_media_add_url(request: Request, user=Depends(auth)):
+    body = await request.json()
+    kind = body.get("kind") if body.get("kind") in ("photo", "cutout", "product", "icon", "logo") else "photo"
+    return media.add_url(str(body.get("url", ""))[:500], str(body.get("alt", ""))[:250], kind, user)
+
+
 # ---------- A/B tests ----------
 def _ab(fn, *a):
     try:

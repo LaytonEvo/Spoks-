@@ -356,3 +356,18 @@
 - Email editor gains a **Design** panel: per-email overrides that win over the theme, shown in the canvas and preview,
   with "reset" per setting and "Use the brand theme again". Overrides are stored as the difference from the brand.
 - Nothing published or pushed by this change; the theme is still the original brand.
+
+## 2 Nov 2026 — Evoflows round 4 (requirements items 18–20)
+
+- **18 A/B split:** Evoflows added `contact.bucket` (fixed 0–99 per contact). A/B tests now split with
+  `{"field": "contact.bucket", "lt": <cut>}`; version B can get 10, 25, 50, 75 or 90%. The "don't start tests yet"
+  warning is gone. This also fixes a bug in the old uuid split, where the 25% and 75% options were the wrong way round
+  (no test had been started, so nothing was affected). The simulator and flow labels know the new field.
+- **19 Live template edits:** confirmed safe (the template is looked up at send time; a push that would break a template
+  is rejected before anything changes; each push is logged and emits `template.updated`). No code change.
+- **20 Image uploads:** no Shopify key in Railway. Evoflows will add `POST /uploads` after F3 goes live. Meanwhile
+  Brand & media takes a Shopify Files link (`cdn.shopify.com/s/files/…`, JPG/PNG only): the same brand checks run on it
+  and it joins the library and the editor's image picker. Images that would need flattening are refused, with the reason.
+- Shared doc "Evoflows: what our flows need": items 18–20 ticked with the answers.
+- Not done: items 1, 3–5 and 7–15 were answered in section 11 of Evoflows' contract (13 Oct), which isn't in this repo
+  (it's in the BusinessEmail repo, which this session can't reach). Their flow changes wait on that text.

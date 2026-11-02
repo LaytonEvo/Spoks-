@@ -31,7 +31,6 @@ async function renderAbtests() {
   };
   $("#main").innerHTML = `<p class="eyebrow">A/B tests</p><h1>Test one email against another</h1>
     <p class="muted" style="max-width:90ch">Pick an email in a flow and write a version B in the builder. While the test runs, each person entering the flow is put in group A or B by their random contact ID, so the same person always gets the same version. Results are orders and revenue after each version. Opens and clicks come once Evoflows tracks them.</p>
-    <p class="flag medium">Before the first test goes live, Luke needs to confirm the split works on Evoflows (requirements item 18). Until then, set tests up here but don't start them.</p>
     <div class="panel"><h3>New test</h3><div class="m-form ab-form">
       <label>Flow <select id="ab-flow">${d.flows.map((f) => `<option value="${esc(f.key)}">${esc(f.name)}</option>`).join("")}</select></label>
       <label>Email <select id="ab-step"></select></label>
