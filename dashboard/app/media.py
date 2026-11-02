@@ -54,7 +54,7 @@ def catalog():
     from . import builder
     used = {}
     man = evoflows.manifest()
-    for key in man["templates"]:
+    for key in builder.all_keys():
         htmls = [builder.live(key)["html"]]
         for h in htmls:
             for tag in IMG.findall(h):
@@ -70,7 +70,8 @@ def catalog():
     for u in _uploads():
         e = used.setdefault(u["url"], {"url": u["url"], "name": u["name"], "alts": {}, "used_in": set(), "width": u.get("width")})
         e["alts"][u.get("alt", "")] = 99
-        e["uploaded"] = {k: u.get(k) for k in ("by", "at", "kind", "bytes", "width", "height")}
+        e["uploaded"] = {k: u.get(k) for k in ("by", "at", "kind", "bytes", "width", "height", "source", "credit", "credit_url", "licence",
+                                               "licence_url", "needs_credit", "ai", "prompt")}
     out = []
     for e in used.values():
         alt = max(e["alts"], key=e["alts"].get) if e["alts"] else ""
@@ -177,7 +178,7 @@ def upload(name, data_b64, alt, kind, who):
 CDN_RE = re.compile(r"^https://cdn\.shopify\.com/s/files/[\w./%-]+\.(?:jpe?g|png)(?:\?v=\d+)?$", re.I)
 
 
-def add_url(url, alt, kind, who):
+def add_url(url, alt, kind, who, extra=None):
     """Add an image that's already in Shopify Files (uploaded in Shopify admin > Content > Files) by its CDN link.
     Until Evoflows' upload route exists this is how new images get in; the same brand checks run on the file."""
     url = url.strip()
@@ -201,7 +202,8 @@ def add_url(url, alt, kind, who):
         return result
     name = url.split("?")[0].rsplit("/", 1)[-1]
     rec = _uploads()
-    rec.append({"url": url, "name": name, "alt": alt, "kind": kind, "by": who, "at": _now(), "bytes": len(data), "source": "shopify admin", **info})
+    rec.append({"url": url, "name": name, "alt": alt, "kind": kind, "by": who, "at": _now(), "bytes": len(data), "source": "shopify admin", **info,
+                **(extra or {})})
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     STORE.write_text(json.dumps(rec, ensure_ascii=False, indent=1))
     evoflows._log({"at": _now(), "by": who, "push": f"add image {name} from Shopify Files", "status": 200})

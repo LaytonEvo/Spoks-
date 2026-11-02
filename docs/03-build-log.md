@@ -388,3 +388,19 @@
 - **Comments** on an email or a block: reply, resolve and reopen; counts on blocks and the Emails page.
 - Checked: all 29 flow emails render identical to their approved builds, including after an unchanged save; browser test of
   create → drag → undo/redo → settings → comment → save → audience previews → approve.
+
+## 2 Nov 2026 — Find or make an image (Brand & media)
+
+- New `dashboard/app/sources.py` + a "Find or make an image" panel on Brand & media:
+  - **Unsplash** search (`UNSPLASH_ACCESS_KEY`; Unsplash License, no credit needed; a download is registered with Unsplash when a photo is used).
+  - **Openverse** search (no key; only licences that allow commercial use and edits; "credit needed" shown for CC BY/BY-SA).
+  - **AI scenes** via Fal (`FAL_KEY`, default model `fal-ai/flux-pro/v1.1`, override with `FAL_IMAGE_MODEL`). Scenes only: prompts
+    naming products we sell, brands, endorsements or text are refused; a house style is added (natural, no text, no logos, no
+    equipment close-ups, no faces to camera). Every AI image is labelled "AI-generated" in the library, with its prompt.
+  - **Tidy:** background removal onto pure white (`fal-ai/birefnet`), upscale ×2 (`fal-ai/esrgan`); each edit is a new copy.
+  - **Crop** to brand sizes (1200×720, 1200×600, 1200×1200, or 1200 wide) with a focus point; saved as a JPG under 250 KB.
+  - **Alt text** suggested by Claude (`ANTHROPIC_API_KEY`).
+  - **Add to the library:** download the email-ready file, upload it in Shopify admin (Content, Files), paste the link; the
+    brand checks run and the licence, credit, AI flag and edit steps are kept with the image.
+- Working copies live on the app volume (`DATA_DIR/media/staged`); every take, generation and edit is in the engine log with who did it.
+- Fal and Openverse couldn't be reached from the build machine; tested with stand-ins, so the first real runs are on Railway.

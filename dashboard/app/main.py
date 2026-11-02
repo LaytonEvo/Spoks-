@@ -7,12 +7,14 @@ import secrets
 import threading
 import time
 
+import httpx
+
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import abtest, builder, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -559,6 +561,72 @@ async def api_media_upload(request: Request, user=Depends(auth)):
         return media.upload(str(body.get("name", "image"))[:120], body.get("data", ""), str(body.get("alt", ""))[:250], kind, user)
     except Exception as e:
         raise HTTPException(502, f"Upload failed: {str(e)[:300]}")
+
+
+def _src(fn, *a, **k):
+    try:
+        return fn(*a, **k)
+    except sources.SourceError as e:
+        raise HTTPException(400, str(e))
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(502, f"The image service answered {e.response.status_code}.")
+    except httpx.HTTPError as e:
+        raise HTTPException(502, f"Couldn't reach the image service ({type(e).__name__}).")
+
+
+@app.get("/api/media/sources")
+def api_sources(user=Depends(auth)):
+    return {**sources.enabled(), "staged": sources.staged()}
+
+
+@app.get("/api/media/search")
+def api_media_search(source: str, q: str, page: int = 1, user=Depends(auth)):
+    return {"results": _src(sources.search, source, q, page)}
+
+
+@app.post("/api/media/stage")
+async def api_media_stage(request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _src(sources.stage, str(b.get("source", "")), str(b.get("id", "")), user)
+
+
+@app.post("/api/media/generate")
+async def api_media_generate(request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _src(sources.generate, b.get("prompt"), str(b.get("aspect", "hero")), user)
+
+
+@app.post("/api/media/staged/{sid}/edit")
+async def api_media_edit(sid: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _src(sources.edit, sid, str(b.get("op", "")), user, crop=b.get("crop"), focus=str(b.get("focus", "centre")))
+
+
+@app.post("/api/media/staged/{sid}/alt")
+def api_media_alt(sid: str, user=Depends(auth)):
+    return _src(sources.suggest_alt, sid)
+
+
+@app.post("/api/media/staged/{sid}/hide")
+def api_media_hide(sid: str, user=Depends(auth)):
+    return _src(sources.hide, sid, user)
+
+
+@app.post("/api/media/staged/{sid}/attach")
+async def api_media_attach(sid: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    kind = b.get("kind") if b.get("kind") in ("photo", "cutout", "product", "icon") else "photo"
+    return _src(sources.attach, sid, str(b.get("url", ""))[:500], str(b.get("alt", ""))[:250], kind, user)
+
+
+@app.get("/media/staged/{sid}")
+def media_staged_file(sid: str, download: int = 0, user=Depends(auth)):
+    data = _src(sources.image_bytes, sid)
+    mime = "image/png" if data[:4] == b"\x89PNG" else "image/jpeg"
+    headers = {"Cache-Control": "private, max-age=3600"}
+    if download:
+        headers["Content-Disposition"] = f'attachment; filename="{_src(sources.download_name, sid)}"'
+    return Response(data, media_type=mime, headers=headers)
 
 
 @app.post("/api/media/add-url")
