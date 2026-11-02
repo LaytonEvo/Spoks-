@@ -492,3 +492,19 @@ svg.vz { display: block; margin: 0 auto; font-family: Inter, Arial, sans-serif; 
 #th-key { padding: 6px 8px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; background: #fff; max-width: 320px; }
 .m-addurl { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
 .m-addurl input { width: 100%; }
+/* full editor */
+.b-undo { display: inline-flex; gap: 4px; } .b-undo .btn-line { padding: 6px 10px; } .b-undo .btn-line:disabled { opacity: .45; }
+.bdrag { cursor: grab; padding: 0 6px 0 2px; color: var(--muted); user-select: none; font-size: 14px; }
+.bdrag:active { cursor: grabbing; }
+.bblock.drop-before { box-shadow: inset 0 3px 0 var(--green); } .bblock.drop-after { box-shadow: inset 0 -3px 0 var(--green); }
+.bcond.aud { background: #E7F1FB; color: #1D4F86; } .bcom { font-size: 11px; margin-left: 6px; cursor: pointer; }
+.b-set label, .b-comments label { display: block; font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.b-set select { display: block; width: 100%; margin-top: 3px; padding: 6px 8px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; background: #fff; color: var(--ink); }
+.b-set-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.b-comments textarea { width: 100%; box-sizing: border-box; margin-top: 8px; padding: 7px 9px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; }
+.bc { border-left: 3px solid var(--green); padding: 4px 0 4px 9px; margin: 8px 0; } .bc.res { opacity: .6; border-color: var(--line); }
+.bc p { margin: 3px 0; font-size: 14px; } .bc-reply { margin: 6px 0 0 10px; padding-left: 8px; border-left: 2px solid var(--line); }
+.bc-act { margin-top: 2px; } .bc-block { display: block; text-align: left; margin: 2px 0; }
+.e-new { display: grid; grid-template-columns: 2fr 2fr auto; gap: 10px; align-items: end; }
+.e-new label { font-size: 13px; color: var(--muted); } .e-new input, .e-new select { display: block; width: 100%; margin-top: 3px; padding: 7px 9px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 15px; background: #fff; }
+@media (max-width: 800px) { .e-new { grid-template-columns: 1fr; } }

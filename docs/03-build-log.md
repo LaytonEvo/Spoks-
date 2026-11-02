@@ -371,3 +371,20 @@
 - Shared doc "Evoflows: what our flows need": items 18–20 ticked with the answers.
 - Not done: items 1, 3–5 and 7–15 were answered in section 11 of Evoflows' contract (13 Oct), which isn't in this repo
   (it's in the BusinessEmail repo, which this session can't reach). Their flow changes wait on that text.
+
+## 2 Nov 2026 — Full email editor
+
+- **Emails page** (sidebar): every email by flow, plus emails composed from scratch, with status, open comments and last edit.
+- **New email:** start blank (the general header and footer, a heading, a paragraph, a button) or copy any email. Stored as
+  `new_<name>`; not sent by any flow until a flow uses that key. Same draft → approve → publish and the same checks. A brand
+  theme publish skips new emails that were never published.
+- **Drag and drop:** move blocks by their ⠿ handle; drag library blocks into place (click still adds after the selected block).
+  New library block: Photo.
+- **Block settings:** show to (members, non-members, annual, Free, everyone except annual, trolley/Motocaddy/clubs/hardware/
+  no-hardware/shoes in the basket or order, known first name), space above/below, left/centre, white or the stone panel.
+  Stored as a wrapper row the server builds itself (`builder.wrap`/`unwrap`); the approved rows inside are checked as before.
+  The footer can't be hidden from anyone (unsubscribe link).
+- **Undo/redo** (buttons, Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z or Ctrl+Y; Ctrl/Cmd+S saves), 100 steps.
+- **Comments** on an email or a block: reply, resolve and reopen; counts on blocks and the Emails page.
+- Checked: all 29 flow emails render identical to their approved builds, including after an unchanged save; browser test of
+  create → drag → undo/redo → settings → comment → save → audience previews → approve.

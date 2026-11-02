@@ -74,6 +74,63 @@ def tokens(s):
     return sorted(TOK.findall(s))
 
 
+# ---------------- block settings and audience (the full editor) ----------------
+# A block's settings and "only show to" condition are a wrapper row around its original rows, so the rows inside stay
+# exactly as approved and the server rebuilds the wrapper itself (the editor never sends wrapper HTML).
+COND = {  # key -> (Go condition, label)
+    "members": (".Tx.Data.is_member", "Members (Free or annual)"), "non_members": ("not .Tx.Data.is_member", "Not members"),
+    "annual": (".Tx.Data.is_annual", "Annual members"), "free": (".Tx.Data.is_free_member", "Free members"),
+    "not_annual": ("not .Tx.Data.is_annual", "Everyone except annual members"),
+    "trolley": (".Tx.Data.has_trolley", "Basket or order has a trolley"),
+    "motocaddy": (".Tx.Data.has_motocaddy_trolley", "Basket or order has a Motocaddy trolley"),
+    "clubs": ("(or .Tx.Data.has_clubs .Tx.Data.has_used_clubs)", "Basket or order has clubs or used clubs"),
+    "hardware": (".Tx.Data.has_hardware", "Basket or order has a trolley, clubs or used clubs"),
+    "no_hardware": ("not .Tx.Data.has_hardware", "No trolley or clubs in the basket or order"),
+    "shoes": (".Tx.Data.has_shoes", "Basket or order has shoes"),
+    "named": (".Tx.Data.first_name", "We know their first name"),
+}
+SPACES = (0, 8, 16, 24, 32, 48)
+DEFAULT_SET = {"pt": 0, "pb": 0, "al": "l", "bg": "w"}
+WRAP_RE = re.compile(r'^(\{\{ if (.+?) \}\})?<tr class="egb pt(\d+) pb(\d+) al([lc]) bg([ws])"><td[^>]*><table role="presentation" '
+                     r'width="100%" cellpadding="0" cellspacing="0" border="0">(.*)</table></td></tr>(\{\{ end \}\})?$', re.S)
+GO_COND = {v[0]: k for k, v in COND.items()}
+
+
+def clean_settings(s):
+    s = s or {}
+    out = dict(DEFAULT_SET)
+    for k in ("pt", "pb"):
+        try:
+            v = int(s.get(k, 0))
+        except (TypeError, ValueError):
+            v = 0
+        out[k] = v if v in SPACES else 0
+    out["al"] = "c" if s.get("al") == "c" else "l"
+    out["bg"] = "s" if s.get("bg") == "s" else "w"
+    return out
+
+
+def wrap(inner, settings=None, cond=""):
+    s = clean_settings(settings)
+    if cond and cond not in COND:
+        raise ValueError("Unknown audience for a block.")
+    if s == DEFAULT_SET and not cond:
+        return inner
+    style = f"padding:{s['pt']}px 0 {s['pb']}px 0;" + ("text-align:center;" if s["al"] == "c" else "")
+    bg = ' bgcolor="[[c:stone]]"' if s["bg"] == "s" else ""
+    row = (f'<tr class="egb pt{s["pt"]} pb{s["pb"]} al{s["al"]} bg{s["bg"]}"><td{bg} style="{style}"><table role="presentation" '
+           f'width="100%" cellpadding="0" cellspacing="0" border="0">{inner}</table></td></tr>')
+    return "{{ if " + COND[cond][0] + " }}" + row + "{{ end }}" if cond else row
+
+
+def unwrap(block):
+    """(inner rows, settings, audience key) for a block; plain blocks have default settings and no audience."""
+    m = WRAP_RE.match(block.strip())
+    if not m or bool(m.group(1)) != bool(m.group(8)) or (m.group(2) and m.group(2) not in GO_COND):
+        return block, dict(DEFAULT_SET), ""
+    return m.group(7), {"pt": int(m.group(3)), "pb": int(m.group(4)), "al": m.group(5), "bg": m.group(6)}, GO_COND.get(m.group(2) or "", "")
+
+
 # ---------------- labels ----------------
 GO_FIELD = {"is_annual": "annual member", "is_free_member": "Free member", "is_member": "member (Free or annual)",
             "has_trolley": "has a trolley", "has_motocaddy_trolley": "has a Motocaddy trolley", "has_clubs": "has clubs",
@@ -264,7 +321,94 @@ def variants():
 
 
 def is_template(key):
-    return key in evoflows.manifest()["templates"] or key in variants()
+    return key in evoflows.manifest()["templates"] or key in variants() or key in customs()
+
+
+def customs():
+    """Emails composed from scratch in the editor: {key: {name, html_t, subject, preview_text, from_name, by, at}}."""
+    try:
+        return json.loads((STORE / "_custom.json").read_text())
+    except Exception:
+        return {}
+
+
+def create_custom(name, start, who):
+    """A new email. start: "blank" (brand header, a heading, a paragraph, a button, footer) or an email key to copy."""
+    name = re.sub(r"\s+", " ", str(name or "")).strip()[:80]
+    if not name:
+        raise ValueError("Give the new email a name.")
+    slug = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")[:24] or "email"
+    if start and start != "blank":
+        if not is_template(start):
+            raise ValueError("Unknown email to copy.")
+        src = live(start)
+        html_t, subject, pre, frm = src["html_t"], src["subject"], src["preview_text"], src["from_name"]
+    else:
+        b = base("f1_e1")  # the general (non-member) header and footer
+        head, blocks, tail = split(b["html_t"])
+        lib = {x["name"]: x["html"] for x in library()}
+        kinds = [block_meta(x)["kind"] for x in blocks]
+        foot = kinds.index("Footer")
+        keep = [blocks[kinds.index("Header")], lib.get("Heading and intro", ""), lib.get("Plain paragraph", ""), lib.get("Button", "")] + blocks[foot:]
+        html_t, subject, pre, frm = head + "".join(x for x in keep if x) + tail, "", "", SENDERS[0]
+    with _lock:
+        c = customs()
+        key, i = f"new_{slug}", 2
+        while key in c or key in evoflows.manifest()["templates"]:
+            key, i = f"new_{slug}_{i}", i + 1
+        c[key] = {"name": name, "html_t": html_t, "subject": subject, "preview_text": pre, "from_name": frm, "by": who, "at": _now(),
+                  "copied_from": None if start in (None, "", "blank") else start}
+        STORE.mkdir(parents=True, exist_ok=True)
+        (STORE / "_custom.json").write_text(json.dumps(c, ensure_ascii=False))
+    return {"key": key}
+
+
+def emails():
+    """Every email the editor can open, for the Emails page."""
+    man = evoflows.manifest()
+    flow_of = {t: f for f, m in man["flows"].items() for t in m["templates"]}
+    out = []
+    for key in all_keys():
+        rec = _load(key)
+        cur = live(key)
+        latest = rec["versions"][-1] if rec["versions"] else None
+        out.append({"key": key, "name": cur["name"], "subject": cur["subject"], "flow": flow_of.get(key) or flow_of.get(variants().get(key, "")),
+                    "custom": key in customs(), "variant": key in variants(), "published_n": rec.get("published"),
+                    "pending": latest["status"] if latest and latest["status"] in ("draft", "approved") else None,
+                    "edited_at": latest["at"] if latest else None, "comments": sum(1 for c in comments(key) if not c.get("resolved"))})
+    return out
+
+
+# ---------------- comments ----------------
+def comments(key):
+    try:
+        return json.loads((STORE / "_comments" / f"{key}.json").read_text())
+    except Exception:
+        return []
+
+
+def add_comment(key, text, block, who, reply_to=None):
+    text = str(text or "").strip()[:2000]
+    if not text:
+        raise ValueError("Write a comment first.")
+    with _lock:
+        cs = comments(key)
+        cid = max([c["id"] for c in cs] + [0]) + 1
+        cs.append({"id": cid, "text": text, "block": str(block or "")[:120], "by": who, "at": _now(), "resolved": False,
+                   "reply_to": int(reply_to) if reply_to else None})
+        (STORE / "_comments").mkdir(parents=True, exist_ok=True)
+        (STORE / "_comments" / f"{key}.json").write_text(json.dumps(cs, ensure_ascii=False))
+    return cs
+
+
+def resolve_comment(key, cid, who, resolved=True):
+    with _lock:
+        cs = comments(key)
+        for c in cs:
+            if c["id"] == cid or c.get("reply_to") == cid:
+                c.update(resolved=resolved, resolved_by=who if resolved else None)
+        (STORE / "_comments" / f"{key}.json").write_text(json.dumps(cs, ensure_ascii=False))
+    return cs
 
 
 def create_variant(key):
@@ -305,7 +449,7 @@ def _final(v):
 
 
 def all_keys():
-    return sorted(set(evoflows.manifest()["templates"]) | set(variants()))
+    return sorted(set(evoflows.manifest()["templates"]) | set(variants()) | set(customs()))
 
 
 def base(key):
@@ -313,6 +457,11 @@ def base(key):
     if parent:  # a test version starts from what customers get now
         p = live(parent)
         return {**p, "n": 0, "status": "approved build", "name": f"{p['name']} (test version B)", "by": "copy of the live email", "at": None}
+    c = customs().get(key)
+    if c:  # composed in the editor: its starting point is what it was created from
+        return {"n": 0, "status": "approved build", "subject": c["subject"], "preview_text": c["preview_text"], "from_name": c["from_name"],
+                "name": c["name"], "html_t": c["html_t"], "overrides": {}, "html": design.render(c["html_t"], design.brand()),
+                "by": f"started by {c['by']}", "at": c["at"]}
     body = json.loads((OUT / "templates" / f"{key}.json").read_text())
     ht = design.tokenize(body["html"])
     return {"n": 0, "status": "approved build", "subject": body["subject"], "preview_text": body["preview_text"],
@@ -342,14 +491,14 @@ def library():
              ("Button", "f2_pe1", "Open my member portal", None), ("Benefits table", "f2_pe1", "10% off monthly", None),
              ("Numbered steps", "f2_pe1", "Three things to do this week", None), ("Membership panel", "f3_e1hi", "Evolution Golf Membership", None),
              ("Good to know", "f3_e1hi", "Good to know before you check out", None), ("Trust line", "f3_e1hi", "Advice from golfers", None),
-             ("Product from the basket", "f3_e1hi", "Qty", "checkout")]
+             ("Product from the basket", "f3_e1hi", "Qty", "checkout"), ("Photo", "f1_e1", 'alt="A golf course', None)]
     out = []
     for name, key, needle, context in picks:
         try:
             _, blocks, _ = split(base(key)["html_t"])
         except Exception:
             continue
-        b = next((x for x in blocks if needle in htmllib.unescape(re.sub(r"<[^>]+>", " ", x))), None)
+        b = next((x for x in blocks if (needle in x if needle.startswith("alt=") else needle in htmllib.unescape(re.sub(r"<[^>]+>", " ", x)))), None)
         if b:
             out.append({"id": f"lib:{len(out)}", "name": name, "from": key, "context": context, "html": b, "meta": block_meta(b)})
     return out
@@ -370,14 +519,27 @@ def doc(key):
                                   "families": {k: v[0] for k, v in {**design.FONTS["head"], **design.FONTS["body"]}.items()}}},
             "editing": {"n": start["n"], "status": start["status"], "subject": start["subject"], "preview_text": start["preview_text"],
                         "from_name": start["from_name"],
-                        "blocks": [{"src": f"v{start['n']}:{i}", "html": b, "meta": block_meta(b), "segments": segments(b)} for i, b in enumerate(blocks)]},
+                        "blocks": [_doc_block(start["n"], i, b) for i, b in enumerate(blocks)]},
+            "conds": [{"key": k, "label": v[1]} for k, v in COND.items()], "conds_go": {k: v[0] for k, v in COND.items()}, "spaces": list(SPACES), "custom": key in customs(),
             "versions": [{k: v.get(k) for k in ("n", "status", "subject", "by", "at", "note", "approved_by", "approved_at", "published_by", "published_at")}
                          for v in rec["versions"]][::-1],
             "library": [{**x, "segments": segments(x["html"])} for x in library()],
             "checks": checks(_final(start), start["subject"])}
 
 
+def _doc_block(n, i, b):
+    inner, s, cond = unwrap(b)
+    meta = block_meta(inner)
+    return {"src": f"v{n}:{i}", "html": inner, "meta": meta, "segments": segments(inner), "settings": s, "cond": cond}
+
+
 def _source_block(key, src):
+    """The approved rows a block came from (a wrapper's settings and audience removed)."""
+    b = _source_raw(key, src)
+    return None if b is None else unwrap(b)[0]
+
+
+def _source_raw(key, src):
     if src.startswith("lib:"):
         lib = library()
         i = int(src[4:])
@@ -428,6 +590,8 @@ def save(key, body, who):
         src = _source_block(key, b.get("src", ""))
         if src is None:
             raise ValueError("A block came from somewhere unknown; reload the editor.")
+        if b.get("cond") and ".Tx.Data.unsubscribe_url" in src:
+            raise ValueError("The footer goes to everyone (it carries the unsubscribe link).")
         if tokens(src) != tokens(b.get("html", "")):
             raise ValueError("Personalisation or a condition inside a block was changed; only words can be edited.")
         if _tags(src) != _tags(b["html"]):
@@ -445,7 +609,7 @@ def save(key, body, who):
     from_name = body.get("from_name") if body.get("from_name") in SENDERS else live(key)["from_name"]
     cur = live(key)
     head, _, tail = split(cur["html_t"])
-    html_t = head + "".join(b["html"] for b in blocks) + tail
+    html_t = head + "".join(wrap(b["html"], b.get("settings"), b.get("cond") or "") for b in blocks) + tail
     br = design.brand()
     overrides = design.diff(design.merge(br, body.get("overrides") or {}), br)  # only what differs from the brand theme
     html = design.render(html_t, design.merge(br, overrides))
@@ -561,6 +725,8 @@ def preview(key, n=None, audience="non", html_t=None, overrides=None, theme=None
 
 def republish_for_theme(key, who, note):
     """After a brand theme change: re-publish what customers get, re-rendered with the new theme (their own overrides kept)."""
+    if key in customs() and not _load(key).get("published"):
+        return {"status": 200, "skipped": "new email, never published"}
     cur = live(key)
     with _lock:
         rec = _load(key)

@@ -476,6 +476,34 @@ def api_builder(key: str, user=Depends(auth)):
     return _b(builder.doc, _tpl_key(key))
 
 
+@app.get("/api/emails")
+def api_emails(user=Depends(auth)):
+    return {"emails": builder.emails(), "flows": {f: m.get("name", f) for f, m in evoflows.manifest()["flows"].items()}}
+
+
+@app.post("/api/emails/new")
+async def api_emails_new(request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _b(builder.create_custom, b.get("name"), b.get("from") or "blank", user)
+
+
+@app.get("/api/builder/{key}/comments")
+def api_builder_comments(key: str, user=Depends(auth)):
+    return {"comments": builder.comments(_tpl_key(key))}
+
+
+@app.post("/api/builder/{key}/comments")
+async def api_builder_comment(key: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    return {"comments": _b(builder.add_comment, _tpl_key(key), b.get("text"), b.get("block"), user, b.get("reply_to"))}
+
+
+@app.post("/api/builder/{key}/comments/{cid}/resolve")
+async def api_builder_comment_resolve(key: str, cid: int, request: Request, user=Depends(auth)):
+    b = await request.json()
+    return {"comments": _b(builder.resolve_comment, _tpl_key(key), cid, user, bool(b.get("resolved", True)))}
+
+
 @app.post("/api/builder/{key}/save")
 async def api_builder_save(key: str, request: Request, user=Depends(auth)):
     return _b(builder.save, _tpl_key(key), await request.json(), user)
