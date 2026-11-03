@@ -520,6 +520,8 @@ def doc(key):
             "editing": {"n": start["n"], "status": start["status"], "subject": start["subject"], "preview_text": start["preview_text"],
                         "from_name": start["from_name"],
                         "blocks": [_doc_block(start["n"], i, b) for i, b in enumerate(blocks)]},
+            "ai": bool(config.ANTHROPIC_API_KEY),
+            "testable": key in evoflows.manifest()["templates"] and any(key in m["templates"] for m in evoflows.manifest()["flows"].values()),
             "conds": [{"key": k, "label": v[1]} for k, v in COND.items()], "conds_go": {k: v[0] for k, v in COND.items()}, "spaces": list(SPACES), "custom": key in customs(),
             "versions": [{k: v.get(k) for k in ("n", "status", "subject", "by", "at", "note", "approved_by", "approved_at", "published_by", "published_at")}
                          for v in rec["versions"]][::-1],

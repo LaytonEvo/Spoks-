@@ -521,3 +521,12 @@ svg.vz { display: block; margin: 0 auto; font-family: Inter, Arial, sans-serif; 
 .m-wb-img img { max-width: 100%; max-height: 60vh; display: block; margin: 0 auto; border: 1px solid var(--line); background: #fff; }
 .m-wb-side h3 { margin: 12px 0 6px; font-size: 15px; } .m-wb-side label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
 .m-wb-side select, .m-wb-side input, .m-wb-side textarea { display: block; width: 100%; box-sizing: border-box; margin-top: 3px; padding: 6px 8px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; background: #fff; }
+/* AI assistant */
+.b-ai .ai-tabs { flex-wrap: wrap; margin-bottom: 8px; } .b-ai .ai-tabs button { font-size: 12px; padding: 5px 8px; }
+.b-ai input, .b-ai textarea { width: 100%; box-sizing: border-box; margin: 6px 0; padding: 7px 9px; border: 1px solid #D9D4C7; border-radius: 6px; font: inherit; font-size: 14px; }
+.ai-asks { line-height: 1.8; } .ai-opt { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 8px 0; background: #fff; }
+.ai-opt p { margin: 4px 0 8px; font-size: 14px; } .b-ai mark { background: #E5F4E4; color: inherit; padding: 0 1px; } .b-ai s { color: var(--muted); }
+.ai-find { border-left: 3px solid var(--line); padding: 2px 0 2px 9px; margin: 10px 0; } .ai-find.high { border-color: var(--high); } .ai-find.medium { border-color: var(--med); }
+.ai-find p { margin: 3px 0; } .ai-q { font-style: italic; font-size: 13px; }
+.ai-sev { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.ai-edit { display: flex !important; gap: 8px; align-items: flex-start; font-size: 13px; margin: 8px 0; color: var(--ink) !important; } .ai-edit input { width: auto; margin-top: 3px; }

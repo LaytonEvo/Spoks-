@@ -3,7 +3,7 @@
 // library, preview it as different customers, then save a draft -> approve -> publish. Layout and personalisation are
 // locked (the server refuses a block whose tags or {{ }} tokens changed).
 
-const B = { key: null, doc: null, blocks: [], subject: "", preview: "", from: "", mode: "edit", previewN: null, audience: "non", width: "600", sel: null, dirty: false, subjMap: [], overrides: {}, theme: null, vals: {}, hist: [], fut: [], typing: null, comments: [], showResolved: false, drag: null };
+const B = { key: null, doc: null, blocks: [], subject: "", preview: "", from: "", mode: "edit", previewN: null, audience: "non", width: "600", sel: null, dirty: false, subjMap: [], overrides: {}, theme: null, vals: {}, hist: [], fut: [], typing: null, comments: [], showResolved: false, drag: null, ai: { tab: "rewrite", busy: false, res: null, err: "", key: "", typed: {} } };
 
 const unesc = (s) => { const t = document.createElement("textarea"); t.innerHTML = s; return t.value; };
 const escText = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -120,6 +120,7 @@ function drawBuilder() {
       <aside class="b-side">
         ${checks.errors.length || checks.warnings.length || qc.length ? `<div class="panel"><h3>Checks</h3>${checks.errors.map((x) => `<div class="flag high">${esc(x)}</div>`).join("")}${[...new Set([...checks.warnings, ...qc])].map((x) => `<div class="flag medium">${esc(x)}</div>`).join("")}</div>` : ""}
         <div id="b-setp">${bSettingsPanel()}</div>
+        <div id="b-aip">${bAiPanel()}</div>
         <div id="b-comp">${bCommentsPanel()}</div>
         <details class="panel ds-panel" ${Object.keys(B.overrides).length ? "open" : ""}><summary><h3 style="display:inline">Design</h3> <span class="muted small">${Object.keys(B.overrides).length ? "this email has its own design" : "uses the brand theme"}</span></summary>
           <p class="muted small">Changes here apply to this email only and win over the <a href="#theme">brand theme</a>.</p>
@@ -395,7 +396,7 @@ document.addEventListener("click", async (e) => {
     catch (err) { alertInline(e.target, err.message); e.target.disabled = false; }
   }
 });
-function bSide() { const a = $("#b-setp"), c = $("#b-comp"); if (a) a.innerHTML = bSettingsPanel(); if (c) { const t = $("#bc-text"), keep = t ? t.value : ""; c.innerHTML = bCommentsPanel(); if (keep) $("#bc-text").value = keep; } }
+function bSide() { const a = $("#b-setp"), c = $("#b-comp"); if (a) a.innerHTML = bSettingsPanel(); if (typeof aiDraw === "function") aiDraw(); if (c) { const t = $("#bc-text"), keep = t ? t.value : ""; c.innerHTML = bCommentsPanel(); if (keep) $("#bc-text").value = keep; } }
 
 // ---------------- Emails page: every email the editor can open, and new emails from scratch ----------------
 async function renderEmails() {
@@ -427,3 +428,124 @@ document.addEventListener("click", async (e) => {
     catch (err) { alertInline(e.target, err.message); e.target.disabled = false; }
   }
 });
+
+// ---------------- AI copy assistant: suggestions only; applying one is an ordinary (undoable) edit ----------------
+const AI_TABS = [["rewrite", "Rewrite a block"], ["subjects", "Subject lines"], ["check", "Check the copy"], ["change", "Describe a change"]];
+const AI_ASKS = ["Make it shorter", "Make it warmer and more personal", "Make it clearer", "Make it more direct", "Use simpler words"];
+function aiParts(b) { return b.segs.map(([k, v], si) => k === "text" ? { i: si, text: unesc(v) } : k === "tok" ? { tok: bTokLabel(v) } : null).filter(Boolean); }
+function aiBlockText(b) { return aiParts(b).map((p) => p.tok ? `[${p.tok}]` : p.text).join("").replace(/\s+/g, " ").trim(); }
+function aiEditable(b) { return !["Header", "Footer"].includes(b.meta.kind) && b.segs.some(([k]) => k === "text"); }
+function aiEmail() { return B.blocks.map((b, bi) => ({ block: bi, kind: b.meta.kind, only_if: [b.meta.only_if, condLabel(b.cond)].filter(Boolean).join("; "), text: aiBlockText(b) })).filter((x) => x.text); }
+function aiLabels() { return B.subjMap.map(([label]) => label); }
+function aiPreview(b, pieces) {
+  const rep = Object.fromEntries(pieces.map((p) => [p.i, p.text]));
+  return aiParts(b).map((p) => p.tok ? `<span class="tokchip">${esc(p.tok)}</span>` : rep[p.i] != null ? `<mark>${esc(rep[p.i])}</mark>` : esc(p.text)).join("");
+}
+function aiApply(bi, pieces) {
+  const b = B.blocks[bi];
+  for (const p of pieces) {
+    const seg = b.segs[p.i];
+    if (!seg || seg[0] !== "text") continue;
+    const orig = unesc(seg[1]), lead = orig.match(/^\s*/)[0], trail = orig.match(/\s*$/)[0];
+    seg[1] = escText(lead + p.text + trail);
+  }
+}
+function aiProb(list) { return list && list.length ? `<span class="m-badge warn">${esc(list.join(", "))}</span>` : ""; }
+function bAiPanel() {
+  const a = B.ai;
+  if (!B.doc.ai) return `<div class="panel"><h3>AI assistant</h3><p class="muted small">Needs ANTHROPIC_API_KEY in Railway.</p></div>`;
+  const sel = B.sel != null ? B.blocks[B.sel] : null;
+  let body = "";
+  if (a.tab === "rewrite") {
+    body = sel && aiEditable(sel) ? `<p class="muted small">Selected: ${esc(blockLabel(sel))}</p>
+      <div class="ai-asks">${AI_ASKS.map((q) => `<button type="button" class="link-btn small" data-aiask="${esc(q)}">${esc(q)}</button>`).join(" · ")}</div>
+      <input id="ai-instr" value="${esc(a.typed.rewrite || "")}" placeholder="Or say how, e.g. lead with the free delivery" maxlength="300"><button type="button" class="btn-line" data-aigo="rewrite">Suggest rewrites</button>`
+      : `<p class="muted small">Select a block with words in it (not the header or footer).</p>`;
+    if (a.res && a.res.kind === "rewrite" && a.res.bi === B.sel) body += a.res.options.map((o, oi) => `<div class="ai-opt"><b>${esc(o.label)}</b> ${aiProb([].concat(...o.pieces.map((p) => p.problems)))}<p>${aiPreview(sel, o.pieces)}</p><button type="button" class="btn-line" data-aiuse="${oi}">Use this</button></div>`).join("");
+  } else if (a.tab === "subjects") {
+    body = `<input id="ai-goal" value="${esc(a.typed.subjects || "")}" placeholder="Optional: the angle you want, e.g. lean on membership" maxlength="300"><button type="button" class="btn-line" data-aigo="subjects">Suggest subject lines</button>`;
+    if (a.res && a.res.kind === "subjects") body += a.res.ideas.map((x, i) => `<div class="ai-opt"><b>${esc(x.subject)}</b> ${aiProb(x.problems)}<p class="muted small">${esc(x.preview_text)} · <i>${esc(x.angle)}</i></p>
+      <button type="button" class="btn-line" data-aisubj="${i}">Use it</button>${B.doc.testable ? ` <button type="button" class="link-btn small" data-aitest="${i}">A/B test it against the current subject</button>` : ""}</div>`).join("") || `<p class="muted small">No ideas came back that fit; try again.</p>`;
+  } else if (a.tab === "check") {
+    body = `<p class="muted small">Claude reads the email (as it stands in the editor) against the rules: invented facts, urgency, discounts, the members' delivery line, UK spelling, voice, and whether each block suits who sees it.</p><button type="button" class="btn-line" data-aigo="check">Check the copy</button>`;
+    if (a.res && a.res.kind === "check") body += `<p><b>${esc(a.res.summary)}</b></p>` + a.res.findings.map((f, i) => `<div class="ai-find ${f.severity}"><span class="ai-sev">${esc(f.severity)}</span> <b>${esc(f.rule)}</b>
+      ${f.quote ? `<p class="ai-q">“${esc(f.quote)}” <button type="button" class="link-btn small" data-aiq="${i}">Show</button></p>` : ""}<p class="small">${esc(f.why)}</p>${f.suggestion ? `<p class="small"><i>Try:</i> ${esc(f.suggestion)}</p>` : ""}</div>`).join("");
+  } else {
+    body = `<textarea id="ai-change" rows="3" maxlength="600" placeholder="e.g. Make this suit Free members: mention they already get free delivery over £10, and soften the sign-up ask">${esc(a.typed.change || "")}</textarea><button type="button" class="btn-line" data-aigo="change">Suggest changes</button>`;
+    if (a.res && a.res.kind === "change") {
+      const r = a.res;
+      body += `<p><b>${esc(r.summary)}</b></p>${r.subject ? `<label class="ai-edit"><input type="checkbox" data-aich="subject" checked> <span>Subject: <s>${esc(B.subject)}</s> → <mark>${esc(r.subject.text)}</mark> ${aiProb(r.subject.problems)}</span></label>` : ""}
+        ${r.preview_text ? `<label class="ai-edit"><input type="checkbox" data-aich="preview" checked> <span>Preview: <s>${esc(B.preview)}</s> → <mark>${esc(r.preview_text.text)}</mark> ${aiProb(r.preview_text.problems)}</span></label>` : ""}
+        ${r.edits.map((e, i) => `<label class="ai-edit"><input type="checkbox" data-aich="${i}" checked> <span><span class="muted small">${esc(e.kind)}</span><br><s>${esc(e.before)}</s> → <mark>${esc(e.text)}</mark> ${aiProb(e.problems)}</span></label>`).join("")}
+        ${r.notes.length ? `<ul class="small">${r.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+        ${r.edits.length || r.subject || r.preview_text ? `<button type="button" class="btn" data-aiapply="1">Apply the ticked changes</button>` : `<p class="muted small">No word changes suggested.</p>`}`;
+    }
+  }
+  return `<div class="panel b-ai"><h3>AI assistant</h3><div class="seg seg-light ai-tabs">${AI_TABS.map(([k, l]) => `<button type="button" data-aitab="${k}" aria-pressed="${a.tab === k}">${l}</button>`).join("")}</div>
+    ${a.err ? `<div class="flag high">${esc(a.err)}</div>` : ""}${a.busy ? `<p class="muted">Asking Claude…</p>` : body}
+    <p class="muted small">Suggestions only: anything you use is an edit you can undo, and still goes through approve and publish.</p></div>`;
+}
+function aiDraw() { const el = $("#b-aip"); if (el) el.innerHTML = bAiPanel(); }
+async function aiCall(path, body) { return api(`/api/assistant/${encodeURIComponent(B.key)}/${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); }
+async function aiGo(kind, instr) {
+  const a = B.ai; a.err = ""; a.busy = true; a.res = null; if (kind !== "check" && !AI_ASKS.includes(instr)) a.typed[kind] = instr; aiDraw();
+  try {
+    if (kind === "rewrite") {
+      const b = B.blocks[B.sel], bi = B.sel;
+      const r = await aiCall("rewrite", { parts: aiParts(b), instruction: instr, context: { kind: b.meta.kind, only_if: [b.meta.only_if, condLabel(b.cond)].filter(Boolean).join("; "), subject: B.subject, email: B.doc.name } });
+      a.res = { kind, bi, ...r };
+    } else if (kind === "subjects") {
+      a.res = { kind, ...(await aiCall("subjects", { subject: B.subject, preview_text: B.preview, email_text: aiEmail().map((x) => x.text).join("\n"), labels: aiLabels(), goal: instr })) };
+    } else if (kind === "check") {
+      a.res = { kind, ...(await aiCall("check", { subject: B.subject, preview_text: B.preview, blocks: aiEmail() })) };
+    } else {
+      const blocks = B.blocks.map((b, bi) => ({ block: bi, kind: b.meta.kind, only_if: [b.meta.only_if, condLabel(b.cond)].filter(Boolean).join("; "), parts: aiParts(b), ok: aiEditable(b) })).filter((x) => x.ok);
+      a.res = { kind, ...(await aiCall("change", { instruction: instr, subject: B.subject, preview_text: B.preview, blocks, labels: aiLabels() })) };
+    }
+  } catch (err) { a.err = err.message; }
+  a.busy = false; aiDraw();
+}
+document.addEventListener("click", async (e) => {
+  if (state.page !== "edit" || !e.target.closest || !e.target.closest(".b-ai")) return;
+  const a = B.ai, t = e.target;
+  const tab = t.closest("[data-aitab]"); if (tab) { a.tab = tab.dataset.aitab; a.res = null; a.err = ""; aiDraw(); return; }
+  const ask = t.closest("[data-aiask]"); if (ask) { aiGo("rewrite", ask.dataset.aiask); return; }
+  const go = t.closest("[data-aigo]");
+  if (go) {
+    const k = go.dataset.aigo, v = k === "rewrite" ? ($("#ai-instr").value || "Make it clearer and tighter") : k === "subjects" ? $("#ai-goal").value : k === "change" ? $("#ai-change").value : "";
+    if (k === "change" && v.trim().length < 4) { a.err = "Say what you'd like changed."; aiDraw(); return; }
+    aiGo(k, v); return;
+  }
+  const use = t.closest("[data-aiuse]");
+  if (use && a.res && a.res.kind === "rewrite") { bPush(); aiApply(a.res.bi, a.res.options[+use.dataset.aiuse].pieces); a.res = null; B.dirty = true; drawBuilder(); return; }
+  const su = t.closest("[data-aisubj]");
+  if (su) { const x = a.res.ideas[+su.dataset.aisubj]; bPush(); B.subject = x.subject; B.preview = x.preview_text; B.dirty = true; drawBuilder(); return; }
+  const te = t.closest("[data-aitest]");
+  if (te) {
+    const x = a.res.ideas[+te.dataset.aitest];
+    if (!confirm(`Set up an A/B test?\n\nA: "${B.subject}"\nB: "${x.subject}"\n\nVersion B is a copy of this email with the new subject, saved as a draft. The test still needs approving and starting on the A/B tests page.`)) return;
+    te.disabled = true;
+    try { const r = await aiCall("subject-test", { subject: textToSubj(x.subject), preview_text: x.preview_text });
+      a.err = ""; a.res = null; aiDraw(); $("#b-aip .b-ai").insertAdjacentHTML("afterbegin", `<div class="flag">Test set up. <a href="#abtests">Open A/B tests</a> to approve and start it, or <a href="#edit/${esc(r.variant)}">edit version B</a>.</div>`); }
+    catch (err) { a.err = err.message; aiDraw(); }
+    return;
+  }
+  const q = t.closest("[data-aiq]");
+  if (q) {
+    const quote = a.res.findings[+q.dataset.aiq].quote.toLowerCase().replace(/\s+/g, " ").replace(/[“”"]/g, "");
+    const i = B.blocks.findIndex((b) => aiBlockText(b).toLowerCase().replace(/[“”"]/g, "").includes(quote.slice(0, 60)));
+    if (i >= 0) { B.sel = i; B.mode = "edit"; drawBuilder(); const el = document.querySelector(`.bblock[data-bi="${i}"]`); if (el) el.scrollIntoView({ block: "center" }); }
+    else if (B.subject.toLowerCase().includes(quote.slice(0, 40)) || B.preview.toLowerCase().includes(quote.slice(0, 40))) $("#b-subject").focus();
+    else alertInline(q, "Couldn't find those words in a block.");
+    return;
+  }
+  if (t.closest("[data-aiapply]") && a.res && a.res.kind === "change") {
+    const r = a.res, ticked = (k) => { const c = document.querySelector(`[data-aich="${k}"]`); return c && c.checked; };
+    bPush();
+    if (r.subject && ticked("subject")) B.subject = r.subject.text;
+    if (r.preview_text && ticked("preview")) B.preview = r.preview_text.text;
+    r.edits.forEach((ed, i) => { if (ticked(i)) aiApply(ed.block, [ed]); });
+    a.res = null; B.dirty = true; drawBuilder();
+  }
+});
+document.addEventListener("keydown", (e) => { if (state.page === "edit" && e.key === "Enter" && e.target.id === "ai-instr") { e.preventDefault(); aiGo("rewrite", e.target.value || "Make it clearer and tighter"); } });

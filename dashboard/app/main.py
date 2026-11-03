@@ -7,6 +7,7 @@ import secrets
 import threading
 import time
 
+import anthropic
 import httpx
 
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -14,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import abtest, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, assistant, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -476,6 +477,53 @@ def _b(fn, *a):
 @app.get("/api/builder/{key}")
 def api_builder(key: str, user=Depends(auth)):
     return _b(builder.doc, _tpl_key(key))
+
+
+# ---------- AI copy assistant (suggestions only; applying them is an edit like any other) ----------
+def _ai(fn, *a):
+    try:
+        return fn(*a)
+    except assistant.AssistantError as e:
+        raise HTTPException(400, str(e))
+    except anthropic.APIStatusError as e:
+        raise HTTPException(502, f"Claude answered {e.status_code}; try again in a moment.")
+    except anthropic.APIConnectionError:
+        raise HTTPException(502, "Couldn't reach Claude; try again in a moment.")
+
+
+@app.post("/api/assistant/{key}/rewrite")
+async def api_ai_rewrite(key: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _ai(assistant.rewrite, _tpl_key(key), b.get("parts"), b.get("instruction"), b.get("context") or {}, user)
+
+
+@app.post("/api/assistant/{key}/subjects")
+async def api_ai_subjects(key: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _ai(assistant.subjects, _tpl_key(key), str(b.get("subject", ""))[:300], str(b.get("preview_text", ""))[:300],
+               str(b.get("email_text", "")), b.get("labels") or [], str(b.get("goal", ""))[:300], user)
+
+
+@app.post("/api/assistant/{key}/subject-test")
+async def api_ai_subject_test(key: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    try:
+        return _ai(assistant.subject_test, _tpl_key(key), str(b.get("subject", ""))[:300], str(b.get("preview_text", ""))[:300], user)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/assistant/{key}/check")
+async def api_ai_check(key: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _ai(assistant.check, _tpl_key(key), str(b.get("subject", ""))[:300], str(b.get("preview_text", ""))[:300], b.get("blocks") or [], user)
+
+
+@app.post("/api/assistant/{key}/change")
+async def api_ai_change(key: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    return _ai(assistant.change, _tpl_key(key), b.get("instruction"), str(b.get("subject", ""))[:300], str(b.get("preview_text", ""))[:300],
+               b.get("blocks") or [], b.get("labels") or [], user)
 
 
 @app.get("/api/emails")

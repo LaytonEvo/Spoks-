@@ -404,3 +404,20 @@
     brand checks run and the licence, credit, AI flag and edit steps are kept with the image.
 - Working copies live on the app volume (`DATA_DIR/media/staged`); every take, generation and edit is in the engine log with who did it.
 - Fal and Openverse couldn't be reached from the build machine; tested with stand-ins, so the first real runs are on Railway.
+
+## 3 Nov 2026 — AI copy assistant (email editor)
+
+- New `dashboard/app/assistant.py` + an "AI assistant" panel in the editor (Claude, `ANTHROPIC_API_KEY`, model `REVIEW_MODEL`):
+  - **Rewrite a block:** quick asks (shorter, warmer, clearer, more direct, simpler) or your own; three options, previewed with
+    the changes highlighted; "Use this" applies one.
+  - **Subject lines:** six subject + preview ideas with their angle; "Use it", or "A/B test it": creates a 50/50 test of this email
+    with version B as a draft copy carrying the new subject (still approved and started on the A/B tests page).
+  - **Check the copy:** findings by severity (rules, clarity/audience fit, polish) with the exact words; "Show" jumps to the block.
+  - **Describe a change:** whole-email word edits (and subject/preview if asked), each shown before → after with a tick box;
+    things words can't do are listed as notes.
+- Safety: Claude sees and returns only the editable words, as replacements for numbered text pieces. Anything with markup or
+  template code is dropped; subjects can only use personalisation the email already has; discount-code and urgency wording is
+  flagged on every suggestion. The system prompt carries the rules (no invented facts — use [CONFIRM: …], no urgency, no codes,
+  members' delivery line, UK English, house voice). Applying a suggestion is an ordinary undoable edit; nothing is saved,
+  approved or published by the assistant. Every request is logged (`DATA_DIR/assistant.jsonl`) with who asked.
+- Tested in a browser with fixed Claude answers (no Anthropic key on the build machine), including unsafe ones.
