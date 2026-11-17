@@ -280,7 +280,7 @@ def _template_drift(keys, out):
         time.sleep(0.3)
 
 
-CHECK_VERSION = "4"  # bump when the copy check's instructions change, so every email is read again
+CHECK_VERSION = "5"  # bump when the copy check's instructions change, so every email is read again
 FLOW_AUDIENCE = {
     "f3_checkout": "People who left a checkout without buying (opted-in customers, soft opt-in). Paths by basket value (£300+ / under £300) and annual membership.",
     "f9_after_delivery": "Customers whose order was delivered. Paths by what they bought (trolleys, clubs, used clubs, other) and membership.",
@@ -298,16 +298,16 @@ def _readable(inner):
         inner_ = m.group(1).strip()
         word = inner_.split(" ", 1)[0]
         if word == "if":
-            return f" ⟦if {builder.go_label(inner_[3:])}: "
+            return f"⟦if {builder.go_label(inner_[3:])}: "
         if inner_.startswith("else if"):
             return f" | else if {builder.go_label(inner_[8:])}: "
         if word == "else":
             return " | otherwise: "
         if word == "range":
-            return " ⟦for each basket or order item: "
+            return "⟦for each basket or order item: "
         if word == "with":
-            return " ⟦if there is one: "
-        return "⟧ "
+            return "⟦if there is one: "
+        return "⟧"
     t = re.sub(r"\{\{-?\s*((?:if|else|end|range|with)\b.*?)\s*-?\}\}", ctl, t, flags=re.S)
     t = re.sub(r"\{\{.*?\}\}", lambda m: f"[{builder.tok_label(m.group(0))}]", t, flags=re.S)
     t = re.sub(r"<a\b[^>]*>(.*?)</a>", lambda m: f" [link: {re.sub(r'<[^>]+>', ' ', m.group(1)).strip()}] ", t, flags=re.S | re.I)
@@ -348,7 +348,7 @@ def _ai_copy(keys, out, state, cap=12):
                 meta = builder.block_meta(inner)
                 t = _readable(inner)
                 if t and meta["kind"] not in ("Header", "Footer"):
-                    bl.append({"block": i, "kind": meta["kind"], "only_if": "; ".join(filter(None, [meta["only_if"], builder.COND.get(cond, ("", ""))[1]])), "text": t})
+                    bl.append({"block": i, "kind": meta["kind"], "only_if": builder.COND.get(cond, ("", "everyone who gets this email"))[1] or "everyone who gets this email", "text": t})
             subj = _readable(v["subject"])
             res = assistant.check(k, subj, _readable(v["preview_text"]), bl, "QA agent", _context(k))
             for f in res["findings"]:

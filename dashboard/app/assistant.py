@@ -39,7 +39,8 @@ emails about trolleys, clubs or used clubs. A member's own code kept in their me
   Annual membership, £36 a year: 10% off the first order and then one order every month, on anything across the site; \
 free delivery over £10 (normally £50 for non-members); four free returns a year; 48 hours' early access to new \
 products; a monthly prize draw, entered automatically and drawn at the start of the next month; instant daily deals and \
-exclusive member deals in the portal; members' own codes are kept in their portal.
+exclusive member deals in the portal (which tiers get the deals is being confirmed: don't flag either way); members' \
+own codes are kept in their portal.
   Describing these, including that they apply across the site, is fine. Flag only a figure that contradicts them.
 - No invented reviews, quotes or testimonials.
 - The members' delivery line is exactly "Free delivery over £10" (with "Normally £50 for non-members" where it appears).
