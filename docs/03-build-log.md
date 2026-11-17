@@ -468,3 +468,23 @@
   with its versions and comments, and the flows; give a verdict on a finding (confirmed / false_alarm with reason, which
   dismisses it / note); start a QA run. It can't publish, approve, send, enable or edit. Unset = 404.
 - Verdicts show on the Agents page under each finding and are passed to the in-app manager's brief.
+
+## 17 Nov 2026 — First review of the live QA findings (Claude Code as reviewer)
+
+Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
+- 6 high "broken link" = Trustpilot refusing automated checks (403): false alarm; already reclassified by the new link check.
+- ~26 high + most medium AI copy findings = false alarms caused by the check itself:
+  1. tokens were stripped before Claude read the copy ("Welcome, Sam." became "Welcome ."): now shown as [first name],
+     links as [link: …];
+  2. **builder.split bug:** a condition inside a row ("Welcome{{ if first_name }}, Sam{{ end }}.") was treated as a block
+     edge, cutting rows mid-sentence (the editor showed fragments; moving one could break the layout). Fixed: only
+     conditions at row boundaries start blocks; all 29 emails still render identical and every block's conditions balance;
+  3. the copy rules said "never suggest a discount on trolleys, clubs or used clubs"; the real rule is no codes/coupons
+     there. Membership benefits as approved, and members' own portal codes, are now stated as fine;
+  4. Claude didn't know each flow's audience, so asked for "members only" conditions inside members-only flows: each
+     check now gets the flow and who receives it. Check version 2 re-reads every email.
+- Real points for Layton (kept): hard-coded Trustpilot figures ("4.8 out of 5 from 611 reviews") must be kept current
+  (DMCC); the monthly prize draw needs accessible terms; F2 Annual renewal reminder should give the renewal date, price
+  and how to cancel; small wording points (f2_fe2 "from £10" vs the members' line "over £10").
+- Manager feedback applied: links reported once per address; "refused" ≠ broken; findings show whether their flow is
+  live; "What was checked" listed; report says how many emails Claude read and how many are still to read.

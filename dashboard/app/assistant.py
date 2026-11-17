@@ -30,7 +30,13 @@ Rules you must never break (UK DMCC Act 2024, PECR and the business's own rules)
 stock levels or product details that are not already in the text you are given. If a fact is needed and missing, write \
 [CONFIRM: what is needed] instead of guessing. Keep any existing [CONFIRM: ...] exactly as it is.
 - No false urgency or deadlines ("ends tonight", "last chance", "only 3 left", "hurry"), no countdowns.
-- No discount codes, and never suggest a discount on trolleys, clubs or used clubs.
+- No public discount codes or coupons (a code anyone could type at checkout), and no coupon or promotional discount in \
+emails about trolleys, clubs or used clubs. A member's own code kept in their member portal is part of membership and fine.
+- Membership is real and its benefits as written in the approved emails are the approved terms (for example the Free \
+tier's 5% off, the £36 annual plan's 10% off the first order and then one order a month, free delivery over £10, free \
+returns, early access, the monthly prize draw, member deals). Describing them, including that they apply across the \
+site, is fine: don't flag them as discounts on trolleys or clubs, or as unconfirmed. Do flag a figure that contradicts \
+another email or the terms above.
 - No invented reviews, quotes or testimonials.
 - The members' delivery line is exactly "Free delivery over £10" (with "Normally £50 for non-members" where it appears).
 - Words in square brackets such as [first name] or [basket link] are filled in per customer. Keep each one exactly as \
@@ -232,13 +238,15 @@ class Check(BaseModel):
     findings: List[Finding]
 
 
-def check(key, subject, preview, blocks, who):
-    res = _ask(Check, "Check this email before it is approved. Flag anything that breaks the rules (high), anything that is "
+def check(key, subject, preview, blocks, who, context=None):
+    res = _ask(Check, "Check this email before it is approved. Each flow only reaches the people described in email_context, "
+               "so don't ask for a block condition to keep other audiences out. [link: …] marks a link or button. "
+               "[Bracketed] words are filled in per customer; a name is left out when unknown, so 'Welcome, [first name].' is fine. Flag anything that breaks the rules (high), anything that is "
                "unclear, inconsistent with who it is shown to, or off-voice (medium), and small polish points (low). Check UK "
                "spelling, facts that look invented or unconfirmed, urgency, discount wording, the members' delivery line, and "
                "that each block makes sense for the audience it is shown to. Quote the exact words. Don't flag the "
                "[bracketed] personalisation itself. If it's fine, say so and return no findings.",
-               {"subject": subject, "preview_text": preview, "blocks": blocks}, effort="high", max_tokens=12000)
+               {"email_context": context or {}, "subject": subject, "preview_text": preview, "blocks": blocks}, effort="high", max_tokens=12000)
     order = {"high": 0, "medium": 1, "low": 2}
     out = [{"severity": f.severity, "rule": _txt(f.rule, 80), "quote": re.sub(r"\s+", " ", f.quote).strip()[:300],
             "why": _txt(f.why, 600), "suggestion": re.sub(r"\s+", " ", f.suggestion).strip()[:600]} for f in res.findings[:20]]

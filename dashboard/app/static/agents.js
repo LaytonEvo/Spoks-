@@ -68,7 +68,8 @@ function agQa(d) {
   const trend = d.qa_history.slice(-14);
   const max = Math.max(1, ...trend.map((t) => t.counts.high + t.counts.medium + t.counts.low));
   return `<section class="panel">${head}
-    <p class="muted small">Last run ${esc(when(q.at))} (${esc(q.reason)}): ${q.emails} emails, ${q.links_checked} links and images loaded${q.ai_checked ? `, ${q.ai_checked} changed email${q.ai_checked > 1 ? "s" : ""} read by Claude` : ""}, ${q.seconds}s.</p>
+    <p class="muted small">Last run ${esc(when(q.at))} (${esc(q.reason)}): ${q.emails} emails, ${q.links_checked} different link and image addresses loaded, ${q.ai_checked || 0} email${q.ai_checked === 1 ? "" : "s"} read by Claude this run${q.ai_pending ? ` (${q.ai_pending} still to read)` : ""}, ${q.seconds}s.</p>
+    ${q.checks_run ? `<details><summary class="small">What was checked</summary><ul class="small">${q.checks_run.map((c) => `<li>${esc(c)}</li>`).join("")}</ul></details>` : ""}
     <div class="ag-counts">${["high", "medium", "low", "info"].map((s) => `<button type="button" data-agsev="${s}" aria-pressed="${AG.sev === s}"><span class="stat ${SEV[s][0]}">${q.counts[s]}</span> ${SEV[s][1]}</button>`).join("")}
       <button type="button" data-agsev="open" aria-pressed="${AG.sev === "open"}">All open</button><button type="button" data-agsev="new" aria-pressed="${AG.sev === "new"}">New (${q.new})</button>
       <span class="muted small">${q.fixed ? `${q.fixed} fixed since the last run` : ""}</span>
@@ -81,7 +82,7 @@ function agQa(d) {
         <button type="button" class="btn-line" id="ag-dismiss" ${AG.sel.size ? "" : "disabled"}>Not an issue…</button></div>
       <div class="table-wrap"><table class="ag-t"><thead><tr><th></th><th></th><th>Where</th><th>What</th><th>Fix</th><th>Since</th></tr></thead><tbody>
       ${list.map((f) => `<tr><td><input type="checkbox" data-agsel="${esc(f.id)}" ${AG.sel.has(f.id) ? "checked" : ""} aria-label="Select"></td><td><span class="stat ${SEV[f.severity][0]}">${SEV[f.severity][1]}</span>${f.status === "new" && f.severity !== "info" ? ` <span class="m-badge">new</span>` : ""}</td>
-        <td><a href="${esc(f.where)}">${esc(f.item)}</a><br><span class="muted small">${esc(f.area)}</span></td><td>${esc(f.detail)}${f.review ? `<div class="ag-rev ${f.review.verdict}">${f.review.verdict === "confirmed" ? "Verified as real" : f.review.verdict === "false_alarm" ? "False alarm" : "Note"} · ${esc(f.review.by)}${f.review.reason ? `: ${esc(f.review.reason)}` : ""}</div>` : ""}</td>
+        <td><a href="${esc(f.where)}">${esc(f.item)}</a><br><span class="muted small">${esc(f.area)}${f.flow_status ? ` · flow ${f.flow_status === "live" ? "<b>live</b>" : esc(f.flow_status)}` : ""}</span></td><td>${esc(f.detail)}${f.review ? `<div class="ag-rev ${f.review.verdict}">${f.review.verdict === "confirmed" ? "Verified as real" : f.review.verdict === "false_alarm" ? "False alarm" : "Note"} · ${esc(f.review.by)}${f.review.reason ? `: ${esc(f.review.reason)}` : ""}</div>` : ""}</td>
         <td class="small">${esc(f.fix || "")}${f.action ? `<br><span class="ag-who ${CAN_FIX.includes(f.action.type) ? "agent" : ""}">${esc(f.action.label)}</span>` : ""}</td><td class="small muted">${esc(f.since || "")}</td></tr>`).join("")}</tbody></table></div>`
       : `<p class="muted">Nothing here.</p>`}
     ${q.dismissed && q.dismissed.length ? `<details><summary class="small">Marked “not an issue” (${q.dismissed.length})</summary><ul class="small">${q.dismissed.map((f) => `<li>${esc(f.item)}: ${esc(f.detail)} — <i>${esc(f.dismissed.reason)}</i> (${esc(f.dismissed.by)}) <button type="button" class="link-btn small" data-agrestore="${esc(f.id)}">Restore</button></li>`).join("")}</ul></details>` : ""}

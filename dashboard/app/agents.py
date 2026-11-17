@@ -280,11 +280,43 @@ def _template_drift(keys, out):
         time.sleep(0.3)
 
 
-def _ai_copy(keys, out, state):
+CHECK_VERSION = "2"  # bump when the copy check's instructions change, so every email is read again
+FLOW_AUDIENCE = {
+    "f3_checkout": "People who left a checkout without buying (opted-in customers, soft opt-in). Paths by basket value (£300+ / under £300) and annual membership.",
+    "f9_after_delivery": "Customers whose order was delivered. Paths by what they bought (trolleys, clubs, used clubs, other) and membership.",
+    "f1_welcome": "New newsletter subscribers who are not members and haven't ordered (members and customers are excluded).",
+    "f2_free": "New Free members only (tier 'free').",
+    "f2_annual": "New annual (£36 a year) members only, through their membership year, including the renewal reminder.",
+}
+
+
+def _readable(inner):
+    """An email block as a reader sees it, for Claude: personalisation as [labels], links as [link: text], no markup."""
+    t = re.sub(r"\{\{-?\s*if \.Tx\.Data\.first_name\s*-?\}\}(.*?)\{\{-?\s*end\s*-?\}\}",
+               lambda m: re.sub(r"\{\{ \.Tx\.Data\.first_name \}\}", "[first name]", m.group(1)), inner, flags=re.S)
+    t = re.sub(r"\{\{-?\s*(?:if|else|end|range|with)\b.*?\}\}", " ", t, flags=re.S)
+    t = re.sub(r"\{\{.*?\}\}", lambda m: f"[{builder.tok_label(m.group(0))}]", t, flags=re.S)
+    t = re.sub(r"<a\b[^>]*>(.*?)</a>", lambda m: f" [link: {re.sub(r'<[^>]+>', ' ', m.group(1)).strip()}] ", t, flags=re.S | re.I)
+    return _text(t)
+
+
+def _context(key):
+    man = evoflows.manifest()
+    flow = next((f for f, m in man["flows"].items() if key in m["templates"]), None)
+    if not flow:
+        return {"flow": "not in a flow yet (a new email or a test version)"}
+    m = man["flows"][flow]
+    return {"flow": m.get("name", flow), "who_gets_this_flow": FLOW_AUDIENCE.get(flow, m.get("summary", "")),
+            "email": builder.live(key)["name"], "sender": builder.live(key)["from_name"]}
+
+
+def _ai_copy(keys, out, state, cap=12):
     """Claude's copy check, only for emails whose content changed since it last looked (keeps the cost down)."""
     if not config.ANTHROPIC_API_KEY:
         return 0
     from . import assistant
+    if state.get("ai_version") != CHECK_VERSION:  # instructions changed: earlier findings no longer stand
+        state.update(ai_version=CHECK_VERSION, ai_hashes={}, ai_findings={})
     seen = state.setdefault("ai_hashes", {})
     n = 0
     for k in keys:
@@ -292,7 +324,7 @@ def _ai_copy(keys, out, state):
         hv = hashlib.sha256((v["subject"] + v["preview_text"] + v["html"]).encode()).hexdigest()
         if seen.get(k) == hv:
             continue
-        if n >= 12:
+        if n >= cap:
             break
         try:
             _, blocks, _ = builder.split(v["html_t"])
@@ -300,10 +332,11 @@ def _ai_copy(keys, out, state):
             for i, b in enumerate(blocks):
                 inner, _, cond = builder.unwrap(b)
                 meta = builder.block_meta(inner)
-                t = _text(re.sub(r"\{\{.*?\}\}", " ", inner))
+                t = _readable(inner)
                 if t and meta["kind"] not in ("Header", "Footer"):
                     bl.append({"block": i, "kind": meta["kind"], "only_if": "; ".join(filter(None, [meta["only_if"], builder.COND.get(cond, ("", ""))[1]])), "text": t})
-            res = assistant.check(k, v["subject"], v["preview_text"], bl, "QA agent")
+            subj = _readable(v["subject"])
+            res = assistant.check(k, subj, _readable(v["preview_text"]), bl, "QA agent", _context(k))
             for f in res["findings"]:
                 out.append(_find(f["severity"], "copy", k, "ai:" + hashlib.sha1((f["rule"] + f["quote"]).encode()).hexdigest()[:8],
                                  f"{f['rule']}: {f['why']}" + (f" (“{f['quote'][:120]}”)" if f["quote"] else ""), f["suggestion"], f"#edit/{k}"))
@@ -345,6 +378,17 @@ def _process_checks(keys, out):
             out.append(_find("info", "process", t["flow"], f"abtest_{t['id']}", f"A/B test “{t['name']}” is {t['status']}, not running.", "Start or cancel it on A/B tests.", "#abtests"))
 
 
+CHECKS_RUN = ["Unsubscribe and manage-preferences links present, and Unsubscribe visible to every audience",
+              "Company address in the footer", "Approved sender; Alex's emails signed 'Alex, Head of Ecommerce'",
+              "No discount codes; no deadline or urgency wording; no [CONFIRM] left in", "Delivery amounts (£10 members, £50 everyone)",
+              "Subject and preview text present", "Alt text on images (decorative icons excepted); images hosted on Shopify Files",
+              "Renders as non-member, Free and annual, with and without a first name (no leftover template code, no 'Hi ,')",
+              "Every distinct link and image address loaded once", "Size under Gmail's clipping limit", "UK spelling",
+              "Each flow: consent level, matches the approved build, validates on Evoflows, its emails are on Evoflows and match the dashboard",
+              "Evoflows health flags (sends, errors, unsubscribes, bounces, complaints)",
+              "Claude reads emails that changed since it last looked: rules, facts, clarity, audience fit"]
+
+
 def run_qa(reason="manual", who="QA agent"):
     if running["qa"]:
         return {"busy": True}
@@ -366,7 +410,7 @@ def run_qa(reason="manual", who="QA agent"):
                              "The dashboard can't reach Evoflows (no EVOFLOWS_TOKEN), so engine checks were skipped.", "Add the token in Railway.", "#evoflows"))
         _flow_checks(out, evosnap.load())
         _template_drift(keys, out)
-        ai_n = _ai_copy(keys, out, state)
+        ai_n = _ai_copy(keys, out, state, 12 if reason == "daily" else 40)
         _process_checks(keys, out)
         # one finding per id; compare with the last run
         uniq = {}
@@ -375,6 +419,12 @@ def run_qa(reason="manual", who="QA agent"):
         dismissed_ids = state.get("dismissed", {})
         dismissed = [{**f, "dismissed": dismissed_ids[f["id"]]} for f in uniq.values() if f["id"] in dismissed_ids]
         out = [f for f in uniq.values() if f["id"] not in dismissed_ids]
+        flow_of = {t: f for f, m in evoflows.manifest()["flows"].items() for t in m["templates"]}
+        status_of = {f["id"]: f.get("status") for f in (evosnap.load() or {}).get("flows", [])}
+        for f in uniq.values():
+            fl = flow_of.get(f["item"]) or (f["item"] if f["item"] in status_of else None)
+            if fl:
+                f["flow_status"] = status_of.get(fl, "unknown")
         revs = state.get("reviews", {})
         for f in out:
             f["action"] = fix_kind(f)
@@ -395,7 +445,8 @@ def run_qa(reason="manual", who="QA agent"):
         rep = {"agent": "qa", "at": _now(), "reason": reason, "by": who, "seconds": round(time.time() - started),
                "emails": len(keys), "links_checked": len(seen), "ai_checked": ai_n, "counts": counts,
                "new": sum(1 for f in out if f["status"] == "new" and f["severity"] != "info"), "fixed": len(resolved),
-               "findings": out, "resolved": resolved[:50], "dismissed": dismissed}
+               "findings": out, "resolved": resolved[:50], "dismissed": dismissed, "checks_run": CHECKS_RUN,
+               "ai_pending": sum(1 for k in keys if k not in state.get("ai_hashes", {}))}
         by = {}
         for f in out:
             by[(f["severity"], f["check"].split(":")[0])] = by.get((f["severity"], f["check"].split(":")[0]), 0) + 1

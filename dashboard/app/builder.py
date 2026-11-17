@@ -41,7 +41,7 @@ def split(html):
     if i < 0:
         raise ValueError("not an editorial email (no card)")
     start = html.find(">", i) + 1
-    depth, tpl, cur, end, blocks = 1, 0, start, None, []
+    depth, tpl, inline, cur, end, blocks = 1, 0, 0, start, None, []
     for m in SPLIT.finditer(html, start):
         t = m.group(0)
         if t.startswith("<table"):
@@ -55,7 +55,11 @@ def split(html):
             blocks.append(html[cur:m.end()])
             cur = m.end()
         elif depth == 1 and t.startswith("{{"):
-            if re.match(r"\{\{-?\s*end", t):
+            is_end = re.match(r"\{\{-?\s*end", t)
+            if tpl == 0 and (inline or html[cur:m.start()].strip()):
+                # a condition inside a row (e.g. "Welcome{{ if first_name }}, Sam{{ end }}."): part of that row, not a block edge
+                inline += -1 if is_end else 1
+            elif is_end:
                 tpl -= 1
                 if tpl == 0:
                     blocks.append(html[cur:m.end()])
