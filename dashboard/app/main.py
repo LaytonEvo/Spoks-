@@ -742,6 +742,12 @@ def api_agents(user=Depends(auth)):
     return agents.overview()
 
 
+@app.get("/api/agents/status")
+def api_agents_status(user=Depends(auth)):
+    b, q = agents.briefs(), agents.latest_qa()
+    return {"running": dict(agents.running), "qa_at": q["at"] if q else None, "brief_n": b[-1]["n"] if b else None}
+
+
 @app.get("/api/agents/brief/{n}")
 def api_agents_brief(n: int, user=Depends(auth)):
     b = agents.brief(n)

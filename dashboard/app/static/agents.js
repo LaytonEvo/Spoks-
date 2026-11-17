@@ -12,8 +12,22 @@ async function renderAgents() {
   AG.d = await api("/api/agents");
   if (AG.briefN && AG.d.brief && AG.d.brief.n !== AG.briefN) { try { AG.d.brief = await api(`/api/agents/brief/${AG.briefN}`); } catch (e) { AG.briefN = null; } }
   drawAgents();
+  agWatch();
+}
+// While a run is going, check a small status call quietly; the page only changes when a run finishes, keeps your place,
+// and never redraws while you're typing a note (it shows a "new results" link instead).
+function agWatch() {
   clearTimeout(AG.poll);
-  if (AG.d.running.qa || AG.d.running.manager) AG.poll = setTimeout(() => { if (state.page === "agents") renderAgents(); }, 8000);
+  if (!(AG.d.running.qa || AG.d.running.manager)) return;
+  AG.poll = setTimeout(async () => {
+    if (state.page !== "agents") return;
+    let st; try { st = await api("/api/agents/status"); } catch (e) { agWatch(); return; }
+    const done = (AG.d.running.qa && !st.running.qa) || (AG.d.running.manager && !st.running.manager);
+    if (!done) { agWatch(); return; }
+    const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest(".ag-dec, #ag-ctx");
+    if (typing) { const h = $("#main h1"); if (h && !$("#ag-fresh")) h.insertAdjacentHTML("beforeend", ` <button type="button" class="btn-line" id="ag-fresh">New results: show them</button>`); return; }
+    const y = window.scrollY; await renderAgents(); window.scrollTo(0, y);
+  }, 10000);
 }
 function drawAgents() {
   const d = AG.d;
@@ -91,7 +105,7 @@ document.addEventListener("click", async (e) => {
   if (state.page !== "agents") return;
   const t = e.target;
   const run = t.closest("[data-agrun]");
-  if (run) { run.disabled = true; try { await api(`/api/agents/run/${run.dataset.agrun}`, { method: "POST" }); setTimeout(renderAgents, 1500); } catch (err) { alertInline(run, err.message); run.disabled = false; } return; }
+  if (run) { run.disabled = true; try { await api(`/api/agents/run/${run.dataset.agrun}`, { method: "POST" }); AG.d.running[run.dataset.agrun] = true; run.textContent = run.dataset.agrun === "qa" ? "Checking… (a few minutes)" : "Writing… (waits for checks to finish)"; agWatch(); } catch (err) { alertInline(run, err.message); run.disabled = false; } return; }
   const sv = t.closest("[data-agsev]"); if (sv) { AG.sev = sv.dataset.agsev; drawAgents(); return; }
   const dc = t.closest("[data-agdec]");
   if (dc) {
@@ -101,6 +115,7 @@ document.addEventListener("click", async (e) => {
     return;
   }
   const ch = t.closest("[data-agchange]"); if (ch) { AG.d.decisions = AG.d.decisions.filter((x) => x.rec !== ch.dataset.agchange); drawAgents(); return; }
+  if (t.id === "ag-fresh") { const y = window.scrollY; await renderAgents(); window.scrollTo(0, y); return; }
   if (t.id === "ag-ctx-save") { t.disabled = true; try { await api("/api/agents/context", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: $("#ag-ctx").value }) }); t.textContent = "Saved"; } catch (err) { alertInline(t, err.message); } t.disabled = false; }
 });
 document.addEventListener("change", async (e) => {

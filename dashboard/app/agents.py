@@ -519,6 +519,10 @@ def run_manager(reason="manual", who="Manager agent"):
     running["manager"] = True
     try:
         import anthropic
+        for _ in range(180):  # a QA run in progress finishes first, so the brief uses its results
+            if not running["qa"]:
+                break
+            time.sleep(5)
         qa = latest_qa()
         if not qa or (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(qa["at"])).total_seconds() > 20 * 3600:
             qa = run_qa("before the manager's brief")
