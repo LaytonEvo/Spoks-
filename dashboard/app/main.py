@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import abtest, assistant, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, agents, assistant, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -81,6 +81,7 @@ def _auto_refresh():
 async def lifespan(_app):
     threading.Thread(target=_auto_refresh, daemon=True).start()
     threading.Thread(target=evosnap.loop, daemon=True).start()
+    threading.Thread(target=agents.loop, daemon=True).start()
     yield
 
 
@@ -98,7 +99,7 @@ def index(user=Depends(auth)):
     old copy in the browser's cache."""
     import hashlib
     html = (STATIC / "index.html").read_text()
-    for name in ("app.css", "app.js", "pages.js", "sim.js", "simviz.js", "design.js", "builder.js", "media.js", "abtests.js"):
+    for name in ("app.css", "app.js", "pages.js", "sim.js", "simviz.js", "design.js", "builder.js", "media.js", "abtests.js", "agents.js"):
         v = hashlib.sha1((STATIC / name).read_bytes()).hexdigest()[:10]
         html = html.replace(f'"/static/{name}"', f'"/static/{name}?v={v}"')
     return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
@@ -444,6 +445,7 @@ def api_evoflows_approve(key: str, user=Depends(auth)):
         raise HTTPException(404)
     res = _evo(evoflows.push_flow, key, user)
     threading.Thread(target=evosnap.build, daemon=True).start()
+    agents.qa_soon(f"flow {key} approved")
     return res
 
 
@@ -568,6 +570,7 @@ def api_builder_approve(key: str, n: int, user=Depends(auth)):
 def api_builder_publish(key: str, n: int, user=Depends(auth)):
     res = _b(builder.publish, _tpl_key(key), n, user)
     threading.Thread(target=evosnap.build, daemon=True).start()
+    agents.qa_soon(f"{key} v{n} published")
     return res
 
 
@@ -575,6 +578,7 @@ def api_builder_publish(key: str, n: int, user=Depends(auth)):
 def api_builder_restore(key: str, user=Depends(auth)):
     res = _b(builder.restore_build, _tpl_key(key), user)
     threading.Thread(target=evosnap.build, daemon=True).start()
+    agents.qa_soon(f"{key} restored to the approved build")
     return res
 
 
@@ -728,7 +732,62 @@ async def api_abtest_action(tid: str, action: str, request: Request, user=Depend
     else:
         raise HTTPException(404)
     threading.Thread(target=evosnap.build, daemon=True).start()
+    agents.qa_soon(f"A/B test {tid} {action}")
     return res
+
+
+# ---------- agents (QA & compliance, manager) ----------
+@app.get("/api/agents")
+def api_agents(user=Depends(auth)):
+    return agents.overview()
+
+
+@app.get("/api/agents/brief/{n}")
+def api_agents_brief(n: int, user=Depends(auth)):
+    b = agents.brief(n)
+    if not b:
+        raise HTTPException(404)
+    return b
+
+
+@app.post("/api/agents/run/{which}")
+def api_agents_run(which: str, user=Depends(auth)):
+    if which == "qa":
+        if agents.running["qa"]:
+            raise HTTPException(409, "QA is already running.")
+        threading.Thread(target=agents._safe, args=(agents.run_qa, f"run by {user}"), daemon=True).start()
+        return {"started": True}
+    if which == "manager":
+        if agents.running["manager"]:
+            raise HTTPException(409, "The manager is already writing.")
+        if not config.ANTHROPIC_API_KEY:
+            raise HTTPException(400, "The manager needs ANTHROPIC_API_KEY in Railway.")
+        threading.Thread(target=agents._safe, args=(agents.run_manager, "manual"), daemon=True).start()
+        return {"started": True}
+    raise HTTPException(404)
+
+
+@app.post("/api/agents/decide")
+async def api_agents_decide(request: Request, user=Depends(auth)):
+    b = await request.json()
+    try:
+        return agents.decide(int(b.get("brief", 0)), str(b.get("rec", "")), str(b.get("decision", "")), b.get("note", ""), user)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/agents/action")
+async def api_agents_action(request: Request, user=Depends(auth)):
+    b = await request.json()
+    try:
+        return {"actions": agents.set_action(str(b.get("rec", "")), str(b.get("status", "")), user)}
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/agents/context")
+async def api_agents_context(request: Request, user=Depends(auth)):
+    return agents.save_context((await request.json()).get("text", ""), user)
 
 
 # ---------- brand theme (design system) ----------
@@ -762,6 +821,7 @@ def api_design_approve(n: int, user=Depends(auth)):
 def api_design_publish(n: int, user=Depends(auth)):
     res = _b(design.publish_theme, n, user)
     threading.Thread(target=evosnap.build, daemon=True).start()
+    agents.qa_soon(f"brand theme v{n} published")
     return res
 
 

@@ -421,3 +421,25 @@
   members' delivery line, UK English, house voice). Applying a suggestion is an ordinary undoable edit; nothing is saved,
   approved or published by the assistant. Every request is logged (`DATA_DIR/assistant.jsonl`) with who asked.
 - Tested in a browser with fixed Claude answers (no Anthropic key on the build machine), including unsafe ones.
+
+## 17 Nov 2026 — Agents, phase 1: QA & compliance + manager (Layton: "get going")
+
+- New `dashboard/app/agents.py` + **Agents** page (sidebar, top).
+- **QA & compliance agent** — daily at 06:30 London and 2 minutes after anything is published (email, brand theme, flow
+  approval, A/B test start/end). Checks every email customers can get (29 flow emails, running test versions, published new
+  emails): unsubscribe + preferences links, company address, approved sender + Alex's sign-off, discount codes, urgency,
+  [CONFIRM] left in, delivery amounts (£10 members / £50 everyone), alt text (decorative icons excepted), image hosts,
+  Gmail clipping, US spelling; renders each as non-member/Free/annual with and without a first name (leftover template
+  code, "Hi ,", visible Unsubscribe); loads every distinct link and image; per flow: consent level (F3/F9 soft_opt_in,
+  others newsletter_only), matches the approved build, validates on Evoflows, emails exist there and match what the
+  dashboard published; engine health flags; plus Claude's copy check on emails that changed since it last looked (max 12
+  a run). Findings are new / ongoing / fixed against the last run; Slack alert on new high-priority issues.
+  First local run: all 29 emails clean (after removing two false alarms: the £50 non-member line, empty alt on icons).
+- **Manager** (`claude-fable-5-2`, effort high, server-side fallback) — Mondays 07:00 London, before the Monday summary,
+  or on demand. Reads the QA report and trend, each flow's numbers, A/B tests, the standing context (editable on the page)
+  and the decisions log; writes a brief: headline, status by area, ≤5 recommendations with evidence/owner/impact/effort and
+  the decision, questions, FYIs, feedback to agents. Rules: evidence only, <100 sends = too small to judge, no opens/clicks
+  on Evoflows, respects rejected decisions, never codes/urgency/switching flows on. Posted to Slack when SLACK_WEBHOOK_URL
+  is set. Layton approves / parks / rejects each recommendation (with a note); approvals become actions with an owner.
+- Nothing in the agents publishes, sends, enables or edits; QA's Evoflows calls are reads and validate only.
+- Planned agents (email, product, design, data) shown on the page with what each waits on.
