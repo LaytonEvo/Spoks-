@@ -52,3 +52,6 @@ EVOFLOWS_BASE = os.getenv("EVOFLOWS_BASE", "https://mail.evolutiongolf.co.uk/flo
 EVOFLOWS_TOKEN = os.getenv("EVOFLOWS_TOKEN", "")
 # Optional: the webhook secret, if set by hand. Normally the app stores the secret PUT /webhooks returns on its volume.
 EVOFLOWS_WEBHOOK_SECRET = os.getenv("EVOFLOWS_WEBHOOK_SECRET", "")
+# Reviewer access for Claude Code (the reporting manager): read the agents' work, give verdicts on findings, start a QA
+# run. It can't publish, approve, send or switch anything on. Sent as the X-Review-Token header; unset = no access.
+REVIEW_TOKEN = os.getenv("AGENT_REVIEW_TOKEN", "")

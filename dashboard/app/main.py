@@ -40,6 +40,14 @@ def auth(credentials: HTTPBasicCredentials | None = Depends(security)):
     return credentials.username
 
 
+def review_auth(request: Request):
+    """Claude Code's reviewer access (X-Review-Token). Read the agents' work, give verdicts, start QA; nothing else."""
+    tok = request.headers.get("x-review-token", "")
+    if len(config.REVIEW_TOKEN) < 24 or not secrets.compare_digest(tok, config.REVIEW_TOKEN):
+        raise HTTPException(404)
+    return "Claude (reviewer)"
+
+
 def _check_id(value):
     if not ID_RE.match(value):
         raise HTTPException(404)
@@ -826,6 +834,51 @@ def api_agents_fix_discard(fid: str, user=Depends(auth)):
 @app.post("/api/agents/context")
 async def api_agents_context(request: Request, user=Depends(auth)):
     return agents.save_context((await request.json()).get("text", ""), user)
+
+
+# ---------- reviewer access (Claude Code as the reporting manager) ----------
+@app.get("/review/agents")
+def review_agents(who=Depends(review_auth)):
+    return {**agents.overview(), "reviews": agents.reviews(), "events": agents._read("events.json", [])[-100:]}
+
+
+@app.get("/review/brief/{n}")
+def review_brief(n: int, who=Depends(review_auth)):
+    return agents.brief(n) or {}
+
+
+@app.get("/review/email/{key}")
+def review_email(key: str, who=Depends(review_auth)):
+    """An email as customers get it (to verify findings), plus its version history."""
+    _tpl_key(key)
+    v = builder.live(key)
+    rec = builder._load(key)
+    return {"key": key, "name": v["name"], "subject": v["subject"], "preview_text": v["preview_text"], "from_name": v["from_name"],
+            "html": v["html"], "status": v["status"], "versions": [{k: x.get(k) for k in ("n", "status", "by", "at", "note", "approved_by", "published_by")} for x in rec["versions"]],
+            "comments": builder.comments(key)}
+
+
+@app.get("/review/flows")
+def review_flows(who=Depends(review_auth)):
+    snap = evosnap.load() or {}
+    return {"generated_at": snap.get("generated_at"), "flows": [{k: f.get(k) for k in ("id", "name", "status", "consent", "differs", "totals", "flow_filter", "exit", "definition")} for f in snap.get("flows", [])]}
+
+
+@app.post("/review/findings/{fid:path}")
+async def review_finding(fid: str, request: Request, who=Depends(review_auth)):
+    b = await request.json()
+    try:
+        return agents.review(fid, str(b.get("verdict", "")), b.get("reason", ""), who)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/review/run/qa")
+def review_run_qa(who=Depends(review_auth)):
+    if agents.running["qa"]:
+        raise HTTPException(409, "QA is already running.")
+    threading.Thread(target=agents._safe, args=(agents.run_qa, "run by the reviewer"), daemon=True).start()
+    return {"started": True}
 
 
 # ---------- brand theme (design system) ----------

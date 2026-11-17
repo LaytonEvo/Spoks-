@@ -460,3 +460,11 @@
 - **Fixes from the agent:** list of drafts with before → after, "Approve & publish selected" (approve + publish each,
   logged with who), Discard. QA re-runs 2 minutes after fixes are drafted or published.
 - QA logs a one-line summary of each run (counts by check) to the Railway logs.
+
+## 17 Nov 2026 — Reviewer access for Claude Code (Layton: the reporting manager needs to see and vet findings)
+
+- `AGENT_REVIEW_TOKEN` (Railway variable, ≥24 chars) unlocks `/review/*` via the `X-Review-Token` header: read the
+  agents' work (QA findings, history, dismissals, briefs, decisions, actions, fixes, events), any email as customers get it
+  with its versions and comments, and the flows; give a verdict on a finding (confirmed / false_alarm with reason, which
+  dismisses it / note); start a QA run. It can't publish, approve, send, enable or edit. Unset = 404.
+- Verdicts show on the Agents page under each finding and are passed to the in-app manager's brief.

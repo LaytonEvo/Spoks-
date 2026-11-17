@@ -375,8 +375,11 @@ def run_qa(reason="manual", who="QA agent"):
         dismissed_ids = state.get("dismissed", {})
         dismissed = [{**f, "dismissed": dismissed_ids[f["id"]]} for f in uniq.values() if f["id"] in dismissed_ids]
         out = [f for f in uniq.values() if f["id"] not in dismissed_ids]
+        revs = state.get("reviews", {})
         for f in out:
             f["action"] = fix_kind(f)
+            if f["id"] in revs:
+                f["review"] = revs[f["id"]]
         prev = (latest_qa() or {}).get("findings", [])
         prev_ids = {f["id"]: f for f in prev}
         first_seen = state.setdefault("first_seen", {})
@@ -462,6 +465,32 @@ def fix_kind(f):
     if f.get("area") == "links":
         return {"type": "person", "label": "Check by hand"}
     return {"type": "person", "label": "Needs a person"}
+
+
+def review(fid, verdict, reason, who):
+    """The reviewer's verdict on a finding: confirmed (real), false_alarm (dismissed with the reason), or a note."""
+    if verdict not in ("confirmed", "false_alarm", "note"):
+        raise ValueError("verdict: confirmed, false_alarm or note")
+    reason = str(reason or "").strip()[:500]
+    if verdict != "confirmed" and not reason:
+        raise ValueError("Give the reason.")
+    if verdict == "false_alarm":
+        dismiss([fid], reason, who)
+    state = _read("qa_state.json", {})
+    state.setdefault("reviews", {})[fid] = {"verdict": verdict, "reason": reason, "by": who, "at": _now()}
+    _write("qa_state.json", state)
+    rep = latest_qa()
+    if rep:
+        for f in rep["findings"]:
+            if f["id"] == fid:
+                f["review"] = state["reviews"][fid]
+        _write("qa_latest.json", rep)
+    _log_event(who, f"review {verdict}: {fid}")
+    return state["reviews"][fid]
+
+
+def reviews():
+    return _read("qa_state.json", {}).get("reviews", {})
 
 
 def dismiss(ids, reason, who):
@@ -746,6 +775,7 @@ def run_manager(reason="manual", who="Manager agent"):
             "standing_context": context(),
             "qa_report": {"at": qa["at"], "counts": qa["counts"], "emails_checked": qa["emails"], "links_checked": qa["links_checked"],
                           "new_this_run": qa["new"], "fixed_since_last_run": [f"{r['id']}: {r['detail']}" for r in qa.get("resolved", [])][:20],
+                          "reviewer_verdicts": {k: v for k, v in reviews().items()},
                           "open_findings": [{k: f[k] for k in ("id", "severity", "area", "item", "detail", "fix", "status", "since")}
                                             for f in qa["findings"] if f["severity"] != "info"][:60],
                           "info": [f"{f['item']}: {f['detail']}" for f in qa["findings"] if f["severity"] == "info"][:20]},
