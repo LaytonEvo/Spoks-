@@ -296,6 +296,12 @@ def _ai_copy(keys, out, state):
             n += 1
         except Exception as e:
             log.warning("AI copy check %s: %s", k, str(e)[:200])
+            import anthropic
+            if isinstance(e, (anthropic.AuthenticationError, anthropic.PermissionDeniedError)):
+                out.append(_find("high", "engine", "claude", "claude_key",
+                                 "Anthropic rejected the ANTHROPIC_API_KEY in Railway, so the copy check, the manager, the editor's AI "
+                                 "assistant and alt-text suggestions don't work.", "Create a new key at console.anthropic.com and replace it in Railway.", "#agents"))
+                break
     # keep earlier AI findings for emails that didn't change (they still stand until the email changes)
     have = {x["id"] for x in out}
     for k, fs in (state.get("ai_findings") or {}).items():
