@@ -32,11 +32,15 @@ stock levels or product details that are not already in the text you are given. 
 - No false urgency or deadlines ("ends tonight", "last chance", "only 3 left", "hurry"), no countdowns.
 - No public discount codes or coupons (a code anyone could type at checkout), and no coupon or promotional discount in \
 emails about trolleys, clubs or used clubs. A member's own code kept in their member portal is part of membership and fine.
-- Membership is real and its benefits as written in the approved emails are the approved terms (for example the Free \
-tier's 5% off, the £36 annual plan's 10% off the first order and then one order a month, free delivery over £10, free \
-returns, early access, the monthly prize draw, member deals). Describing them, including that they apply across the \
-site, is fine: don't flag them as discounts on trolleys or clubs, or as unconfirmed. Do flag a figure that contradicts \
-another email or the terms above.
+- Facts approved by the owner (they appear in the approved emails; never flag them as invented or unconfirmed):
+  Everyone: free delivery over £50. Sender names are fixed: "⛳ Evolution Golf" (the ⛳ is part of the name) and \
+"Alex at Evolution Golf", who signs "Alex, Head of Ecommerce".
+  Free membership: 5% off everything on the site, loyalty points on everything, their own member portal.
+  Annual membership, £36 a year: 10% off the first order and then one order every month, on anything across the site; \
+free delivery over £10 (normally £50 for non-members); four free returns a year; 48 hours' early access to new \
+products; a monthly prize draw, entered automatically and drawn at the start of the next month; instant daily deals and \
+exclusive member deals in the portal; members' own codes are kept in their portal.
+  Describing these, including that they apply across the site, is fine. Flag only a figure that contradicts them.
 - No invented reviews, quotes or testimonials.
 - The members' delivery line is exactly "Free delivery over £10" (with "Normally £50 for non-members" where it appears).
 - Words in square brackets such as [first name] or [basket link] are filled in per customer. Keep each one exactly as \
@@ -240,8 +244,12 @@ class Check(BaseModel):
 
 def check(key, subject, preview, blocks, who, context=None):
     res = _ask(Check, "Check this email before it is approved. Each flow only reaches the people described in email_context, "
-               "so don't ask for a block condition to keep other audiences out. [link: …] marks a link or button. "
-               "[Bracketed] words are filled in per customer; a name is left out when unknown, so 'Welcome, [first name].' is fine. Flag anything that breaks the rules (high), anything that is "
+               "so don't ask for a block condition to keep other audiences out. ⟦if …: A | otherwise: B⟧ means each customer "
+               "sees only the version that applies to them; read each version for its own audience. [link: …] marks a link or "
+               "button. [Bracketed] words are filled in per customer; a name is left out when unknown, so 'Welcome, [first name].' "
+               "is fine. Severity: high only for a broken rule or something customers would see as wrong; medium for something "
+               "likely to confuse a customer; low for polish and voice preferences. Report at most 8 findings, the most important "
+               "first, each point once. Flag anything that breaks the rules (high), anything that is "
                "unclear, inconsistent with who it is shown to, or off-voice (medium), and small polish points (low). Check UK "
                "spelling, facts that look invented or unconfirmed, urgency, discount wording, the members' delivery line, and "
                "that each block makes sense for the audience it is shown to. Quote the exact words. Don't flag the "
