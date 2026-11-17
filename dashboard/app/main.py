@@ -745,7 +745,8 @@ def api_agents(user=Depends(auth)):
 @app.get("/api/agents/status")
 def api_agents_status(user=Depends(auth)):
     b, q = agents.briefs(), agents.latest_qa()
-    return {"running": dict(agents.running), "qa_at": q["at"] if q else None, "brief_n": b[-1]["n"] if b else None}
+    return {"running": {**agents.running, "fix": agents.fix_state["running"]}, "qa_at": q["at"] if q else None, "brief_n": b[-1]["n"] if b else None,
+            "fixes": len(agents.fixes())}
 
 
 @app.get("/api/agents/brief/{n}")
@@ -789,6 +790,37 @@ async def api_agents_action(request: Request, user=Depends(auth)):
         return {"actions": agents.set_action(str(b.get("rec", "")), str(b.get("status", "")), user)}
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+
+@app.post("/api/agents/fix")
+async def api_agents_fix(request: Request, user=Depends(auth)):
+    b = await request.json()
+    try:
+        return agents.approve_fixes([str(x) for x in b.get("ids") or []][:200], user)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/agents/dismiss")
+async def api_agents_dismiss(request: Request, user=Depends(auth)):
+    b = await request.json()
+    if b.get("restore"):
+        return agents.undismiss(str(b["restore"]), user)
+    ids = [str(x) for x in b.get("ids") or []][:200]
+    if not ids or not str(b.get("reason", "")).strip():
+        raise HTTPException(400, "Say why it isn't an issue (the manager and future runs read it).")
+    return agents.dismiss(ids, b.get("reason"), user)
+
+
+@app.post("/api/agents/fixes/publish")
+async def api_agents_fixes_publish(request: Request, user=Depends(auth)):
+    b = await request.json()
+    return agents.publish_fixes([str(x) for x in b.get("ids") or []][:100], user)
+
+
+@app.post("/api/agents/fixes/{fid}/discard")
+def api_agents_fix_discard(fid: str, user=Depends(auth)):
+    return agents.discard_fix(fid, user)
 
 
 @app.post("/api/agents/context")

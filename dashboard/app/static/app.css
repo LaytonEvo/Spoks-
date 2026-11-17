@@ -548,3 +548,5 @@ table.ag-t { width: 100%; border-collapse: collapse; } table.ag-t th { text-alig
 table.ag-t td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14px; }
 #ag-ctx { width: 100%; box-sizing: border-box; margin: 8px 0; padding: 8px 10px; border: 1px solid #D9D4C7; border-radius: 6px; font: 13px/1.5 ui-monospace, Menlo, monospace; }
 section.panel { margin-bottom: 16px; }
+.ag-bulk { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 6px 0 8px; }
+.ag-who { display: inline-block; margin-top: 3px; font-size: 11px; font-weight: 600; color: var(--muted); } .ag-who.agent { color: var(--green); }

@@ -30,7 +30,7 @@ from pydantic import BaseModel, Field
 
 from . import builder, config, evoflows
 
-log = logging.getLogger("agents")
+log = logging.getLogger("uvicorn.error")  # shows in Railway logs, like the other jobs
 STORE = config.DATA_DIR / "agents"
 MANAGER_MODEL = __import__("os").getenv("MANAGER_MODEL", "claude-fable-5-2")
 _lock = threading.Lock()
@@ -180,27 +180,43 @@ def _decorative(tag, src):
     return "icon" in src or "spacer" in src or (w is not None and int(w.group(1)) <= 48)
 
 
+OWN_HOSTS = ("evolutiongolf.co.uk", "cdn.shopify.com", "members.evolutiongolf.co.uk")
+BROWSER_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15"
+
+
 def _check_urls(urls, imgs, out):
-    """Every distinct link and image, once. Broken = 4xx/5xx or no answer."""
+    """Every distinct link and image, once, reported once per address (listing the emails it's in).
+    Our own site and images: any failure is high. Other sites (social, Trustpilot, brands) often refuse automated visits,
+    so a refusal (401/403/429/999) is "couldn't verify" (low), not broken; 404/410 is broken anywhere."""
     seen = {}
-    with httpx.Client(timeout=12, follow_redirects=True, headers={"User-Agent": "EvolutionGolfFlows-QA/1.0"}) as c:
+    with httpx.Client(timeout=15, follow_redirects=True, headers={"User-Agent": BROWSER_UA, "Accept-Language": "en-GB"}) as c:
         for u, keys in list(urls.items())[:150] + list(imgs.items())[:150]:
             if u in seen:
                 continue
             try:
                 r = c.head(u)
-                if r.status_code in (403, 405, 501):
+                if r.status_code >= 400:
                     r = c.get(u)
                 seen[u] = r.status_code
             except httpx.HTTPError as e:
                 seen[u] = type(e).__name__
             time.sleep(0.1)
             st = seen[u]
-            if not isinstance(st, int) or st >= 400:
-                kind = "image" if u in imgs else "link"
-                for k in sorted(keys)[:6]:
-                    out.append(_find("high", "links", k, f"broken_{kind}:{hashlib.sha1(u.encode()).hexdigest()[:8]}",
-                                     f"Broken {kind} ({st}): {u[:120]}", "Fix the address, or swap the image.", f"#edit/{k}"))
+            if isinstance(st, int) and st < 400:
+                continue
+            host = httpx.URL(u).host
+            own = host.endswith(OWN_HOSTS)
+            kind = "image" if u in imgs else "link"
+            emails = sorted(keys)
+            where = f" (in {len(emails)} email{'s' if len(emails) > 1 else ''}: {', '.join(emails[:5])}{'…' if len(emails) > 5 else ''})"
+            uid = hashlib.sha1(u.encode()).hexdigest()[:8]
+            if own or st in (404, 410) or (isinstance(st, str) and "ConnectError" in st):
+                sev, detail, fix = "high", f"Broken {kind} ({st}): {u[:120]}{where}", "Fix the address in the email, or swap the image."
+            elif isinstance(st, int) and st >= 500 or st in ("ReadTimeout", "ConnectTimeout"):
+                sev, detail, fix = "medium", f"{kind.title()} didn't load ({st}): {u[:120]}{where}", "Open it to check; if it works, it was a hiccup."
+            else:
+                sev, detail, fix = "low", f"Couldn't verify ({st}): {host} refuses automated checks. {u[:100]}{where}", "Click it once by hand; mark “Not an issue” if it works."
+            out.append({**_find(sev, "links", emails[0], f"{kind}:{uid}", detail, fix, f"#edit/{emails[0]}"), "emails": emails, "url": u})
     return seen
 
 
@@ -356,7 +372,11 @@ def run_qa(reason="manual", who="QA agent"):
         uniq = {}
         for f in out:
             uniq.setdefault(f["id"], f)
-        out = list(uniq.values())
+        dismissed_ids = state.get("dismissed", {})
+        dismissed = [{**f, "dismissed": dismissed_ids[f["id"]]} for f in uniq.values() if f["id"] in dismissed_ids]
+        out = [f for f in uniq.values() if f["id"] not in dismissed_ids]
+        for f in out:
+            f["action"] = fix_kind(f)
         prev = (latest_qa() or {}).get("findings", [])
         prev_ids = {f["id"]: f for f in prev}
         first_seen = state.setdefault("first_seen", {})
@@ -372,7 +392,11 @@ def run_qa(reason="manual", who="QA agent"):
         rep = {"agent": "qa", "at": _now(), "reason": reason, "by": who, "seconds": round(time.time() - started),
                "emails": len(keys), "links_checked": len(seen), "ai_checked": ai_n, "counts": counts,
                "new": sum(1 for f in out if f["status"] == "new" and f["severity"] != "info"), "fixed": len(resolved),
-               "findings": out, "resolved": resolved[:50]}
+               "findings": out, "resolved": resolved[:50], "dismissed": dismissed}
+        by = {}
+        for f in out:
+            by[(f["severity"], f["check"].split(":")[0])] = by.get((f["severity"], f["check"].split(":")[0]), 0) + 1
+        log.info("QA run (%s): %s | %s", reason, counts, ", ".join(f"{s_}/{c}×{n}" for (s_, c), n in sorted(by.items())))
         _write("qa_latest.json", rep)
         hist = _read("qa_history.json", [])
         hist.append({k: rep[k] for k in ("at", "reason", "counts", "new", "fixed", "emails", "links_checked", "ai_checked")})
@@ -413,6 +437,195 @@ def _slack(text):
         httpx.post(config.SLACK_WEBHOOK_URL, json={"text": text}, timeout=20)
     except Exception as e:
         log.warning("Slack post failed: %s", str(e)[:200])
+
+
+# =====================================================================================================================
+# Fixer: works through QA findings Layton approves. Email fixes become drafts (or, for "publish the dashboard's version
+# again", a publish he has approved); anything it can't safely do is handed back with what's needed.
+# =====================================================================================================================
+COPY_CHECKS = ("spelling", "delivery_line", "delivery_normal", "urgency", "signoff", "preview", "ai")
+fix_state = {"running": False}
+
+
+def fix_kind(f):
+    c = f["check"].split(":")[0]
+    if f.get("area") == "copy" or c in COPY_CHECKS:
+        return {"type": "draft", "label": "Agent drafts a fix"}
+    if c == "alt":
+        return {"type": "alt", "label": "Agent adds alt text (draft)"}
+    if c in ("template_drift", "template_missing"):
+        return {"type": "republish", "label": "Agent publishes the dashboard's version again"}
+    if c in ("confirm_left",):
+        return {"type": "person", "label": "Needs the confirmed fact from you"}
+    if f.get("area") == "engine" or c.startswith(("consent", "validate", "templates_missing", "differs", "engine_flag", "not_pushed")):
+        return {"type": "person", "label": "Needs Luke or a re-approval"}
+    if f.get("area") == "links":
+        return {"type": "person", "label": "Check by hand"}
+    return {"type": "person", "label": "Needs a person"}
+
+
+def dismiss(ids, reason, who):
+    state = _read("qa_state.json", {})
+    d = state.setdefault("dismissed", {})
+    for i in ids:
+        d[str(i)] = {"by": who, "at": _now(), "reason": str(reason or "")[:300]}
+    _write("qa_state.json", state)
+    _drop_from_latest(ids)
+    return {"dismissed": len(ids)}
+
+
+def undismiss(fid, who):
+    state = _read("qa_state.json", {})
+    state.get("dismissed", {}).pop(fid, None)
+    _write("qa_state.json", state)
+    return {"ok": True}
+
+
+def _drop_from_latest(ids):
+    rep = latest_qa()
+    if rep:
+        ids = set(ids)
+        rep["findings"] = [f for f in rep["findings"] if f["id"] not in ids]
+        rep["counts"] = {s: sum(1 for f in rep["findings"] if f["severity"] == s) for s in ("high", "medium", "low", "info")}
+        _write("qa_latest.json", rep)
+
+
+def fixes():
+    return _read("fixes.json", [])
+
+
+def approve_fixes(ids, who):
+    """Layton approved these findings to be fixed: run the fixer in the background."""
+    rep = latest_qa() or {"findings": []}
+    chosen = [f for f in rep["findings"] if f["id"] in set(ids) and f.get("action", {}).get("type") in ("draft", "alt", "republish")]
+    if not chosen:
+        raise ValueError("None of those can be fixed by the agent.")
+    if fix_state["running"]:
+        raise ValueError("The fixer is already working; try again in a minute.")
+    _log_event(who, f"approved {len(chosen)} QA fixes")
+    threading.Thread(target=_safe, args=(_run_fixes, chosen, who), daemon=True).start()
+    return {"started": len(chosen)}
+
+
+def _run_fixes(chosen, who):
+    fix_state["running"] = True
+    try:
+        by_email = {}
+        for f in chosen:
+            by_email.setdefault(f["item"], []).append(f)
+        for key, fs in by_email.items():
+            try:
+                if any(f["action"]["type"] == "republish" for f in fs):
+                    res = builder.republish_for_theme(key, f"QA fixer (approved by {who})", "re-published by the QA fixer")
+                    _record(key, fs, "published" if res.get("status", 500) < 400 else "failed", who, f"Published the dashboard's version again ({res.get('status')}).")
+                    continue
+                _fix_email(key, [f for f in fs if f["action"]["type"] in ("draft", "alt")], who)
+            except Exception as e:
+                log.exception("QA fix %s", key)
+                _record(key, fs, "failed", who, str(e)[:300])
+    finally:
+        fix_state["running"] = False
+        qa_soon("QA fixes drafted")
+
+
+def _record(key, fs, status, who, summary, n=None, edits=None):
+    rec = fixes()
+    rec.append({"id": f"x{len(rec) + 1}", "key": key, "findings": [f["id"] for f in fs], "what": [f["detail"][:200] for f in fs],
+                "status": status, "version": n, "summary": summary, "edits": edits or [], "approved_by": who, "at": _now()})
+    _write("fixes.json", rec[-500:])
+
+
+def _fix_email(key, fs, who):
+    from . import assistant, media
+    d = builder.doc(key)
+    e = d["editing"]
+    blocks = [{"src": b["src"], "segs": [list(x) for x in b["segments"]], "meta": b["meta"], "settings": b["settings"], "cond": b["cond"]}
+              for b in e["blocks"]]
+    subject, preview = e["subject"], e["preview_text"]
+    changed, notes = [], []
+    if e["status"] in ("draft", "approved"):
+        notes.append(f"Built on the unpublished v{e['n']}, so publishing this includes its other changes.")
+    # 1. alt text: from the library's description of the same picture
+    alts = {x["url"]: x["alt"] for x in media.catalog() if x.get("alt")}
+    for f in [f for f in fs if f["action"]["type"] == "alt"]:
+        name = f["detail"].split(": ", 1)[-1]
+        done = False
+        for b in blocks:
+            for seg in b["segs"]:
+                if seg[0] == "tag" and seg[1].lower().startswith("<img") and name in seg[1]:
+                    src = (re.search(r'src="([^"]*)"', seg[1]) or [None, ""])[1]
+                    alt = alts.get(src)
+                    if alt:
+                        a = htmllib.escape(alt, quote=True)
+                        seg[1] = re.sub(r'alt="[^"]*"', f'alt="{a}"', seg[1]) if 'alt="' in seg[1] else seg[1].replace("<img", f'<img alt="{a}"', 1)
+                        changed.append({"before": f"no alt text on {name}", "text": f"alt “{alt}”"})
+                        done = True
+        if not done:
+            notes.append(f"No library description for {name}: add its alt text in the editor.")
+    # 2. words: Claude's "describe a change", told exactly which findings to fix and to change nothing else
+    words = [f for f in fs if f["action"]["type"] == "draft"]
+    if words:
+        instr = ("Fix only these problems a QA check found, changing as few words as possible and nothing else: "
+                 + " | ".join(f"{f['detail']}" + (f" (suggested: {f['fix']})" if f.get("fix") else "") for f in words))[:600]
+        parts_blocks = []
+        for i, b in enumerate(blocks):
+            if b["meta"]["kind"] in ("Header", "Footer"):
+                continue
+            parts = [{"i": si, "text": htmllib.unescape(v)} if k == "text" else {"tok": builder.tok_label(v)} for si, (k, v) in enumerate(b["segs"]) if k in ("text", "tok")]
+            if any("i" in p for p in parts):
+                parts_blocks.append({"block": i, "kind": b["meta"]["kind"], "only_if": b["meta"]["only_if"], "parts": parts})
+        res = assistant.change(key, instr, re.sub(r"\{\{.*?\}\}", "[…]", subject), preview, parts_blocks, [], f"QA fixer (approved by {who})")
+        for ed in res["edits"]:
+            if ed["problems"]:
+                notes.append(f"Skipped a suggestion that itself looked wrong ({', '.join(ed['problems'])}).")
+                continue
+            seg = blocks[ed["block"]]["segs"][ed["i"]]
+            orig = htmllib.unescape(seg[1])
+            lead, trail = re.match(r"^\s*", orig).group(0), re.search(r"\s*$", orig).group(0)
+            seg[1] = htmllib.escape(lead + ed["text"] + trail, quote=False)
+            changed.append({"before": ed["before"], "text": ed["text"]})
+        if res.get("preview_text") and not res["preview_text"]["problems"]:
+            changed.append({"before": preview, "text": res["preview_text"]["text"]})
+            preview = res["preview_text"]["text"]
+        notes += res.get("notes", [])
+    if not changed:
+        _record(key, fs, "nothing", who, "No change made. " + " ".join(notes)[:400])
+        return
+    out = builder.save(key, {"subject": subject, "preview_text": preview, "from_name": e["from_name"], "overrides": d["design"]["overrides"],
+                             "blocks": [{"src": b["src"], "html": "".join(x[1] for x in b["segs"]), "settings": b["settings"], "cond": b["cond"]} for b in blocks],
+                             "note": "QA fixes: " + "; ".join(f["detail"][:80] for f in fs)[:280]}, f"QA fixer (approved by {who})")
+    _record(key, fs, "drafted", who, (f"Draft v{out['n']} saved. " + " ".join(notes))[:500], out["n"], changed)
+
+
+def publish_fixes(ids, who):
+    """Layton approves and publishes the fixer's drafts (one click for several emails)."""
+    rec = fixes()
+    done = []
+    for x in rec:
+        if x["id"] in set(ids) and x["status"] == "drafted":
+            try:
+                v = next(v for v in builder._load(x["key"])["versions"] if v["n"] == x["version"])
+                if v["status"] != "draft":
+                    raise ValueError(f"v{x['version']} is now {v['status']} (edited since?)")
+                builder.approve(x["key"], x["version"], who)
+                res = builder.publish(x["key"], x["version"], who)
+                x.update(status="published" if res["status"] < 400 else "failed", published_by=who, published_at=_now())
+            except Exception as e:
+                x.update(status="failed", summary=(x["summary"] + f" Publish failed: {str(e)[:200]}")[:600])
+            done.append(x["id"])
+    _write("fixes.json", rec)
+    if done:
+        qa_soon("QA fixes published")
+    return {"fixes": rec[-100:]}
+
+
+def discard_fix(fid, who):
+    rec = fixes()
+    for x in rec:
+        if x["id"] == fid and x["status"] == "drafted":
+            x.update(status="discarded", discarded_by=who)
+    _write("fixes.json", rec)
+    return {"fixes": rec[-100:]}
 
 
 # =====================================================================================================================
@@ -626,7 +839,7 @@ def overview():
     b = briefs()
     return {"qa": latest_qa(), "qa_history": _read("qa_history.json", [])[-30:], "brief": b[-1] if b else None,
             "briefs": [{"n": x["n"], "at": x["at"], "headline": x["brief"]["headline"]} for x in b][::-1][:20],
-            "decisions": decisions()[-60:][::-1], "actions": actions(), "context": context(), "running": dict(running),
+            "decisions": decisions()[-60:][::-1], "actions": actions(), "fixes": fixes()[-100:][::-1], "fixing": fix_state["running"], "context": context(), "running": {**running, "fix": fix_state["running"]},
             "manager_model": MANAGER_MODEL, "slack": bool(config.SLACK_WEBHOOK_URL), "ai": bool(config.ANTHROPIC_API_KEY),
             "schedule": {"qa": "Daily at 06:30, and 2 minutes after anything is published", "manager": "Mondays at 07:00"}}
 

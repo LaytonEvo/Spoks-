@@ -1,7 +1,8 @@
 "use strict";
 // Agents: the manager's weekly brief (decide each recommendation), the QA & compliance report, approved actions,
 // and the context the manager works from. Agents only report and draft; nothing here publishes or switches anything on.
-const AG = { d: null, sev: "open", briefN: null, poll: null };
+const AG = { d: null, sev: "open", briefN: null, poll: null, sel: new Set(), fsel: new Set() };
+const CAN_FIX = ["draft", "alt", "republish"];
 const SEV = { high: ["high", "High"], medium: ["medium", "Medium"], low: ["low", "Low"], info: ["skip", "Info"] };
 const RATE = { good: ["live", "Good"], watch: ["todo", "Watch"], act: ["high", "Act"] };
 const OWNER = { qa: "QA agent", email: "Email agent", product: "Product agent", design: "Design agent", data: "Data agent", layton: "Layton", luke: "Luke", dashboard: "Dashboard" };
@@ -18,11 +19,11 @@ async function renderAgents() {
 // and never redraws while you're typing a note (it shows a "new results" link instead).
 function agWatch() {
   clearTimeout(AG.poll);
-  if (!(AG.d.running.qa || AG.d.running.manager)) return;
+  if (!(AG.d.running.qa || AG.d.running.manager || AG.d.running.fix)) return;
   AG.poll = setTimeout(async () => {
     if (state.page !== "agents") return;
     let st; try { st = await api("/api/agents/status"); } catch (e) { agWatch(); return; }
-    const done = (AG.d.running.qa && !st.running.qa) || (AG.d.running.manager && !st.running.manager);
+    const done = (AG.d.running.qa && !st.running.qa) || (AG.d.running.manager && !st.running.manager) || (AG.d.running.fix && !st.running.fix);
     if (!done) { agWatch(); return; }
     const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest(".ag-dec, #ag-ctx");
     if (typing) { const h = $("#main h1"); if (h && !$("#ag-fresh")) h.insertAdjacentHTML("beforeend", ` <button type="button" class="btn-line" id="ag-fresh">New results: show them</button>`); return; }
@@ -33,7 +34,7 @@ function drawAgents() {
   const d = AG.d;
   $("#main").innerHTML = `<p class="eyebrow">Agents</p><h1>Agents</h1>
     <p class="muted" style="max-width:90ch">A manager and its agents watch the emails and report to you. They check, analyse and draft; you decide. Nothing here publishes an email or switches a flow on.</p>
-    ${agBrief(d)}${agQa(d)}${agActions(d)}${agTeam(d)}${agContext(d)}`;
+    ${agBrief(d)}${agFixes(d)}${agQa(d)}${agActions(d)}${agTeam(d)}${agContext(d)}`;
 }
 function agBrief(d) {
   const r = d.brief;
@@ -72,10 +73,18 @@ function agQa(d) {
       <button type="button" data-agsev="open" aria-pressed="${AG.sev === "open"}">All open</button><button type="button" data-agsev="new" aria-pressed="${AG.sev === "new"}">New (${q.new})</button>
       <span class="muted small">${q.fixed ? `${q.fixed} fixed since the last run` : ""}</span>
       <span class="ag-spark" title="Open issues, last ${trend.length} runs">${trend.map((t) => `<i style="height:${Math.round(4 + 22 * (t.counts.high + t.counts.medium + t.counts.low) / max)}px" class="${t.counts.high ? "h" : ""}"></i>`).join("")}</span></div>
-    ${list.length ? `<div class="table-wrap"><table class="ag-t"><thead><tr><th></th><th>Where</th><th>What</th><th>Fix</th><th>Since</th></tr></thead><tbody>
-      ${list.map((f) => `<tr><td><span class="stat ${SEV[f.severity][0]}">${SEV[f.severity][1]}</span>${f.status === "new" && f.severity !== "info" ? ` <span class="m-badge">new</span>` : ""}</td>
-        <td><a href="${esc(f.where)}">${esc(f.item)}</a><br><span class="muted small">${esc(f.area)}</span></td><td>${esc(f.detail)}</td><td class="small">${esc(f.fix || "")}</td><td class="small muted">${esc(f.since || "")}</td></tr>`).join("")}</tbody></table></div>`
+    ${list.length ? `<div class="ag-bulk">
+        <button type="button" class="link-btn small" id="ag-selfix">Select all the agent can fix (${list.filter((f) => f.action && CAN_FIX.includes(f.action.type)).length})</button>
+        <button type="button" class="link-btn small" id="ag-selnone">Clear</button>
+        <span class="muted small">${AG.sel.size} selected</span>
+        <button type="button" class="btn" id="ag-fixgo" ${[...AG.sel].some((id) => { const f = q.findings.find((x) => x.id === id); return f && f.action && CAN_FIX.includes(f.action.type); }) && !d.running.fix ? "" : "disabled"}>${d.running.fix ? "Fixing…" : "Approve: agent fixes the selected"}</button>
+        <button type="button" class="btn-line" id="ag-dismiss" ${AG.sel.size ? "" : "disabled"}>Not an issue…</button></div>
+      <div class="table-wrap"><table class="ag-t"><thead><tr><th></th><th></th><th>Where</th><th>What</th><th>Fix</th><th>Since</th></tr></thead><tbody>
+      ${list.map((f) => `<tr><td><input type="checkbox" data-agsel="${esc(f.id)}" ${AG.sel.has(f.id) ? "checked" : ""} aria-label="Select"></td><td><span class="stat ${SEV[f.severity][0]}">${SEV[f.severity][1]}</span>${f.status === "new" && f.severity !== "info" ? ` <span class="m-badge">new</span>` : ""}</td>
+        <td><a href="${esc(f.where)}">${esc(f.item)}</a><br><span class="muted small">${esc(f.area)}</span></td><td>${esc(f.detail)}</td>
+        <td class="small">${esc(f.fix || "")}${f.action ? `<br><span class="ag-who ${CAN_FIX.includes(f.action.type) ? "agent" : ""}">${esc(f.action.label)}</span>` : ""}</td><td class="small muted">${esc(f.since || "")}</td></tr>`).join("")}</tbody></table></div>`
       : `<p class="muted">Nothing here.</p>`}
+    ${q.dismissed && q.dismissed.length ? `<details><summary class="small">Marked “not an issue” (${q.dismissed.length})</summary><ul class="small">${q.dismissed.map((f) => `<li>${esc(f.item)}: ${esc(f.detail)} — <i>${esc(f.dismissed.reason)}</i> (${esc(f.dismissed.by)}) <button type="button" class="link-btn small" data-agrestore="${esc(f.id)}">Restore</button></li>`).join("")}</ul></details>` : ""}
     ${q.resolved && q.resolved.length ? `<details><summary class="small">Fixed since the last run (${q.resolved.length})</summary><ul class="small">${q.resolved.map((f) => `<li>${esc(f.item)}: ${esc(f.detail)}</li>`).join("")}</ul></details>` : ""}</section>`;
 }
 function agActions(d) {
@@ -123,4 +132,65 @@ document.addEventListener("change", async (e) => {
   if (e.target.id === "ag-briefs") { AG.briefN = +e.target.value; AG.d.brief = await api(`/api/agents/brief/${AG.briefN}`); drawAgents(); return; }
   const a = e.target.dataset && e.target.dataset.agact;
   if (a) { try { AG.d.actions = (await api("/api/agents/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rec: a, status: e.target.value }) })).actions; drawAgents(); } catch (err) { alertInline(e.target, err.message); } }
+});
+
+function agFixes(d) {
+  const rows = d.fixes || [];
+  if (!rows.length && !d.running.fix) return "";
+  const ready = rows.filter((x) => x.status === "drafted");
+  const st = { drafted: ["todo", "Draft ready"], published: ["live", "Published"], failed: ["high", "Failed"], nothing: ["skip", "No change"], discarded: ["skip", "Discarded"] };
+  const row = (x) => `<tr><td>${x.status === "drafted" ? `<input type="checkbox" data-agfsel="${esc(x.id)}" ${AG.fsel.has(x.id) ? "checked" : ""} aria-label="Select">` : ""}</td>
+    <td><a href="#edit/${esc(x.key)}">${esc(x.key)}</a>${x.version ? ` <span class="muted small">v${x.version}</span>` : ""}<br><span class="stat ${(st[x.status] || ["skip"])[0]}">${(st[x.status] || [0, x.status])[1]}</span></td>
+    <td class="small">${x.what.map((w) => `<div>${esc(w)}</div>`).join("")}</td>
+    <td class="small">${x.edits.length ? x.edits.map((e) => `<div><s>${esc(e.before)}</s> → <mark>${esc(e.text)}</mark></div>`).join("") : ""}<div class="muted">${esc(x.summary)}</div></td>
+    <td>${x.status === "drafted" ? `<button type="button" class="link-btn small" data-agdiscard="${esc(x.id)}">Discard</button>` : `<span class="small muted">${esc(when(x.published_at || x.at))}</span>`}</td></tr>`;
+  return `<section class="panel"><div class="ag-head"><h2>Fixes from the agent</h2>${d.running.fix ? `<span class="muted">Working on the fixes you approved…</span>` : ""}</div>
+    <p class="muted small">Each fix is saved as a draft of that email; open it to preview. Publishing sends the fixed emails to Evoflows (live flows use them from their next send).</p>
+    ${ready.length ? `<div class="ag-bulk"><button type="button" class="link-btn small" id="ag-fall">Select all drafts (${ready.length})</button><span class="muted small">${AG.fsel.size} selected</span>
+      <button type="button" class="btn" id="ag-fpub" ${AG.fsel.size ? "" : "disabled"}>Approve &amp; publish selected</button></div>` : ""}
+    <div class="table-wrap"><table class="ag-t"><thead><tr><th></th><th>Email</th><th>Found</th><th>Change</th><th></th></tr></thead><tbody>${rows.slice(0, 40).map(row).join("")}</tbody></table></div></section>`;
+}
+document.addEventListener("change", (e) => {
+  if (state.page !== "agents") return;
+  const c = e.target.dataset && (e.target.dataset.agsel || e.target.dataset.agfsel);
+  if (!c) return;
+  const set = e.target.dataset.agsel ? AG.sel : AG.fsel;
+  if (e.target.checked) set.add(c); else set.delete(c);
+  const y = window.scrollY; drawAgents(); window.scrollTo(0, y);
+});
+document.addEventListener("click", async (e) => {
+  if (state.page !== "agents") return;
+  const t = e.target, y = window.scrollY, q = AG.d && AG.d.qa;
+  const redraw = () => { drawAgents(); window.scrollTo(0, y); };
+  if (t.id === "ag-selfix") { const list = q.findings.filter((f) => AG.sev === "open" ? f.severity !== "info" : AG.sev === "new" ? f.status === "new" : f.severity === AG.sev); list.filter((f) => f.action && CAN_FIX.includes(f.action.type)).forEach((f) => AG.sel.add(f.id)); redraw(); return; }
+  if (t.id === "ag-selnone") { AG.sel.clear(); redraw(); return; }
+  if (t.id === "ag-fall") { (AG.d.fixes || []).filter((x) => x.status === "drafted").forEach((x) => AG.fsel.add(x.id)); redraw(); return; }
+  if (t.id === "ag-fixgo") {
+    const ids = [...AG.sel].filter((id) => { const f = q.findings.find((x) => x.id === id); return f && f.action && CAN_FIX.includes(f.action.type); });
+    const rep = ids.filter((id) => q.findings.find((x) => x.id === id).action.type === "republish").length;
+    if (!confirm(`Let the agent fix ${ids.length} finding${ids.length > 1 ? "s" : ""}?\n\nWording and alt text fixes are saved as drafts for you to check and publish.${rep ? `\n${rep} of them re-publish the dashboard's version of an email to Evoflows straight away.` : ""}`)) return;
+    t.disabled = true;
+    try { await api("/api/agents/fix", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) }); AG.sel.clear(); AG.d.running.fix = true; redraw(); agWatch(); }
+    catch (err) { alertInline(t, err.message); t.disabled = false; }
+    return;
+  }
+  if (t.id === "ag-dismiss") {
+    const reason = prompt(`Mark ${AG.sel.size} finding${AG.sel.size > 1 ? "s" : ""} as not an issue?\n\nWhy? (e.g. "Checked by hand: the Instagram link works.") Future runs and the manager see this.`);
+    if (!reason || !reason.trim()) return;
+    try { await api("/api/agents/dismiss", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: [...AG.sel], reason }) }); AG.sel.clear(); await renderAgents(); window.scrollTo(0, y); }
+    catch (err) { alertInline(t, err.message); }
+    return;
+  }
+  const rs = t.closest("[data-agrestore]");
+  if (rs) { await api("/api/agents/dismiss", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: rs.dataset.agrestore }) }); rs.closest("li").remove(); return; }
+  if (t.id === "ag-fpub") {
+    const ids = [...AG.fsel];
+    if (!confirm(`Approve and publish ${ids.length} fixed email${ids.length > 1 ? "s" : ""} to Evoflows?\n\nLive flows use them from their next send. Every version is kept, so each can be rolled back in its editor.`)) return;
+    t.disabled = true; t.textContent = "Publishing…";
+    try { AG.d.fixes = (await api("/api/agents/fixes/publish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) })).fixes.slice().reverse(); AG.fsel.clear(); redraw(); }
+    catch (err) { alertInline(t, err.message); t.disabled = false; }
+    return;
+  }
+  const dc = t.closest("[data-agdiscard]");
+  if (dc) { AG.d.fixes = (await api(`/api/agents/fixes/${dc.dataset.agdiscard}/discard`, { method: "POST" })).fixes.slice().reverse(); AG.fsel.delete(dc.dataset.agdiscard); redraw(); }
 });

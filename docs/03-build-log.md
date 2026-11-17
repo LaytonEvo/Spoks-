@@ -443,3 +443,20 @@
   is set. Layton approves / parks / rejects each recommendation (with a note); approvals become actions with an owner.
 - Nothing in the agents publishes, sends, enables or edits; QA's Evoflows calls are reads and validate only.
 - Planned agents (email, product, design, data) shown on the page with what each waits on.
+
+## 17 Nov 2026 — Agents act on approved QA findings (Layton: "approve actions and have the agents run them")
+
+- **Link checks reworked:** one finding per address (listing the emails it's in) instead of one per email; a browser-like
+  request; our own site/images failing = high, 404/410 anywhere = high, 5xx/timeouts = medium, and other sites refusing
+  automated visits (Instagram, Facebook, Trustpilot…) = low "couldn't verify". This was the likely source of the first
+  live run's 32 high findings.
+- **"Not an issue":** select findings, give a reason; they're kept out of future runs (listed and restorable) and the
+  manager sees the reason.
+- **Fixer agent:** each finding shows what the agent can do. Approve selected → it works in the background:
+  wording problems (US spelling, delivery amounts, urgency, sign-off, preview, Claude copy findings) → Claude's
+  minimal edit, saved as a draft version of that email; missing alt text → the library's description of the same picture
+  (else handed back); "differs from what the dashboard published" → re-publishes the dashboard version (that one is a
+  publish, confirmed in the dialog). Facts ([CONFIRM]), engine/consent problems and links go to a person.
+- **Fixes from the agent:** list of drafts with before → after, "Approve & publish selected" (approve + publish each,
+  logged with who), Discard. QA re-runs 2 minutes after fixes are drafted or published.
+- QA logs a one-line summary of each run (counts by check) to the Railway logs.
