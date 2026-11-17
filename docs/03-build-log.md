@@ -488,3 +488,8 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   and how to cancel; small wording points (f2_fe2 "from £10" vs the members' line "over £10").
 - Manager feedback applied: links reported once per address; "refused" ≠ broken; findings show whether their flow is
   live; "What was checked" listed; report says how many emails Claude read and how many are still to read.
+- Calibration runs (reviewer-triggered): v2 19 high/108 medium → v3 33/61 (facts list read as exhaustive) → v4 2/58
+  (signed-off copy treated as approved) → v5 2/51 (block audience only from block settings; no spacing artefacts) →
+  v6 (headings/paragraphs/images kept distinct; price format explained). Verdicts recorded on the two v5 highs.
+- Open question for Layton from the review: do Free members get member deals? (F2 Free E2 lists them under "what the
+  £36 plan adds"; F3 under-£300 tells Free joiners they get them.)
