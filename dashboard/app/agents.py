@@ -280,7 +280,7 @@ def _template_drift(keys, out):
         time.sleep(0.3)
 
 
-CHECK_VERSION = "5"  # bump when the copy check's instructions change, so every email is read again
+CHECK_VERSION = "6"  # bump when the copy check's instructions change, so every email is read again
 FLOW_AUDIENCE = {
     "f3_checkout": "People who left a checkout without buying (opted-in customers, soft opt-in). Paths by basket value (£300+ / under £300) and annual membership.",
     "f9_after_delivery": "Customers whose order was delivered. Paths by what they bought (trolleys, clubs, used clubs, other) and membership.",
@@ -310,8 +310,11 @@ def _readable(inner):
         return "⟧"
     t = re.sub(r"\{\{-?\s*((?:if|else|end|range|with)\b.*?)\s*-?\}\}", ctl, t, flags=re.S)
     t = re.sub(r"\{\{.*?\}\}", lambda m: f"[{builder.tok_label(m.group(0))}]", t, flags=re.S)
+    t = re.sub(r"<img\b[^>]*?alt=\"([^\"]*)\"[^>]*>", lambda m: f" [image: {m.group(1) or 'decorative'}] ", t, flags=re.I)
+    t = re.sub(r"<img\b[^>]*>", " [image] ", t, flags=re.I)
+    t = re.sub(r"</(p|h1|h2|h3|li|td)>|<br\s*/?>", " / ", t, flags=re.I)
     t = re.sub(r"<a\b[^>]*>(.*?)</a>", lambda m: f" [link: {re.sub(r'<[^>]+>', ' ', m.group(1)).strip()}] ", t, flags=re.S | re.I)
-    return _text(t)
+    return re.sub(r"(\s*/\s*)+", " / ", _text(t)).strip(" /")
 
 
 def _context(key):
