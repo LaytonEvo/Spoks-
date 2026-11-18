@@ -662,8 +662,13 @@ def _fix_email(key, fs, who):
     # 2. words: Claude's "describe a change", told exactly which findings to fix and to change nothing else
     words = [f for f in fs if f["action"]["type"] == "draft"]
     if words:
+        def one(f):
+            rv = f.get("review") or {}
+            if rv.get("verdict") == "confirmed" and rv.get("reason", "").startswith("Fix:"):  # the reviewer gave the exact fix
+                return f"{f['detail'][:200]} REQUIRED FIX, use these exact words: {rv['reason'][4:].strip()}"
+            return f"{f['detail']}" + (f" (suggested: {f['fix']})" if f.get("fix") else "")
         instr = ("Fix only these problems a QA check found, changing as few words as possible and nothing else: "
-                 + " | ".join(f"{f['detail']}" + (f" (suggested: {f['fix']})" if f.get("fix") else "") for f in words))[:600]
+                 + " | ".join(one(f) for f in words))[:900]
         parts_blocks = []
         for i, b in enumerate(blocks):
             if b["meta"]["kind"] in ("Header", "Footer"):

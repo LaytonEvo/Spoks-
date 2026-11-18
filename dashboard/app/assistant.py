@@ -286,7 +286,7 @@ class Change(BaseModel):
 
 
 def change(key, instruction, subject, preview, blocks, labels, who):
-    instruction = re.sub(r"\s+", " ", str(instruction or "")).strip()[:600]
+    instruction = re.sub(r"\s+", " ", str(instruction or "")).strip()[:900]
     if len(instruction) < 4:
         raise AssistantError("Say what you'd like changed.")
     clean_blocks = []
