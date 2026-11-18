@@ -262,7 +262,11 @@ def approve(pid, op_ids, who):
             raise ValueError("Pick at least one change the agent can make.")
     d = builder.doc(p["key"])
     e = d["editing"]
-    if e["n"] != p.get("based_on") and [b["meta"]["kind"] for b in e["blocks"]] != p.get("shape"):
+    shape = p.get("shape")
+    if shape is None:  # reviews from before shapes were stored: rebuild it from the version that was reviewed
+        v = builder.base(p["key"]) if not p.get("based_on") else next((x for x in builder._load(p["key"])["versions"] if x["n"] == p["based_on"]), None)
+        shape = [builder.block_meta(builder.unwrap(b)[0])["kind"] for b in builder.split(builder._ht(v))[1]] if v else []
+    if e["n"] != p.get("based_on") and [b["meta"]["kind"] for b in e["blocks"]] != shape:
         # only words changed since (e.g. a copy fix) is fine: the changes refer to blocks, which are all where they were
         raise ValueError(f"The email's blocks have changed since the review (now v{e['n']}). Run the design review again for it.")
     blocks = [{"src": b["src"], "html": b["html"], "settings": dict(b["settings"]), "cond": b["cond"]} for b in e["blocks"]]
