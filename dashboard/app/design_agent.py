@@ -158,7 +158,7 @@ def review(key, who="Design agent"):
         x["label"] = _label(x, blocks, lib)
         ops.append(x)
     assistant._log(who, "design review", key, f"{len(ops)} changes")
-    return {"key": key, "name": d["name"], "at": _now(), "based_on": d["editing"]["n"], "verdict": assistant._txt(rv.verdict, 300),
+    return {"key": key, "name": d["name"], "at": _now(), "based_on": d["editing"]["n"], "shape": [b["kind"] for b in blocks], "verdict": assistant._txt(rv.verdict, 300),
             "changes": ops, "ideas": [assistant._txt(x, 300) for x in rv.ab_test_ideas[:5]],
             "notes": [assistant._txt(x, 300) for x in rv.notes[:5]], "status": "proposed"}
 
@@ -262,8 +262,9 @@ def approve(pid, op_ids, who):
             raise ValueError("Pick at least one change the agent can make.")
     d = builder.doc(p["key"])
     e = d["editing"]
-    if e["n"] != p.get("based_on"):
-        raise ValueError(f"The email has changed since the review (now v{e['n']}). Run the design review again for it.")
+    if e["n"] != p.get("based_on") and [b["meta"]["kind"] for b in e["blocks"]] != p.get("shape"):
+        # only words changed since (e.g. a copy fix) is fine: the changes refer to blocks, which are all where they were
+        raise ValueError(f"The email's blocks have changed since the review (now v{e['n']}). Run the design review again for it.")
     blocks = [{"src": b["src"], "html": b["html"], "settings": dict(b["settings"]), "cond": b["cond"]} for b in e["blocks"]]
     lib = {x["id"]: x for x in d["library"]}
     # settings, images and adds refer to the original numbering: apply them first, then removes and moves
