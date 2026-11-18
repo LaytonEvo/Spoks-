@@ -873,6 +873,15 @@ async def review_finding(fid: str, request: Request, who=Depends(review_auth)):
         raise HTTPException(400, str(e))
 
 
+@app.post("/review/request-fix")
+async def review_request_fix(request: Request, who=Depends(review_auth)):
+    b = await request.json()
+    try:
+        return agents.request_fix(str(b.get("item", "")), b.get("detail"), b.get("fix"), who)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
 @app.post("/review/run/qa")
 def review_run_qa(who=Depends(review_auth)):
     if agents.running["qa"]:

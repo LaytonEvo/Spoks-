@@ -433,6 +433,9 @@ def run_qa(reason="manual", who="QA agent"):
         uniq = {}
         for f in out:
             uniq.setdefault(f["id"], f)
+        for rid, r in state.get("requests", {}).items():
+            if r.get("status") == "open" and rid not in uniq:
+                uniq[rid] = _request_finding(rid, r)
         dismissed_ids = state.get("dismissed", {})
         dismissed = [{**f, "dismissed": dismissed_ids[f["id"]]} for f in uniq.values() if f["id"] in dismissed_ids]
         out = [f for f in uniq.values() if f["id"] not in dismissed_ids]
@@ -555,6 +558,34 @@ def review(fid, verdict, reason, who):
         _write("qa_latest.json", rep)
     _log_event(who, f"review {verdict}: {fid}")
     return state["reviews"][fid]
+
+
+def request_fix(item, detail, fix, who):
+    """The reviewer asks for a specific change to an email: it shows as a finding (with the exact wording) for Layton to
+    approve for the fixer, until the fix is drafted."""
+    if not builder.is_template(item):
+        raise ValueError("Unknown email.")
+    detail, fix = str(detail or "").strip()[:400], str(fix or "").strip()[:600]
+    if not detail or not fix:
+        raise ValueError("Give what's wrong and the exact fix.")
+    state = _read("qa_state.json", {})
+    reqs = state.setdefault("requests", {})
+    rid = f"review:{hashlib.sha1((item + detail).encode()).hexdigest()[:8]}:{item}"
+    reqs[rid] = {"item": item, "detail": detail, "fix": fix, "by": who, "at": _now(), "status": "open"}
+    _write("qa_state.json", state)
+    rep = latest_qa()
+    if rep and not any(f["id"] == rid for f in rep["findings"]):
+        rep["findings"].insert(0, _request_finding(rid, reqs[rid]))
+        rep["counts"] = {s_: sum(1 for f in rep["findings"] if f["severity"] == s_) for s_ in ("high", "medium", "low", "info")}
+        _write("qa_latest.json", rep)
+    return {"id": rid}
+
+
+def _request_finding(rid, r):
+    f = {**_find("medium", "copy", r["item"], rid, f"Requested by {r['by']}: {r['detail']}", r["fix"], f"#edit/{r['item']}"),
+         "review": {"verdict": "confirmed", "reason": "Fix: " + r["fix"], "by": r["by"], "at": r["at"]}, "status": "new"}
+    f["action"] = fix_kind(f)
+    return f
 
 
 def reviews():
@@ -697,6 +728,11 @@ def _fix_email(key, fs, who):
                              "blocks": [{"src": b["src"], "html": "".join(x[1] for x in b["segs"]), "settings": b["settings"], "cond": b["cond"]} for b in blocks],
                              "note": "QA fixes: " + "; ".join(f["detail"][:80] for f in fs)[:280]}, f"QA fixer (approved by {who})")
     _record(key, fs, "drafted", who, (f"Draft v{out['n']} saved. " + " ".join(notes))[:500], out["n"], changed)
+    st = _read("qa_state.json", {})
+    for f in fs:
+        if f["id"] in st.get("requests", {}):
+            st["requests"][f["id"]]["status"] = f"drafted v{out['n']}"
+    _write("qa_state.json", st)
 
 
 def publish_fixes(ids, who):
