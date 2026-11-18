@@ -493,3 +493,16 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   v6 (headings/paragraphs/images kept distinct; price format explained). Verdicts recorded on the two v5 highs.
 - Open question for Layton from the review: do Free members get member deals? (F2 Free E2 lists them under "what the
   £36 plan adds"; F3 under-£300 tells Free joiners they get them.)
+
+## 18 Nov 2026 — F9: battery advice for electric trolleys only (Layton: push trolleys shouldn't get it)
+
+- New flag `has_electric_trolley` (collections: electric-trolleys, gps-electric-trolleys, remote-electric-trolleys,
+  motocaddy-electric-trolleys, motocaddy-electric-golf-trolleys, powakaddy-electric-trolleys; checked in Shopify 18 Nov).
+- `klaviyo/evoflows.py` `_electric_only()`: F9 E1 (f9_e1h, f9_e1hn) tip 1 "Charge it after every round" only for electric
+  trolleys, tips renumbered for push trolleys; the Motocaddy 2-year/lithium-battery warranty line needs Motocaddy AND
+  electric (push Motocaddy buyers get "Check your manual…"); F9 E2 (f9_e2h) battery-care section electric only
+  (accessories still for all trolleys). Only these 3 templates and flags.json changed; verified with Go html/template.
+- To go live: push flags (Engine & events) then re-approve F9 on New flows to approve (stays switched off).
+- Copy fixes requested by the reviewer and approved by Layton, waiting for his approval on the Agents page: Trustpilot
+  wording ×13, "four free returns a year" ×8, "Become an annual member" (F2 Free E3), "clubs" not "new clubs" (F9 review,
+  F9 E1 ×2), "free delivery over £10" (F2 Free E2).

@@ -25,6 +25,16 @@
    "motocaddy-push-trolleys"
   ]
  },
+ "has_electric_trolley": {
+  "collections": [
+   "electric-trolleys",
+   "gps-electric-trolleys",
+   "remote-electric-trolleys",
+   "motocaddy-electric-trolleys",
+   "motocaddy-electric-golf-trolleys",
+   "powakaddy-electric-trolleys"
+  ]
+ },
  "has_clubs": {
   "collections": [
    "mens-golf-clubs",

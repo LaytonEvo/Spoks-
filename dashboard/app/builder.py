@@ -137,7 +137,7 @@ def unwrap(block):
 
 # ---------------- labels ----------------
 GO_FIELD = {"is_annual": "annual member", "is_free_member": "Free member", "is_member": "member (Free or annual)",
-            "has_trolley": "has a trolley", "has_motocaddy_trolley": "has a Motocaddy trolley", "has_clubs": "has clubs",
+            "has_trolley": "has a trolley", "has_motocaddy_trolley": "has a Motocaddy trolley", "has_electric_trolley": "has an electric trolley", "has_clubs": "has clubs",
             "has_used_clubs": "has used clubs", "has_hardware": "has a trolley, clubs or used clubs", "has_shoes": "has shoes",
             "first_name": "we have their first name", "items": "the basket has items", "preferences_url": "a preferences page exists"}
 
@@ -214,7 +214,7 @@ def sample(audience="non", name=True):
     return {"first_name": "Sam" if name else "", "items": [SAMPLE_ITEM], "total": "799.00", "recovery_url": "#",
             "unsubscribe_url": "#", "preferences_url": "", "is_annual": audience == "annual",
             "is_free_member": audience == "free", "is_member": audience != "non", "has_trolley": True,
-            "has_motocaddy_trolley": True, "has_hardware": True, "has_clubs": False, "has_used_clubs": False, "has_shoes": False,
+            "has_motocaddy_trolley": True, "has_electric_trolley": True, "has_hardware": True, "has_clubs": False, "has_used_clubs": False, "has_shoes": False,
             "order": {"first_item": {"title": SAMPLE_ITEM["title"], "image": SAMPLE_ITEM["image"], "url": "#"}, "total": 799.0,
                       "age_days": 4, "source": "web"}}
 

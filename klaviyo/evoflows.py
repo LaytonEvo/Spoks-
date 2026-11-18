@@ -75,7 +75,11 @@ CLUBS_H = ["mens-golf-clubs", "ladies-golf-clubs", "womens-golf-clubs", "junior-
            "ladies-golf-wedges", "ladies-golf-package-sets"]
 USED_H = ["approved-used-golf-clubs", "all-second-hand-golf-clubs"]
 SHOES_H = ["mens-golf-shoes", "mens-spiked-golf-shoes", "mens-spikeless-golf-shoes", "mens-waterproof-golf-shoes", "junior-golf-shoes"]
+# Electric only (Layton, 18 Nov 2026: battery advice mustn't go to push-trolley buyers). Checked against Shopify 18 Nov.
+ELECTRIC_H = ["electric-trolleys", "gps-electric-trolleys", "remote-electric-trolleys", "motocaddy-electric-trolleys",
+              "motocaddy-electric-golf-trolleys", "powakaddy-electric-trolleys"]
 FLAGS = {"has_trolley": {"collections": TROLLEY_H}, "has_motocaddy_trolley": {"collections": MOTO_H},
+         "has_electric_trolley": {"collections": ELECTRIC_H},
          "has_clubs": {"collections": CLUBS_H}, "has_used_clubs": {"collections": USED_H}, "has_shoes": {"collections": SHOES_H}}
 
 # The builders' Klaviyo collection-title lists → the Evoflows flag that means the same thing.
@@ -171,6 +175,30 @@ def translate(text):
 PREVIEWS = {}  # template key -> preview HTML (the builders' sample render where there is one, else the template), Shopify images
 
 
+def _electric_only(key, html):
+    """F9: battery advice and the lithium-battery warranty go to electric-trolley buyers only (push trolleys have no battery).
+    Push-trolley buyers keep 'New trolley?' with the set-up and warranty tips, renumbered 1-2."""
+    el = "{{ if .Tx.Data.has_electric_trolley }}"
+    if key in ("f9_e1h", "f9_e1hn"):
+        i = html.index("New trolley?")
+        c = html.index("Charge it after every round.", i)
+        start = html.rindex("<tr>", i, c)
+        end = html.index("</tr>", c) + len("</tr>")
+        row = html[start:end]
+        tail_end = html.index("</table>", end)
+        tail = html[end:tail_end].replace(">2</td>", ">{{ if .Tx.Data.has_electric_trolley }}2{{ else }}1{{ end }}</td>", 1) \
+                                 .replace(">3</td>", ">{{ if .Tx.Data.has_electric_trolley }}3{{ else }}2{{ end }}</td>", 1)
+        html = html[:start] + el + row + "{{ end }}" + tail + html[tail_end:]
+        html, n = re.subn(r"\{\{ if \.Tx\.Data\.has_motocaddy_trolley \}\}(\s*Your trolley and charger)",
+                          r"{{ if (and .Tx.Data.has_motocaddy_trolley .Tx.Data.has_electric_trolley) }}\1", html)
+        assert n == 1, key
+    if key == "f9_e2h":
+        c = html.index("Charge the battery after every round")
+        i = html.rindex("{{ if .Tx.Data.has_trolley }}", 0, c)
+        html = html[:i] + el + html[i + len("{{ if .Tx.Data.has_trolley }}"):]
+    return html
+
+
 def pack_templates(pack, prefix, skip=()):
     pk = json.loads((ROOT.parent / "dashboard/app/drafts" / f"{pack}.json").read_text())
     out = {}
@@ -184,7 +212,7 @@ def pack_templates(pack, prefix, skip=()):
             pv_html = pv_html.replace(k, v)
         PREVIEWS[f"{prefix}_{t['key']}"] = pv_html
         out[f"{prefix}_{t['key']}"] = {"name": f"{prefix.upper()} {t['name']}", "subject": translate(t["subject"]),
-                                       "preview_text": translate(t["preview"]), "html": translate(html),
+                                       "preview_text": translate(t["preview"]), "html": _electric_only(f"{prefix}_{t['key']}", translate(html)),
                                        "from_name": t["sender"]}  # always explicit: "⛳ Evolution Golf" or "Alex at Evolution Golf"
     return out
 
