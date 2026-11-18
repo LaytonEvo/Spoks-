@@ -506,3 +506,18 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
 - Copy fixes requested by the reviewer and approved by Layton, waiting for his approval on the Agents page: Trustpilot
   wording ×13, "four free returns a year" ×8, "Become an annual member" (F2 Free E3), "clubs" not "new clubs" (F9 review,
   F9 E1 ×2), "free delivery over £10" (F2 Free E2).
+
+## 18 Nov 2026 — Design agent (suggestions mode)
+
+- `dashboard/app/design_agent.py` + "Design suggestions" on the Agents page. Claude (REVIEW_MODEL, effort high) reviews an
+  email's layout from an outline (blocks in order: kind, readable text, who sees it, buttons, stone panel, spacing,
+  alignment, pictures) plus the library blocks and pictures, and proposes ≤5 changes using only editor moves: move a
+  block, block spacing/alignment/background, add a library block, swap a library picture (with alt), remove a repeated
+  block. Words, links, conditions and the theme stay as approved; bigger ideas are kept as A/B test ideas, copy points
+  as notes for the email agent.
+- Every proposed change is checked (header first / footer last, one button, one stone panel, library-only pictures with
+  alt, valid spacing) and shown with "Can't do" if it fails. Layton ticks the changes he wants → the agent saves a draft
+  (based on the version it reviewed; refused if the email changed since) → it appears in "Fixes from the agent" to approve
+  and publish. QA re-checks after.
+- Manual for now ("Review all emails"; also /review/run/design for the reviewer); the manager's brief includes the design
+  proposals.

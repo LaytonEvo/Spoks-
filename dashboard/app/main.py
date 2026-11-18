@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import abtest, agents, assistant, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, agents, assistant, design_agent, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -753,7 +753,7 @@ def api_agents(user=Depends(auth)):
 @app.get("/api/agents/status")
 def api_agents_status(user=Depends(auth)):
     b, q = agents.briefs(), agents.latest_qa()
-    return {"running": {**agents.running, "fix": agents.fix_state["running"]}, "qa_at": q["at"] if q else None, "brief_n": b[-1]["n"] if b else None,
+    return {"running": {**agents.running, "fix": agents.fix_state["running"], "design": design_agent.state["running"]}, "qa_at": q["at"] if q else None, "brief_n": b[-1]["n"] if b else None,
             "fixes": len(agents.fixes())}
 
 
@@ -831,6 +831,30 @@ def api_agents_fix_discard(fid: str, user=Depends(auth)):
     return agents.discard_fix(fid, user)
 
 
+@app.post("/api/agents/design/run")
+async def api_design_agent_run(request: Request, user=Depends(auth)):
+    b = await request.json()
+    keys = b.get("keys") or design_agent.all_keys()
+    try:
+        return design_agent.run([str(k) for k in keys][:60], f"Design agent (asked by {user})")
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/agents/design/{pid}/approve")
+async def api_design_agent_approve(pid: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    try:
+        return design_agent.approve(pid, [int(x) for x in b.get("ops") or []], user)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/agents/design/{pid}/dismiss")
+def api_design_agent_dismiss(pid: str, user=Depends(auth)):
+    return design_agent.dismiss(pid, user)
+
+
 @app.post("/api/agents/context")
 async def api_agents_context(request: Request, user=Depends(auth)):
     return agents.save_context((await request.json()).get("text", ""), user)
@@ -878,6 +902,15 @@ async def review_request_fix(request: Request, who=Depends(review_auth)):
     b = await request.json()
     try:
         return agents.request_fix(str(b.get("item", "")), b.get("detail"), b.get("fix"), who)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/review/run/design")
+async def review_run_design(request: Request, who=Depends(review_auth)):
+    b = await request.json()
+    try:
+        return design_agent.run([str(k) for k in (b.get("keys") or design_agent.all_keys())][:60], "Design agent (asked by the reviewer)")
     except ValueError as e:
         raise HTTPException(400, str(e))
 

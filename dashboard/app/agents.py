@@ -28,7 +28,7 @@ from typing import List, Literal
 import httpx
 from pydantic import BaseModel, Field
 
-from . import builder, config, evoflows
+from . import builder, config, design_agent, evoflows
 
 log = logging.getLogger("uvicorn.error")  # shows in Railway logs, like the other jobs
 STORE = config.DATA_DIR / "agents"
@@ -891,6 +891,8 @@ def run_manager(reason="manual", who="Manager agent"):
             "qa_trend": _read("qa_history.json", [])[-14:],
             "flows": _flow_numbers(),
             "ab_tests": [{k: t.get(k) for k in ("name", "flow", "status", "share_b", "started_at")} for t in abtest._load()][-10:],
+            "design_agent": [{"email": p["key"], "status": p["status"], "verdict": p.get("verdict"), "changes": [c["label"] for c in p["changes"]],
+                              "test_ideas": p.get("ideas", [])} for p in design_agent.proposals()[-30:]],
             "decisions_log": decisions()[-40:],
             "last_brief": (prev[-1]["brief"] if prev else None),
         }
@@ -978,8 +980,10 @@ def overview():
     b = briefs()
     return {"qa": latest_qa(), "qa_history": _read("qa_history.json", [])[-30:], "brief": b[-1] if b else None,
             "briefs": [{"n": x["n"], "at": x["at"], "headline": x["brief"]["headline"]} for x in b][::-1][:20],
-            "decisions": decisions()[-60:][::-1], "actions": actions(), "fixes": fixes()[-100:][::-1], "fixing": fix_state["running"], "context": context(), "running": {**running, "fix": fix_state["running"]},
+            "decisions": decisions()[-60:][::-1], "actions": actions(), "fixes": fixes()[-100:][::-1], "fixing": fix_state["running"], "context": context(), "running": {**running, "fix": fix_state["running"], "design": design_agent.state["running"]},
             "manager_model": MANAGER_MODEL, "slack": bool(config.SLACK_WEBHOOK_URL), "ai": bool(config.ANTHROPIC_API_KEY),
+            "design": design_agent.proposals()[-80:][::-1],
+            "design_state": dict(design_agent.state),
             "schedule": {"qa": "Daily at 06:30, and 2 minutes after anything is published", "manager": "Mondays at 07:00"}}
 
 

@@ -19,11 +19,11 @@ async function renderAgents() {
 // and never redraws while you're typing a note (it shows a "new results" link instead).
 function agWatch() {
   clearTimeout(AG.poll);
-  if (!(AG.d.running.qa || AG.d.running.manager || AG.d.running.fix)) return;
+  if (!(AG.d.running.qa || AG.d.running.manager || AG.d.running.fix || AG.d.running.design)) return;
   AG.poll = setTimeout(async () => {
     if (state.page !== "agents") return;
     let st; try { st = await api("/api/agents/status"); } catch (e) { agWatch(); return; }
-    const done = (AG.d.running.qa && !st.running.qa) || (AG.d.running.manager && !st.running.manager) || (AG.d.running.fix && !st.running.fix);
+    const done = (AG.d.running.qa && !st.running.qa) || (AG.d.running.manager && !st.running.manager) || (AG.d.running.fix && !st.running.fix) || (AG.d.running.design && !st.running.design);
     if (!done) { agWatch(); return; }
     const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest(".ag-dec, #ag-ctx");
     if (typing) { const h = $("#main h1"); if (h && !$("#ag-fresh")) h.insertAdjacentHTML("beforeend", ` <button type="button" class="btn-line" id="ag-fresh">New results: show them</button>`); return; }
@@ -34,7 +34,7 @@ function drawAgents() {
   const d = AG.d;
   $("#main").innerHTML = `<p class="eyebrow">Agents</p><h1>Agents</h1>
     <p class="muted" style="max-width:90ch">A manager and its agents watch the emails and report to you. They check, analyse and draft; you decide. Nothing here publishes an email or switches a flow on.</p>
-    ${agBrief(d)}${agFixes(d)}${agQa(d)}${agActions(d)}${agTeam(d)}${agContext(d)}`;
+    ${agBrief(d)}${agFixes(d)}${agQa(d)}${agDesign(d)}${agActions(d)}${agTeam(d)}${agContext(d)}`;
 }
 function agBrief(d) {
   const r = d.brief;
@@ -102,7 +102,7 @@ function agTeam(d) {
     ["QA & compliance", "live", "Every email and flow, daily and after each change", ""],
     ["Email marketing", "planned", "Flow performance and copy, once F3 has 2–3 weeks of sends", "F3 live"],
     ["Product", "planned", "Shopify sales, abandoned products, stock, prices", "A read-only Shopify key (orders, products)"],
-    ["Design", "planned", "Design changes tested through A/B tests", "Enough sends to test"],
+    ["Design", "live", "Layout suggestions within the brand (suggestions mode); A/B tests once there's volume", ""],
     ["Data", "planned", "Tracking and data checks (part of QA until then)", "Opens and clicks on Evoflows"]];
   return `<section class="panel"><h2>The team</h2><div class="table-wrap"><table class="ag-t"><thead><tr><th>Agent</th><th>Status</th><th>Does</th><th>Waiting on</th></tr></thead><tbody>
     ${rows.map(([n, s, w, need]) => `<tr><td><b>${n}</b></td><td><span class="stat ${s === "live" ? "live" : "skip"}">${s}</span></td><td>${w}</td><td class="small muted">${esc(need)}</td></tr>`).join("")}</tbody></table></div></section>`;
@@ -194,4 +194,55 @@ document.addEventListener("click", async (e) => {
   }
   const dc = t.closest("[data-agdiscard]");
   if (dc) { AG.d.fixes = (await api(`/api/agents/fixes/${dc.dataset.agdiscard}/discard`, { method: "POST" })).fixes.slice().reverse(); AG.fsel.delete(dc.dataset.agdiscard); redraw(); }
+});
+
+// ---------------- design agent ----------------
+AG.dsel = {};
+function agDesign(d) {
+  const st = d.design_state || {}, rows = d.design || [];
+  const open = rows.filter((p) => p.status === "proposed"), other = rows.filter((p) => p.status !== "proposed");
+  const card = (p) => {
+    const sel = AG.dsel[p.id] || (AG.dsel[p.id] = new Set(p.changes.filter((c) => !c.problem).map((c) => c.i)));
+    return `<div class="ag-rec"><div class="ag-rec-h"><a href="#edit/${esc(p.key)}"><b>${esc(p.name)}</b></a> <span class="muted small">${esc(when(p.at))}</span></div>
+      <p>${esc(p.verdict)}</p>
+      ${p.changes.length ? p.changes.map((c) => `<label class="ai-edit"><input type="checkbox" data-dsop="${esc(p.id)}:${c.i}" ${sel.has(c.i) ? "checked" : ""} ${c.problem ? "disabled" : ""}>
+        <span><b>${esc(c.label)}</b><br><span class="small">${esc(c.why)}</span>${c.problem ? `<br><span class="small" style="color:var(--high)">Can't do: ${esc(c.problem)}</span>` : ""}</span></label>`).join("")
+        : `<p class="muted small">No layout changes suggested.</p>`}
+      ${p.ideas && p.ideas.length ? `<details><summary class="small">A/B test ideas for later (${p.ideas.length})</summary><ul class="small">${p.ideas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : ""}
+      ${p.notes && p.notes.length ? `<details><summary class="small">Notes for the email agent (${p.notes.length})</summary><ul class="small">${p.notes.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : ""}
+      <div class="ag-bulk">${p.changes.length ? `<button type="button" class="btn" data-dsgo="${esc(p.id)}" ${sel.size ? "" : "disabled"}>Approve: agent builds a draft with the ticked changes</button>` : ""}
+        <button type="button" class="btn-line" data-dsno="${esc(p.id)}">Dismiss</button></div></div>`;
+  };
+  return `<section class="panel"><div class="ag-head"><h2>Design suggestions</h2><span class="muted small">Layout only, within the brand: order, spacing, brand blocks, library pictures. Copy stays as approved.</span>
+    <button type="button" class="btn-line" id="ds-run" ${st.running || !d.ai ? "disabled" : ""}>${st.running ? `Reviewing… ${st.done}/${st.total}` : "Review all emails"}</button></div>
+    ${open.length ? open.map(card).join("") : `<p class="muted">${rows.length ? "No open suggestions." : "No reviews yet. Press “Review all emails” (about 10 minutes for all 29), or open one email at a time from here later."}</p>`}
+    ${other.length ? `<details><summary class="small">Earlier reviews (${other.length})</summary><ul class="small">${other.map((p) => `<li><a href="#edit/${esc(p.key)}">${esc(p.name)}</a>: ${esc(p.status)} · ${esc(when(p.at))}</li>`).join("")}</ul></details>` : ""}</section>`;
+}
+document.addEventListener("change", (e) => {
+  if (state.page !== "agents" || !e.target.dataset || !e.target.dataset.dsop) return;
+  const [pid, i] = e.target.dataset.dsop.split(":");
+  const set = AG.dsel[pid]; if (e.target.checked) set.add(+i); else set.delete(+i);
+  const b = document.querySelector(`[data-dsgo="${pid}"]`); if (b) b.disabled = !set.size;
+});
+document.addEventListener("click", async (e) => {
+  if (state.page !== "agents") return;
+  const t = e.target, y = window.scrollY;
+  if (t.id === "ds-run") {
+    if (!confirm("Ask the design agent to review all the emails' layouts? It takes about 10 minutes and a few pounds of Claude usage. Nothing changes until you approve.")) return;
+    t.disabled = true;
+    try { await api("/api/agents/design/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }); AG.d.running.design = true; t.textContent = "Reviewing…"; agWatch(); }
+    catch (err) { alertInline(t, err.message); t.disabled = false; }
+    return;
+  }
+  const go = t.closest("[data-dsgo]");
+  if (go) {
+    const pid = go.dataset.dsgo, ops = [...(AG.dsel[pid] || [])];
+    go.disabled = true; go.textContent = "Building the draft…";
+    try { const r = await api(`/api/agents/design/${pid}/approve`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ops }) });
+      await renderAgents(); window.scrollTo(0, y); if (r.warnings && r.warnings.length) alert("Draft saved, with checks to look at: " + r.warnings.join(" ")); }
+    catch (err) { alertInline(go, err.message); go.disabled = false; go.textContent = "Approve: agent builds a draft with the ticked changes"; }
+    return;
+  }
+  const no = t.closest("[data-dsno]");
+  if (no) { await api(`/api/agents/design/${no.dataset.dsno}/dismiss`, { method: "POST" }); await renderAgents(); window.scrollTo(0, y); }
 });
