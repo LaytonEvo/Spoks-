@@ -115,7 +115,7 @@ def _outline(key):
 
 def _padding(html):
     """The block's own top/bottom padding from its first cell (the designs space blocks themselves)."""
-    m = re.search(r'<td\b[^>]*style="[^"]*?padding:\s*(\d+)px(?:\s+(\d+)px)?(?:\s+(\d+)px)?(?:\s+(\d+)px)?', html)
+    m = re.search(r'<td\b[^>]*style="[^"]*?padding:\s*(\d+)(?:px)?(?:\s+(\d+)(?:px)?)?(?:\s+(\d+)(?:px)?)?(?:\s+(\d+)(?:px)?)?', html)
     if not m:
         return (0, 0)
     v = [int(x) for x in m.groups() if x is not None]
