@@ -31,7 +31,8 @@ benefits as tables, no icons in new emails, photos 1200px wide, no text on photo
 
 What you can propose (only these):
 - move: move a block to a new position (the header stays first; the footer and anything after it stay last);
-- settings: a block's space above/below (0, 8, 16, 24, 32 or 48 px), alignment (left or centre), background (white, or \
+- settings: EXTRA space above/below a block (0, 8, 16, 24, 32 or 48 px, added on top of the block's own built-in padding, \
+which the designs already use to space blocks: built_in_space_above/below), alignment (left or centre), background (white, or \
 the stone panel, max one per email);
 - add: a brand block from the library, after a given block (never a second button);
 - image: swap a picture for one from the image library (with alt text describing it);
@@ -41,7 +42,9 @@ You can't change words, links, conditions or the design theme; put copy or bigge
 
 Judge like a senior email designer: does the main action appear early (ideally in the first screen on a phone)? Is the \
 email longer than its job needs? Is there a clear order (what this is, why it matters, what to do)? Do images help? \
-Are blocks that show only to some customers placed sensibly? Is spacing even? Propose at most 5 changes, each with a \
+Are blocks that show only to some customers placed sensibly? Spacing is designed into each block already; suggest \
+extra space only to fix a real unevenness you can see in the built-in numbers, at most two spacing changes per email. \
+Older approved emails have a row of small icons repeating the benefits; suggesting its removal is fine. Propose at most 5 changes, each with a \
 specific reason; propose nothing if the email is already right. Don't invent performance numbers: no sends data exists \
 yet, so ground reasons in layout, not metrics.
 
@@ -101,11 +104,24 @@ def _outline(key):
         imgs = [{"file": (re.search(r'src="([^"]*)"', t) or [None, ""])[1].split("/")[-1].split("?")[0][:60],
                  "alt": (re.search(r'alt="([^"]*)"', t) or [None, ""])[1][:80]} for t in re.findall(r"<img\b[^>]*>", html)]
         s = b["settings"]
+        pad = _padding(html)
         blocks.append({"block": i, "kind": b["meta"]["kind"], "text": agents._readable(html)[:350],
                        "shown_to": builder.COND.get(b["cond"], ("", "everyone who gets this email"))[1] or "everyone who gets this email",
                        "buttons": b["meta"]["buttons"], "stone_panel": bool(b["meta"]["panels"]) or s["bg"] == "s",
-                       "space_above": s["pt"], "space_below": s["pb"], "align": "centre" if s["al"] == "c" else "left", "images": imgs})
+                       "built_in_space_above": pad[0], "built_in_space_below": pad[1],
+                       "extra_space_above": s["pt"], "extra_space_below": s["pb"], "align": "centre" if s["al"] == "c" else "left", "images": imgs})
     return d, blocks
+
+
+def _padding(html):
+    """The block's own top/bottom padding from its first cell (the designs space blocks themselves)."""
+    m = re.search(r'<td\b[^>]*style="[^"]*?padding:\s*(\d+)px(?:\s+(\d+)px)?(?:\s+(\d+)px)?(?:\s+(\d+)px)?', html)
+    if not m:
+        return (0, 0)
+    v = [int(x) for x in m.groups() if x is not None]
+    top = v[0]
+    bottom = v[0] if len(v) <= 2 else v[2]
+    return (top, bottom)
 
 
 def _library_lists(d):
