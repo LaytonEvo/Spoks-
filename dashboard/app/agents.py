@@ -851,7 +851,8 @@ class Brief(BaseModel):
 
 
 REQUIREMENTS_DOC = "https://claude.ai/artifact/3h9uGLJXoNx3dqJsLBskpV"
-PAGES = {"#agents": "Agents page: briefs, QA findings, fixes from the agents, design suggestions",
+PAGES = {"#agents": "Agents page: the brief and its decisions", "#agents/qa": "QA findings and fix requests (tick and approve fixes)",
+         "#agents/fixes": "Fixes from the agents (drafts to approve and publish)", "#agents/design": "Design suggestions, with before/after previews",
          "#drafts": "New flows to approve (approve a flow such as F3; it stays switched off)",
          "#emails": "All emails", "#edit/<email key>": "One email in the editor, e.g. #edit/f3_e1hi",
          "#flow/<flow key>": "One flow's page with its numbers and journey, e.g. #flow/f3_checkout",
@@ -894,8 +895,10 @@ def rec_links(rec):
             add(f"{word} flow page", f"#flow/{flow}")
     if re.search(r"requirements item|item \d+\b|\bLuke\b", text):
         add("Requirements doc", REQUIREMENTS_DOC)
+    if re.search(r"design (agent|proposal|suggestion)|proposals", text, re.I):
+        add("Design suggestions", "#agents/design")
     if re.search(r"QA|finding|Trustpilot|fix", text):
-        add("QA findings", "#agents")
+        add("QA findings", "#agents/qa")
     return out
 
 

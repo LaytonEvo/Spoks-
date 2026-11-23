@@ -14,6 +14,7 @@ async function renderAgents() {
   if (AG.briefN && AG.d.brief && AG.d.brief.n !== AG.briefN) { try { AG.d.brief = await api(`/api/agents/brief/${AG.briefN}`); } catch (e) { AG.briefN = null; } }
   drawAgents();
   agWatch();
+  if (state.section) { const el = document.getElementById(`ag-${state.section}`); if (el) el.scrollIntoView({ block: "start" }); state.section = null; }
 }
 // While a run is going, check a small status call quietly; the page only changes when a run finishes, keeps your place,
 // and never redraws while you're typing a note (it shows a "new results" link instead).
@@ -69,7 +70,7 @@ function agQa(d) {
   const list = q.findings.filter((f) => AG.sev === "open" ? f.severity !== "info" : AG.sev === "new" ? f.status === "new" && f.severity !== "info" : f.severity === AG.sev);
   const trend = d.qa_history.slice(-14);
   const max = Math.max(1, ...trend.map((t) => t.counts.high + t.counts.medium + t.counts.low));
-  return `<section class="panel">${head}
+  return `<section class="panel" id="ag-qa">${head}
     <p class="muted small">Last run ${esc(when(q.at))} (${esc(q.reason)}): ${q.emails} emails, ${q.links_checked} different link and image addresses loaded, ${q.ai_checked || 0} email${q.ai_checked === 1 ? "" : "s"} read by Claude this run${q.ai_pending ? ` (${q.ai_pending} still to read)` : ""}, ${q.seconds}s.${q.ai_note ? ` ${esc(q.ai_note)}` : ""}</p>
     ${q.checks_run ? `<details><summary class="small">What was checked</summary><ul class="small">${q.checks_run.map((c) => `<li>${esc(c)}</li>`).join("")}</ul></details>` : ""}
     <div class="ag-counts">${["high", "medium", "low", "info"].map((s) => `<button type="button" data-agsev="${s}" aria-pressed="${AG.sev === s}"><span class="stat ${SEV[s][0]}">${q.counts[s]}</span> ${SEV[s][1]}</button>`).join("")}
@@ -147,7 +148,7 @@ function agFixes(d) {
     <td class="small">${x.what.map((w) => `<div>${esc(w)}</div>`).join("")}</td>
     <td class="small">${x.edits.length ? x.edits.map((e) => `<div><s>${esc(e.before)}</s> → <mark>${esc(e.text)}</mark></div>`).join("") : ""}<div class="muted">${esc(x.summary)}</div></td>
     <td>${x.status === "drafted" ? `<button type="button" class="link-btn small" data-agdiscard="${esc(x.id)}">Discard</button>` : `<span class="small muted">${esc(when(x.published_at || x.at))}</span>`}</td></tr>`;
-  return `<section class="panel"><div class="ag-head"><h2>Fixes from the agent</h2>${d.running.fix ? `<span class="muted">Working on the fixes you approved…</span>` : ""}</div>
+  return `<section class="panel" id="ag-fixes"><div class="ag-head"><h2>Fixes from the agent</h2>${d.running.fix ? `<span class="muted">Working on the fixes you approved…</span>` : ""}</div>
     <p class="muted small">Each fix is saved as a draft of that email; open it to preview. Publishing sends the fixed emails to Evoflows (live flows use them from their next send).</p>
     ${ready.length ? `<div class="ag-bulk"><button type="button" class="link-btn small" id="ag-fall">Select all drafts (${ready.length})</button><span class="muted small">${AG.fsel.size} selected</span>
       <button type="button" class="btn" id="ag-fpub" ${AG.fsel.size ? "" : "disabled"}>Approve &amp; publish selected</button></div>` : ""}
@@ -213,9 +214,10 @@ function agDesign(d) {
       ${p.ideas && p.ideas.length ? `<details><summary class="small">A/B test ideas for later (${p.ideas.length})</summary><ul class="small">${p.ideas.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : ""}
       ${p.notes && p.notes.length ? `<details><summary class="small">Notes for the email agent (${p.notes.length})</summary><ul class="small">${p.notes.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : ""}
       <div class="ag-bulk">${p.changes.length ? `<button type="button" class="btn" data-dsgo="${esc(p.id)}" ${sel.size ? "" : "disabled"}>Approve: agent builds a draft with the ticked changes</button>` : ""}
+        ${p.changes.length ? `<button type="button" class="btn-line" data-dsprev="${esc(p.id)}">Preview before / after</button>` : ""}
         <button type="button" class="btn-line" data-dsno="${esc(p.id)}">Dismiss</button></div></div>`;
   };
-  return `<section class="panel"><div class="ag-head"><h2>Design suggestions</h2><span class="muted small">Layout only, within the brand: order, spacing, brand blocks, library pictures. Copy stays as approved.</span>
+  return `<section class="panel" id="ag-design"><div class="ag-head"><h2>Design suggestions</h2><span class="muted small">Layout only, within the brand: order, spacing, brand blocks, library pictures. Copy stays as approved.</span>
     <button type="button" class="btn-line" id="ds-run" ${st.running || !d.ai ? "disabled" : ""}>${st.running ? `Reviewing… ${st.done}/${st.total}` : "Review all emails"}</button></div>
     ${open.length ? open.map(card).join("") : `<p class="muted">${rows.length ? "No open suggestions." : "No reviews yet. Press “Review all emails” (about 10 minutes for all 29), or open one email at a time from here later."}</p>`}
     ${other.length ? `<details><summary class="small">Earlier reviews (${other.length})</summary><ul class="small">${other.map((p) => `<li><a href="#edit/${esc(p.key)}">${esc(p.name)}</a>: ${esc(p.status)} · ${esc(when(p.at))}</li>`).join("")}</ul></details>` : ""}</section>`;
@@ -247,4 +249,30 @@ document.addEventListener("click", async (e) => {
   }
   const no = t.closest("[data-dsno]");
   if (no) { await api(`/api/agents/design/${no.dataset.dsno}/dismiss`, { method: "POST" }); await renderAgents(); window.scrollTo(0, y); }
+});
+
+// side-by-side preview of a design suggestion: the email now, and with the ticked changes (nothing is saved)
+async function dsPreview(pid, audience) {
+  const p = (AG.d.design || []).find((x) => x.id === pid);
+  const ops = [...(AG.dsel[pid] || [])];
+  let ov = document.getElementById("ds-modal");
+  if (!ov) { ov = document.createElement("div"); ov.id = "ds-modal"; ov.className = "modal"; document.body.appendChild(ov); }
+  ov.innerHTML = `<div class="modal-card ds-prev" role="dialog" aria-modal="true"><div class="modal-head"><div><h2>${esc(p.name)}</h2>
+      <p class="muted small">Left: the email now. Right: with the ${ops.length} ticked change${ops.length === 1 ? "" : "s"}. Shown with example data. Nothing is saved.</p></div>
+      <div class="modal-actions"><div class="seg seg-light">${[["non", "Not a member"], ["free", "Free"], ["annual", "Annual"]].map(([k, l]) => `<button type="button" data-dsaud="${k}" aria-pressed="${audience === k}">${l}</button>`).join("")}</div>
+      <button type="button" class="btn-ghost" data-dsclose="1">Close</button></div></div>
+    <div class="ds-cols"><div><p class="small"><b>Now</b></p><iframe id="ds-before" title="Now" sandbox=""></iframe></div>
+      <div><p class="small"><b>With the changes</b></p><iframe id="ds-after" title="With the changes" sandbox=""></iframe></div></div></div>`;
+  ov.onclick = (e) => {
+    if (e.target === ov || e.target.dataset.dsclose) { ov.remove(); return; }
+    const a = e.target.closest("[data-dsaud]"); if (a) dsPreview(pid, a.dataset.dsaud);
+  };
+  try {
+    const r = await api(`/api/agents/design/${pid}/preview`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ops, audience }) });
+    $("#ds-before").srcdoc = r.before; $("#ds-after").srcdoc = r.after;
+  } catch (err) { ov.querySelector(".ds-cols").innerHTML = `<p class="flag high">${esc(err.message)}</p>`; }
+}
+document.addEventListener("click", (e) => {
+  if (state.page !== "agents") return;
+  const b = e.target.closest("[data-dsprev]"); if (b) dsPreview(b.dataset.dsprev, "non");
 });

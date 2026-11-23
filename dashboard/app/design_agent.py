@@ -249,16 +249,15 @@ def run(keys, who="Design agent"):
     return {"started": len(keys)}
 
 
-def approve(pid, op_ids, who):
-    """Layton picked changes: build a draft of the email with them (it then appears with the other agent fixes)."""
-    from . import agents
+def _build(pid, op_ids, need_open=True):
+    """The email with the chosen changes applied (not saved): (proposal, chosen changes, doc, editing version, blocks)."""
     with _lock:
         rows = _load()
         p = next((r for r in rows if r.get("id") == pid), None)
-        if not p or p["status"] != "proposed":
+        if not p or (need_open and p["status"] != "proposed"):
             raise ValueError("That proposal isn't open any more.")
         chosen = [o for o in p["changes"] if o["i"] in set(op_ids) and not o.get("problem")]
-        if not chosen:
+        if need_open and not chosen:
             raise ValueError("Pick at least one change the agent can make.")
     d = builder.doc(p["key"])
     e = d["editing"]
@@ -304,6 +303,23 @@ def approve(pid, op_ids, who):
         item = tagged.pop(cur)
         tagged.insert(min(o["to"], len(tagged)), item)
     out = [{k: v for k, v in b.items() if k != "_orig"} for _, b in tagged]
+    return p, chosen, d, e, out
+
+
+def preview(pid, op_ids, audience="non"):
+    """Before and after, rendered as a customer would see them (sample data), without saving anything."""
+    p, chosen, d, e, out = _build(pid, op_ids, need_open=False)
+    head, _, tail = builder.split(builder.live(p["key"])["html_t"])
+    before = [{"html": b["html"], "settings": b["settings"], "cond": b["cond"]} for b in e["blocks"]]
+    render = lambda bl: builder.preview(p["key"], None, audience, head + "".join(builder.wrap(b["html"], b["settings"], b["cond"]) for b in bl) + tail,
+                                        d["design"]["overrides"])
+    return {"before": render(before), "after": render(out), "changes": [o["label"] for o in chosen]}
+
+
+def approve(pid, op_ids, who):
+    """Layton picked changes: build a draft of the email with them (it then appears with the other agent fixes)."""
+    from . import agents
+    p, chosen, d, e, out = _build(pid, op_ids)
     res = builder.save(p["key"], {"subject": e["subject"], "preview_text": e["preview_text"], "from_name": e["from_name"],
                                   "overrides": d["design"]["overrides"], "blocks": out,
                                   "note": "Design agent: " + "; ".join(o["label"] for o in chosen)[:280]}, f"Design agent (approved by {who})")

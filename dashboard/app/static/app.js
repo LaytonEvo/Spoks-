@@ -474,8 +474,9 @@ function render() {
   else if (state.flowId) renderFlow(); else renderOverview();
 }
 function route() {
-  const pg = /^#(\w+)$/.exec(location.hash);
+  const pg = /^#(\w+)(?:\/(qa|fixes|design))?$/.exec(location.hash);
   state.page = pg && PAGES[pg[1]] ? pg[1] : null;
+  state.section = pg && pg[2] ? pg[2] : null;  // e.g. #agents/design jumps to that section
   const em = /^#edit\/([a-z0-9_]+)/.exec(location.hash);
   state.editKey = em ? em[1] : null;
   if (state.editKey) state.page = "edit";

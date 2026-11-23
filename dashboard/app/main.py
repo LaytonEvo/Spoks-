@@ -850,6 +850,15 @@ async def api_design_agent_approve(pid: str, request: Request, user=Depends(auth
         raise HTTPException(400, str(e))
 
 
+@app.post("/api/agents/design/{pid}/preview")
+async def api_design_agent_preview(pid: str, request: Request, user=Depends(auth)):
+    b = await request.json()
+    try:
+        return design_agent.preview(pid, [int(x) for x in b.get("ops") or []], str(b.get("audience", "non")))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
 @app.post("/api/agents/design/{pid}/dismiss")
 def api_design_agent_dismiss(pid: str, user=Depends(auth)):
     return design_agent.dismiss(pid, user)
