@@ -409,7 +409,7 @@ document.addEventListener("click", async (e) => {
 let draftState = { data: null, current: null, photos: false };
 const BUILD_BADGE = { not_pushed: ["skip", "Waiting for approval"], off: ["draft", "On Evoflows, switched off: ready for go-live"], live: ["live", "Live on Evoflows"], unknown: ["skip", "Can't reach Evoflows"] };
 function buildBadge(b) {
-  if (b.differs) return `<span class="stat todo">Changed since it was pushed: approve again</span>`;
+  if (b.differs) return `<span class="stat todo">${(b.emails_differ || []).length ? `${b.emails_differ.length} email${b.emails_differ.length === 1 ? "" : "s"} changed` : "Changed"} since it was pushed: approve again</span>`;
   const [cls, label] = BUILD_BADGE[b.status] || ["skip", b.status];
   return `<span class="stat ${cls}">${esc(label)}${b.version ? ` · v${esc(b.version)}` : ""}</span>`;
 }

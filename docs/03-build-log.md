@@ -555,3 +555,5 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   offers"; f1_e4 and f9_e1e "four free returns a year"; f9_e1e "monthly 10% is waiting in your portal"). The roll-out now matches
   a block by layout and re-applies word edits; anything it can't place is reported, not guessed. Nothing published. The
   "2 stone panels" warning on f9_e1e/f9_e1h predates this (the panels are alternative branches: annual vs Free).
+- New flows page: a flow now counts as changed when any of its emails differs from what's on Evoflows (published builder
+  version or rebuilt approved build vs GET /templates), not only its definition. Badge names how many emails changed.

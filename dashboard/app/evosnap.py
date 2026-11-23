@@ -202,6 +202,23 @@ def _manifest():
         return {"flows": {}, "templates": {}}
 
 
+def _emails_differ(keys):
+    """Templates whose html on Evoflows isn't what Approve would push now (tracking query strings ignored)."""
+    import hashlib
+    from . import agents, builder
+    h = lambda x: hashlib.sha256(agents.LINK_QS.sub("", x or "").encode()).hexdigest()
+    out = []
+    for k in keys:
+        try:
+            st, res = evoflows._call("GET", f"/templates/{k}")
+            if st == 404 or (st < 400 and res and h(res.get("html")) != h(builder.template_body(k)["html"])):
+                out.append(k)
+        except Exception:
+            pass
+        time.sleep(0.2)
+    return out
+
+
 def build():
     if not evoflows.enabled() or not _lock.acquire(blocking=False):
         return
@@ -217,11 +234,16 @@ def build():
             built = abtest.definition(key)
             eng = listed.get(key)
             live_def, differs = None, False
+            emails_differ = []
             if eng:
                 code, res = evoflows._call("GET", f"/flows/{key}")
                 if code < 400 and res:
                     live_def = res
                     differs = any(res.get(k) != built.get(k) for k in ("trigger", "entry", "steps", "consent", "exit", "send_window", "utm"))
+                # an email edited since the push (published in the builder, or a rebuilt approved build) also needs re-approval
+                status["step"] = f"Comparing {meta['name']} emails"
+                emails_differ = _emails_differ(meta.get("templates", []))
+                differs = differs or bool(emails_differ)
             defn = live_def or built
             step_metrics, totals, weekly = {}, {}, None
             if eng:
@@ -264,7 +286,7 @@ def build():
                 "flow_filter": "; ".join(only), "exit": label((defn.get("exit") or {}).get("when")),
                 "reentry_text": (f"Can come back after {ent['reentry_after_days']} days" if ent.get("reentry_after_days") else "Once per person"),
                 "consent": defn.get("consent"), "reentry": None, "summary": meta.get("summary"),
-                "replaces": meta.get("replaces", []), "deviations": meta.get("deviations", []), "differs": differs,
+                "replaces": meta.get("replaces", []), "deviations": meta.get("deviations", []), "differs": differs, "emails_differ": emails_differ,
                 "steps": steps_from(defn.get("steps", []), man, step_metrics), "totals": totals, "weekly": weekly,
                 # the raw definition (what's on Evoflows, else the approved build), for the journey simulator
                 "definition": {k: defn.get(k) for k in ("trigger", "entry", "exit", "consent", "send_window", "steps",

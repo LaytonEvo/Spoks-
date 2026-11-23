@@ -434,7 +434,7 @@ def api_evoflows_builds(user=Depends(auth)):
         f = evo.get(key) or {}
         last = next((l for l in log if l.get("push") == f"approve {key}"), None)
         out.append({"key": key, **meta, "status": f.get("status", "unknown"), "version": f.get("version"),
-                    "differs": f.get("differs", False), "trigger": f.get("trigger"), "flow_filter": f.get("flow_filter"),
+                    "differs": f.get("differs", False), "emails_differ": f.get("emails_differ", []), "trigger": f.get("trigger"), "flow_filter": f.get("flow_filter"),
                     "exit": f.get("exit"), "reentry_text": f.get("reentry_text"), "consent": f.get("consent"),
                     "steps": f.get("steps", []), "last_push": last})
     return {"enabled": evoflows.enabled(), "builds": out, "user": user}
