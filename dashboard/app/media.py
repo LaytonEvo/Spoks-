@@ -28,7 +28,7 @@ BRAND = {
     "colours": [("Brand green", "#0F3B2A", "Header, footer, buttons, rules, links"), ("Eyebrow green", "#24563F", "Small capitals above headlines"),
                 ("Headline ink", "#161816", "Headlines"), ("Body text", "#2E322F", "Paragraphs"), ("Muted", "#626862", "Small print"),
                 ("Stone", "#F1F3F1", "The one tinted panel per email, never behind an image"), ("White", "#FFFFFF", "The email background, always")],
-    "fonts": [("Fraunces 400", "Georgia", "Headlines"), ("Inter 400/500/600", "Arial", "Everything else")],
+    "fonts": [("Montserrat 600", "Arial", "Headlines"), ("Inter 400/500/600", "Arial", "Everything else")],
     "rules": ["One primary button per email.", "At most one stone panel per email.", "Corners 0–2px. No cream, beige, mint or gold.",
               "Benefits as tables, no icons in new emails.", "White email background. Any image with a white or transparent background "
               "(product shots, packshots, cut-outs) sits on pure white.", "Photos: JPG, 1200 px wide for a full-width image (shown at 600), "

@@ -24,7 +24,8 @@ thin rules instead of boxes, brand green as an accent and for the header and foo
 No cream, beige, warm off-white, mint, brass or gold.
 
 ## Type
-- Headlines: Fraunces 400 (Georgia fallback). H1 38/42 (32 on mobile), H3 28/34. Sentence case, never bold.
+- Headlines: **Montserrat 600** (Arial fallback), matching evolutiongolf.co.uk (Layton, 23 Nov 2026; replaces Fraunces 400).
+  Set on the Brand theme page; size per the theme. Sentence case.
 - Body: Inter 400/500/600 (Arial fallback). Body 16px / 1.65, benefit rows 14.5px, fine print 12.5px.
 - Eyebrows: Inter 600 11px, uppercase, 0.14em, secondary green.
 - Fonts load with `@import` (Klaviyo strips `<link>`); Gmail and Outlook use the fallbacks.

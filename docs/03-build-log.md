@@ -531,3 +531,8 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   the re-push button reads "Re-upload this version (switched off; only if Evoflows lost it)".
 - Fix: the Brand theme preview was blank. The design agent's before/after function in agents.js was also called `dsPreview` and
   replaced the theme page's own; renamed it `agDesignPreview` (no other duplicate function names across the scripts). Checked in a browser.
+- Decision (Layton, 23 Nov): headlines move to Montserrat, as on the website. Recorded in CLAUDE.md, klaviyo/design/README.md,
+  the design agent's brand rules and the media page's font list. The theme change itself is Layton's to save, approve and publish
+  on the Brand theme page (publishing re-sends every email to Evoflows, switched off).
+- Members section redesign: `docs/design/members-section-options.html` (current vs A price-led / B card-as-badge), from the
+  design agent's repeated finding that the member card and benefits table push the only button below the first phone screen.

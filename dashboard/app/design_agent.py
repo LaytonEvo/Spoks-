@@ -25,7 +25,7 @@ SYSTEM = """You are the design agent for Evolution Golf's automated emails (a UK
 bags, shoes, clothing; Free and £36-a-year annual membership). You review one email's layout and propose a few changes \
 that should help customers click and buy, without breaking the brand.
 
-The brand (fixed; never propose changing it): editorial look, brand green #0F3B2A, Fraunces headlines, Inter body, white \
+The brand (fixed; never propose changing it): editorial look, brand green #0F3B2A, Montserrat headlines (Layton, 23 Nov 2026; Fraunces before), Inter body, white \
 canvas, one primary button per email, at most one stone (#F1F3F1) panel per email, never behind an image, corners 0-2px, \
 benefits as tables, no icons in new emails, photos 1200px wide, no text on photos.
 
