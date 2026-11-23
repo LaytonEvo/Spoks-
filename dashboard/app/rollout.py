@@ -7,6 +7,7 @@ agents' fixes, where Layton publishes them.
 """
 import json
 import pathlib
+import re
 
 from . import builder, design
 
@@ -24,8 +25,30 @@ def _start(key):
     return v
 
 
-def _card(b):
-    return 'alt="The Evolution Golf annual member card"' in b
+SEG = re.compile(r"(<[^>]+>|\{\{.*?\}\})", re.S)
+
+
+def _carry(ht, old, new):
+    """The email's block that has old's exact layout (words may differ), and new with the same word edits applied.
+    Returns (block now in the email, new block with edits, [(was, now)], [edits that couldn't be placed]) or None."""
+    if ht.count(old) == 1:
+        return old, new, [], []
+    cands = [b for b in builder.split(ht)[1] if builder._tags(builder.unwrap(b)[0]) == builder._tags(old)
+             and builder.tokens(builder.unwrap(b)[0]) == builder.tokens(old)]
+    if len(cands) != 1:
+        return None
+    cur = builder.unwrap(cands[0])[0]
+    a, b = SEG.split(old), SEG.split(cur)
+    if len(a) != len(b):
+        return None
+    edits = [(x, y) for x, y in zip(a, b) if x != y]
+    out, lost = new, []
+    for was, now in edits:
+        if out.count(was) == 1:
+            out = out.replace(was, now, 1)
+        else:
+            lost.append((was, now))
+    return cur, out, edits, lost
 
 
 def plan(name):
@@ -36,14 +59,12 @@ def plan(name):
     for key, ps in pairs.items():
         v = _start(key)
         ht = builder._ht(v)
-        counts = [ht.count(old) for old, _ in ps]
         done = all(ht.count(new) == 1 for _, new in ps)
-        row = {"key": key, "based_on": v.get("n", 0), "based_status": v.get("status"), "blocks": len(ps), "found": counts,
-               "ok": all(c == 1 for c in counts), "already": done}
-        if not row["ok"] and not done:  # show what's there now, so a hand-made pair can carry the edit over
-            row["current"] = [b for b in builder.split(ht)[1] if any(_card(b) and _card(old) for old, _ in ps)
-                              or any(old.split(">", 1)[0] in b and c == 0 for (old, _), c in zip(ps, counts))][:3]
-        out.append(row)
+        res = [_carry(ht, old, new) for old, new in ps]
+        ok = not done and all(r and not r[3] for r in res)
+        out.append({"key": key, "based_on": v.get("n", 0), "based_status": v.get("status"), "already": done, "ok": ok,
+                    "carried": [e for r in res if r for e in r[2]], "not_placed": [e for r in res if r for e in r[3]],
+                    "unmatched": sum(1 for r in res if not r)})
     return out
 
 
@@ -53,13 +74,15 @@ def apply(name, who):
     res = []
     for row in plan(name):
         if not row["ok"]:
-            res.append({**row, "result": "skipped: already done" if row["already"] else "skipped: the section was edited, do it by hand"})
+            res.append({**row, "result": "skipped: already done" if row["already"] else "skipped: couldn't place every edit, do it by hand"})
             continue
         key = row["key"]
         v = _start(key)
         ht = builder._ht(v)
         for old, new in pairs[key]:
-            ht = ht.replace(old, new, 1)
+            cur, new2, _, _ = _carry(ht, old, new)
+            assert ht.count(cur) == 1
+            ht = ht.replace(cur, new2, 1)
         overrides = v.get("overrides") or {}
         html = design.render(ht, design.merge(design.brand(), overrides))
         with builder._lock:
