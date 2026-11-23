@@ -971,8 +971,7 @@ def api_design(user=Depends(auth)):
     d = design.theme_doc()
     br = design.brand()
     d["emails"] = [{"key": k, "name": builder.live(k)["name"], "overrides": builder.live(k).get("overrides") or {}} for k in builder.all_keys()]
-    d["stacks"] = {"head": {k: v[1] for k, v in design.FONTS["head"].items()}, "body": {k: v[1] for k, v in design.FONTS["body"].items()},
-                   "families": {k: v[0] for k, v in {**design.FONTS["head"], **design.FONTS["body"]}.items()}}
+    d["stacks"] = design.stacks()
     return d
 
 

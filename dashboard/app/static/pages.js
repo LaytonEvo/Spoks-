@@ -407,13 +407,13 @@ document.addEventListener("click", async (e) => {
 
 // ---------- new flows to approve: approved builds → validate → push to Evoflows (switched off) ----------
 let draftState = { data: null, current: null, photos: false };
-const BUILD_BADGE = { not_pushed: ["skip", "Waiting for approval"], off: ["draft", "On Evoflows, switched off"], live: ["live", "Live on Evoflows"], unknown: ["skip", "Can't reach Evoflows"] };
+const BUILD_BADGE = { not_pushed: ["skip", "Waiting for approval"], off: ["draft", "On Evoflows, switched off: ready for go-live"], live: ["live", "Live on Evoflows"], unknown: ["skip", "Can't reach Evoflows"] };
 function buildBadge(b) {
   if (b.differs) return `<span class="stat todo">Changed since it was pushed: approve again</span>`;
   const [cls, label] = BUILD_BADGE[b.status] || ["skip", b.status];
   return `<span class="stat ${cls}">${esc(label)}${b.version ? ` · v${esc(b.version)}` : ""}</span>`;
 }
-const lastPush = (b) => (b.last_push ? `<span class="muted">Last approved ${esc(b.last_push.at.slice(0, 16).replace("T", " "))} UTC by ${esc(b.last_push.by)}${b.last_push.ok === false ? " (stopped: see the result)" : ""}</span>` : "");
+const lastPush = (b) => (b.last_push ? `<span class="muted">${b.last_push.ok === false ? "Last push" : "Signed off"} ${esc(b.last_push.at.slice(0, 16).replace("T", " "))} UTC by ${esc(b.last_push.by)}${b.last_push.ok === false ? " (stopped: see the result)" : ""}</span>` : `<span class="muted">${b.status === "not_pushed" ? "" : "Not signed off in this app yet"}</span>`);
 async function renderDrafts() {
   draftState.data = await api("/api/evoflows/builds");
   const d = draftState.data;
@@ -427,7 +427,9 @@ async function renderDrafts() {
   $("#main").innerHTML = `<p class="eyebrow">New flows</p><h1>Approve, and the app puts them on Evoflows</h1>
     <p class="muted" style="max-width:88ch">Each flow here is an approved build: the copy and design you signed off, checked against Evoflows. Open one to see every step and preview each email. <b>Approve</b> uploads its emails and the flow to Evoflows, switched off, after Evoflows has checked it. Nothing sends: Luke runs a staff test and switches it on. The app can't switch flows on, send to customers or delete anything.</p>
     <h2 class="fix-h">Waiting for approval <span class="muted">(${waiting.length})</span></h2>${waiting.length ? waiting.map(card).join("") : `<p class="muted">Nothing waiting.</p>`}
-    <h2 class="fix-h">On Evoflows <span class="muted">(${pushed.length})</span></h2>${pushed.length ? pushed.map(card).join("") : `<p class="muted">Nothing pushed yet.</p>`}`;
+    <h2 class="fix-h">On Evoflows, matching what you approved <span class="muted">(${pushed.length})</span></h2>
+    <p class="muted" style="max-width:88ch">These are already uploaded, switched off, and identical to the approved build, so there's nothing to approve again unless the copy changes (then a flow moves back up to <b>Waiting for approval</b>). Before go-live: check the test emails, then give Luke the hour. Only Luke switches a flow on.</p>
+    ${pushed.length ? pushed.map(card).join("") : `<p class="muted">Nothing pushed yet.</p>`}`;
 }
 async function renderDraft() {
   draftState.data = await api("/api/evoflows/builds");
@@ -446,7 +448,7 @@ async function renderDraft() {
       ${(b.replaces || []).length ? `<p class="muted">Replaces in Klaviyo: ${b.replaces.map(esc).join(", ")}.</p>` : ""}
       ${(b.deviations || []).length ? `<details class="fix-steps"><summary>Differences from the approved Klaviyo version (${b.deviations.length})</summary><ul>${b.deviations.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : ""}
       <div class="fix-actions">
-        <button type="button" class="btn${canPush ? "" : "-line"}" data-evo-approve="${esc(b.key)}">${canPush ? "Approve: put it on Evoflows (switched off)" : "Push again (switched off)"}</button>
+        <button type="button" class="btn${canPush ? "" : "-line"}" data-evo-approve="${esc(b.key)}">${canPush ? "Approve: put it on Evoflows (switched off)" : "Re-upload this version (switched off; only if Evoflows lost it)"}</button>
         <button type="button" class="btn-line" data-evo-validate="${esc(b.key)}">Check with Evoflows</button>${lastPush(b)}</div>
       <div class="fix-actions"><input id="evo-test-to" type="email" placeholder="you@evolutiongolf.co.uk" style="min-width:260px">
         <button type="button" class="btn-line" data-evo-tests="${esc(b.key)}">Send me a test of every email</button>

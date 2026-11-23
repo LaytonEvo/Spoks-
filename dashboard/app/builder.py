@@ -523,9 +523,7 @@ def doc(key):
     opts = design.theme_doc()["options"]
     return {"key": key, "name": cur["name"], "senders": SENDERS, "published_n": rec.get("published"),
             "design": {"brand": br, "overrides": start.get("overrides") or {}, "options": opts,
-                       "stacks": {"head": {k: v[1] for k, v in design.FONTS["head"].items()}, "body": {k: v[1] for k, v in design.FONTS["body"].items()},
-                                  "h1": design.H1, "radius": design.RADIUS, "fixed": design.FIXED,
-                                  "families": {k: v[0] for k, v in {**design.FONTS["head"], **design.FONTS["body"]}.items()}}},
+                       "stacks": design.stacks()},
             "editing": {"n": start["n"], "status": start["status"], "subject": start["subject"], "preview_text": start["preview_text"],
                         "from_name": start["from_name"],
                         "blocks": [_doc_block(start["n"], i, b) for i, b in enumerate(blocks)]},

@@ -24,10 +24,10 @@ function dsValues(theme, stacks) {
   for (const [k, x] of Object.entries(theme.colours)) v[`c:${k}`] = x;
   for (const [k, x] of Object.entries(stacks.fixed || { white: "#FFFFFF", trust: "#00B67A" })) v[`c:${k}`] = x;
   const h1 = stacks.h1[theme.h1];
-  Object.assign(v, { "f:head": stacks.head[theme.font_head], "f:body": stacks.body[theme.font_body], h1: h1[0], h1m: h1[1], h1ml: h1[2], radius: stacks.radius[theme.radius], import: "" });
+  Object.assign(v, { hw: (stacks.hw || {})[theme.font_head] || "400", "f:head": stacks.head[theme.font_head], "f:body": stacks.body[theme.font_body], h1: h1[0], h1m: h1[1], h1ml: h1[2], radius: stacks.radius[theme.radius], import: "" });
   return v;
 }
-function dsFill(html, vals) { return html.replace(/\[\[([a-z_:0-9]+)\]\]/g, (m, k) => (vals[k] != null ? vals[k] : m)); }
+function dsFill(html, vals) { return html.replace(/font:400 \[\[h1\]\]/g, "font:[[hw]] [[h1]]").replace(/\[\[([a-z_:0-9]+)\]\]/g, (m, k) => (vals[k] != null ? vals[k] : m)); }
 function dsLoadFonts(theme, families) {
   const fams = [families[theme.font_head], families[theme.font_body]].filter(Boolean);
   const href = fams.length ? `https://fonts.googleapis.com/css2?${fams.map((f) => `family=${f}`).join("&")}&display=swap` : "";
@@ -45,7 +45,7 @@ function dsControls(theme, opts, base, prefix) {
     ${sel("font_head", opts.fonts_head, "Headline font")}${sel("font_body", opts.fonts_body, "Body font")}
     ${sel("h1", opts.h1, "Headline size")}${sel("radius", opts.radius, "Button corners")}
     <p class="ds-sub">Colours</p>${opts.colours.map(col).join("")}
-    <p class="muted small">Gmail and Outlook don't load web fonts: they show the backup (Georgia for serif headlines, Arial or Helvetica for body text).</p></div>`;
+    <p class="muted small">Gmail and Outlook don't load web fonts: they show the backup (Georgia for serif headlines, Arial or Helvetica for sans-serif ones and for body text).</p></div>`;
 }
 function dsRead(scope, theme, base) {
   const t = JSON.parse(JSON.stringify(theme));

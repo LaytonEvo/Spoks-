@@ -521,3 +521,11 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   and publish. QA re-checks after.
 - Manual for now ("Review all emails"; also /review/run/design for the reviewer); the manager's brief includes the design
   proposals.
+
+## 23 Nov 2026: website fonts in the theme options; clearer approval page
+- Brand theme / email Design panel: added headline fonts **Montserrat (as the website)** and **Plus Jakarta Sans** (weight 600, as on
+  evolutiongolf.co.uk) and the same two as body fonts. Headline weight now follows the font (serifs 400, these two 600);
+  `design.stacks()` feeds the theme page and editor. The default theme still renders byte-identical (checked). Nothing published:
+  the brand theme stays Fraunces + Inter until Layton publishes a change.
+- New flows page: flows already on Evoflows and matching the build now say "switched off: ready for go-live" with who signed off;
+  the re-push button reads "Re-upload this version (switched off; only if Evoflows lost it)".

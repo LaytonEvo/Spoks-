@@ -33,15 +33,21 @@ FONTS = {
              "Libre Baskerville": ("Libre+Baskerville:wght@400", "'Libre Baskerville',Georgia,'Times New Roman',serif"),
              "Lora": ("Lora:wght@400", "Lora,Georgia,'Times New Roman',serif"),
              "DM Serif Display": ("DM+Serif+Display", "'DM Serif Display',Georgia,'Times New Roman',serif"),
+             "Montserrat (as the website)": ("Montserrat:wght@600", "Montserrat,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
+             "Plus Jakarta Sans": ("Plus+Jakarta+Sans:wght@600", "'Plus Jakarta Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
              "Inter (sans headlines)": ("", "Inter,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
              "Georgia (no web font)": ("", "Georgia,'Times New Roman',serif")},
     "body": {"Inter": ("Inter:wght@400;500;600", "Inter,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
+             "Montserrat": ("Montserrat:wght@400;500;600", "Montserrat,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
+             "Plus Jakarta Sans": ("Plus+Jakarta+Sans:wght@400;500;600", "'Plus Jakarta Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
              "DM Sans": ("DM+Sans:wght@400;500;600", "'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
              "Lato": ("Lato:wght@400;700", "Lato,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
              "Source Sans 3": ("Source+Sans+3:wght@400;500;600", "'Source Sans 3',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
              "Work Sans": ("Work+Sans:wght@400;500;600", "'Work Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"),
              "Arial (no web font)": ("", "Arial,Helvetica,sans-serif")},
 }
+# Headline weight per headline font (the serifs are drawn for 400; the website's sans headings are 600).
+HEAD_WEIGHT = {"Montserrat (as the website)": "600", "Plus Jakarta Sans": "600"}
 H1 = {"Large (38px)": ("38px/42px", "32px", "36px"), "Extra large (44px)": ("44px/48px", "34px", "38px"),
       "Medium (32px)": ("32px/38px", "28px", "32px")}
 RADIUS = {"Square (2px)": "2px", "Soft (6px)": "6px", "Round (24px)": "24px"}
@@ -72,7 +78,7 @@ def values(theme):
     v = {f"c:{k}": th["colours"].get(k, COLOURS[k]) for k in COLOURS}
     v.update({f"c:{k}": hexv for k, hexv in FIXED.items()})
     h1 = H1[th["h1"]]
-    v.update({"f:head": head[1], "f:body": body[1], "h1": h1[0], "h1m": h1[1], "h1ml": h1[2], "radius": RADIUS[th["radius"]],
+    v.update({"hw": HEAD_WEIGHT.get(th["font_head"], "400"), "f:head": head[1], "f:body": body[1], "h1": h1[0], "h1m": h1[1], "h1ml": h1[2], "radius": RADIUS[th["radius"]],
               "import": f"@import url('https://fonts.googleapis.com/css2?{fams}&display=swap')" if fams else ""})
     if th == DEFAULT:  # exact original import string
         v["import"] = IMPORT
@@ -82,8 +88,16 @@ def values(theme):
 TOKEN = re.compile(r"\[\[([a-z_:0-9]+)\]\]")
 
 
+def stacks():
+    """Everything the browser needs to mirror values() (theme page and the email editor)."""
+    return {"head": {k: v[1] for k, v in FONTS["head"].items()}, "body": {k: v[1] for k, v in FONTS["body"].items()},
+            "h1": H1, "radius": RADIUS, "fixed": FIXED, "hw": HEAD_WEIGHT,
+            "families": {k: v[0] for k, v in {**FONTS["head"], **FONTS["body"]}.items()}}
+
+
 def render(html_t, theme):
     v = values(theme)
+    html_t = html_t.replace("font:400 [[h1]]", "font:[[hw]] [[h1]]")
     return TOKEN.sub(lambda m: v.get(m.group(1), m.group(0)), html_t)
 
 
