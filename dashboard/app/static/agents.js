@@ -1,7 +1,7 @@
 "use strict";
 // Agents: the manager's weekly brief (decide each recommendation), the QA & compliance report, approved actions,
 // and the context the manager works from. Agents only report and draft; nothing here publishes or switches anything on.
-const AG = { d: null, sev: "open", briefN: null, poll: null, sel: new Set(), fsel: new Set() };
+const AG = { d: null, sev: "open", briefN: null, poll: null, sel: new Set(), fsel: new Set(), tab: "brief" };
 const CAN_FIX = ["draft", "alt", "republish"];
 const SEV = { high: ["high", "High"], medium: ["medium", "Medium"], low: ["low", "Low"], info: ["skip", "Info"] };
 const RATE = { good: ["live", "Good"], watch: ["todo", "Watch"], act: ["high", "Act"] };
@@ -9,6 +9,7 @@ const OWNER = { qa: "QA agent", email: "Email agent", product: "Product agent", 
 const when = (s) => (s || "").slice(0, 16).replace("T", " ");
 
 async function renderAgents() {
+  AG.tab = state.section === "design" ? "design" : state.section === "qa" || state.section === "fixes" ? "qa" : state.section === null && location.hash === "#agents" ? "brief" : AG.tab;
   $("#main").innerHTML = `<p class="muted">Loading…</p>`;
   AG.d = await api("/api/agents");
   if (AG.briefN && AG.d.brief && AG.d.brief.n !== AG.briefN) { try { AG.d.brief = await api(`/api/agents/brief/${AG.briefN}`); } catch (e) { AG.briefN = null; } }
@@ -35,7 +36,18 @@ function drawAgents() {
   const d = AG.d;
   $("#main").innerHTML = `<p class="eyebrow">Agents</p><h1>Agents</h1>
     <p class="muted" style="max-width:90ch">A manager and its agents watch the emails and report to you. They check, analyse and draft; you decide. Nothing here publishes an email or switches a flow on.</p>
-    ${agBrief(d)}${agFixes(d)}${agQa(d)}${agDesign(d)}${agActions(d)}${agTeam(d)}${agContext(d)}`;
+    ${agTabs(d)}
+    ${AG.tab === "qa" ? agFixes(d) + agQa(d) : AG.tab === "design" ? agDesign(d) : agBrief(d) + agActions(d) + agTeam(d) + agContext(d)}`;
+}
+// tabs: Brief (decisions), QA & compliance (findings and fixes), Design (suggestions); each shows what's waiting
+function agTabs(d) {
+  const b = d.brief, decided = new Set(d.decisions.map((x) => x.rec));
+  const toDecide = b ? b.brief.recommendations.filter((r) => !decided.has(r.id)).length : 0;
+  const q = d.qa || { counts: { high: 0, medium: 0 }, findings: [] };
+  const drafts = (d.fixes || []).filter((x) => x.status === "drafted").length;
+  const design = (d.design || []).filter((p) => p.status === "proposed" && p.changes.length).length;
+  const tab = (k, label, n, hot) => `<a class="ag-tab" href="#agents${k === "brief" ? "" : "/" + k}" aria-current="${AG.tab === k}" data-agtab="${k}">${label}${n ? ` <span class="ag-count${hot ? " hot" : ""}">${n}</span>` : ""}</a>`;
+  return `<nav class="ag-tabs">${tab("brief", "Brief", toDecide, false)}${tab("qa", "QA &amp; compliance", (q.counts.high || 0) + (q.counts.medium || 0) + drafts, q.counts.high > 0 || drafts > 0)}${tab("design", "Design", design, false)}</nav>`;
 }
 function agBrief(d) {
   const r = d.brief;
@@ -275,4 +287,14 @@ async function dsPreview(pid, audience) {
 document.addEventListener("click", (e) => {
   if (state.page !== "agents") return;
   const b = e.target.closest("[data-dsprev]"); if (b) dsPreview(b.dataset.dsprev, "non");
+});
+
+document.addEventListener("click", (e) => {
+  if (state.page !== "agents") return;
+  const t = e.target.closest("[data-agtab]");
+  if (!t || e.metaKey || e.ctrlKey) return;  // a modified click opens the tab in a new browser tab as usual
+  e.preventDefault();
+  AG.tab = t.dataset.agtab;
+  history.replaceState(null, "", t.getAttribute("href"));
+  drawAgents(); window.scrollTo(0, 0);
 });
