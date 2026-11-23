@@ -550,3 +550,8 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   version (pending fixes kept; an email whose section was hand-edited is skipped). Drafts are listed with the agents' fixes for
   Layton to publish; nothing is published by the roll-out. Reviewer routes GET/POST /review/rollout/{name}.
 - Headlines: every headline (not only H1) now takes the headline font's weight (600 for Montserrat); default theme unchanged.
+- Roll-out run (dry run first, then drafts): f1_e1 v2, f1_e4 v2, f3_e1hi v3, f3_e2hi v2, f9_e1e v3, f9_e1h v3, f9_rem v3, each
+  built on the email's newest version. Word edits from pending fix drafts inside the section were carried over (f1_e1 "other
+  offers"; f1_e4 and f9_e1e "four free returns a year"; f9_e1e "monthly 10% is waiting in your portal"). The roll-out now matches
+  a block by layout and re-applies word edits; anything it can't place is reported, not guessed. Nothing published. The
+  "2 stone panels" warning on f9_e1e/f9_e1h predates this (the panels are alternative branches: annual vs Free).
