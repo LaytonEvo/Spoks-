@@ -85,6 +85,7 @@ def values(theme):
     return v
 
 
+HEAD_400 = re.compile(r"font:400 (\d+px/\d+px )\[\[f:head\]\]")  # every headline takes the font's weight
 TOKEN = re.compile(r"\[\[([a-z_:0-9]+)\]\]")
 
 
@@ -97,7 +98,7 @@ def stacks():
 
 def render(html_t, theme):
     v = values(theme)
-    html_t = html_t.replace("font:400 [[h1]]", "font:[[hw]] [[h1]]")
+    html_t = HEAD_400.sub(r"font:[[hw]] \1[[f:head]]", html_t.replace("font:400 [[h1]]", "font:[[hw]] [[h1]]"))
     return TOKEN.sub(lambda m: v.get(m.group(1), m.group(0)), html_t)
 
 

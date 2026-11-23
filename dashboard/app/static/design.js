@@ -27,7 +27,7 @@ function dsValues(theme, stacks) {
   Object.assign(v, { hw: (stacks.hw || {})[theme.font_head] || "400", "f:head": stacks.head[theme.font_head], "f:body": stacks.body[theme.font_body], h1: h1[0], h1m: h1[1], h1ml: h1[2], radius: stacks.radius[theme.radius], import: "" });
   return v;
 }
-function dsFill(html, vals) { return html.replace(/font:400 \[\[h1\]\]/g, "font:[[hw]] [[h1]]").replace(/\[\[([a-z_:0-9]+)\]\]/g, (m, k) => (vals[k] != null ? vals[k] : m)); }
+function dsFill(html, vals) { return html.replace(/font:400 \[\[h1\]\]/g, "font:[[hw]] [[h1]]").replace(/font:400 (\d+px\/\d+px )\[\[f:head\]\]/g, "font:[[hw]] $1[[f:head]]").replace(/\[\[([a-z_:0-9]+)\]\]/g, (m, k) => (vals[k] != null ? vals[k] : m)); }
 function dsLoadFonts(theme, families) {
   const fams = [families[theme.font_head], families[theme.font_body]].filter(Boolean);
   const href = fams.length ? `https://fonts.googleapis.com/css2?${fams.map((f) => `family=${f}`).join("&")}&display=swap` : "";

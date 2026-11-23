@@ -235,15 +235,51 @@ def h3(text, margin="0 0 10px"):
     return f'<h3 style="margin:{margin};font:400 28px/34px {SERIF};color:{HEAD};">{text}</h3>'
 
 
+def benefits_grid(rows):
+    """Option B (Layton, 23 Nov 2026): benefits two to a row, bold label over a muted line, hairlines; one column on phones."""
+    cells = [(f'<td class="stack" width="50%" valign="top" style="width:50%;padding:12px {18 if i % 2 == 0 else 0}px 12px 0;border-bottom:1px solid {LINE};">'
+              f'<p style="margin:0;font:600 14.5px/21px {SANS};color:{HEAD};">{label}</p>'
+              f'<p style="margin:2px 0 0;font:14px/21px {SANS};color:{MUTED};">{desc}</p></td>') for i, (label, desc) in enumerate(rows)]
+    if len(cells) % 2:
+        cells.append('<td class="stack" width="50%" style="width:50%;"></td>')
+    trs = "".join(f"<tr>{cells[i]}{cells[i + 1]}</tr>" for i in range(0, len(cells), 2))
+    return (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0 0;border-top:1px solid {LINE};">'
+            f'{trs}</table>')
+
+
+# Option B (Layton, 23 Nov 2026): the card shrinks to a badge, the button follows the lede, benefits sit in a grid.
+# The "10% off monthly" row is dropped where the heading or lede already says it; the deals row is shortened.
+DEALS_SHORT = "Plus 48 hours' early access to new kit."
+
+
+def _rows_b(rows, heading, lede):
+    said = "every month" in f"{heading} {lede or ''}"
+    out = []
+    for label, desc in rows:
+        if label == "10% off monthly" and said:
+            continue
+        out.append((label, DEALS_SHORT if label == "Daily member deals" else desc))
+    return out
+
+
 def feature(eyebrow_text, heading, lede, rows, cta=None, href=None, fine="", pad="28px 48px 0", card=False):
-    """Feature section: 3px brand-green top rule (not a box), eyebrow, serif H3, muted lede, benefits table, button, fine print."""
+    """Feature section: 3px brand-green top rule (not a box), eyebrow, H3, muted lede, benefits table, button, fine print.
+    card=True (members offer, Option B): small card beside the eyebrow and heading, then lede, button, benefits grid, fine print."""
     btn = button(cta, href) if cta else ""
     fp = f'<p style="margin:16px 0 0;font:12.5px/19px {SANS};color:{MUTED};">{fine}</p>' if fine else ""
+    open_ = (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:{pad};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+             f'<tr><td style="border-top:3px solid {G};padding:32px 0 0;">')
+    if card:
+        badge = (f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
+                 f'<td width="112" valign="middle" style="width:112px;padding:0 18px 0 0;">'
+                 f'<img src="{CARD}" width="112" height="75" alt="The Evolution Golf annual member card" style="width:112px;height:auto;display:block;"></td>'
+                 f'<td valign="middle">{eyebrow(eyebrow_text, "0 0 6px")}{h3(heading, "0")}</td></tr></table>')
+        ld = f'<p style="margin:16px 0 0;font:15px/23px {SANS};color:{INK};">{lede}</p>' if lede else ""
+        grid = benefits_grid(_rows_b(rows, heading, lede)) if rows else ""
+        return (open_ + badge + ld + (f'<div style="margin:22px 0 0;">{btn}</div>' if btn else "") + grid + fp
+                + '</td></tr></table></td></tr>')
     ld = f'<p style="margin:0 0 24px;font:15px/23px {SANS};color:{MUTED};">{lede}</p>' if lede else ""
-    return (f'<tr><td class="px" bgcolor="{WHITE}" style="padding:{pad};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
-            f'<tr><td style="border-top:3px solid {G};padding:32px 0 0;">'
-            + (f'<div style="text-align:center;margin:0 0 28px;">{card_img()}</div>' if card else "")
-            + eyebrow(eyebrow_text) + h3(heading) + ld
+    return (open_ + eyebrow(eyebrow_text) + h3(heading) + ld
             + (benefits_table(rows) if rows else "") + btn + fp + '</td></tr></table></td></tr>')
 
 

@@ -225,11 +225,11 @@ def rem(ctx):
     body = (intro("Membership", "Still time to get 10% back on your order",
                   "Join the annual plan within 14 days of your order and we'll credit your account with the 10% you'd have saved on it, as "
                   "store credit. After that, the offer ends.")
-            + feature("Evolution Golf Membership · £36 a year", "10% back on your order, then 10% off one order every month.",
-                      "Here's everything that comes with it.", BENEFITS, "Become a member, £36 a year", URL["join"],
+            + feature("Membership · £36 a year", "10% off one order, every month",
+                      "Starting with 10% back on your order.", BENEFITS, "Become a member, £36 a year", URL["join"],
                       "Store credit equal to 10% of your order total, for orders placed in the 14 days before you join. Our team adds the credit "
                       "to your account after you join. Renews at £36 a year; cancel any time from your account.", pad="12px 48px 0", card=True)
-            + text_row(p("<strong style=\"font-weight:600;color:" + HEAD + ";\">Or start free:</strong> Free members get 5% off everything on the site. "
+            + text_row(p("<strong style=\"font-weight:600;color:" + HEAD + ";\">Or start free:</strong> 5% off everything. "
                          + link("Join free", URL["join"]), 15, margin="0"), "24px 48px 0")
             + text_row("", "0 0 8px") + close(ctx))
     return f1.shell(ctx, body, "Join the annual plan within 14 days of your order and we'll credit the 10% you'd have saved.")

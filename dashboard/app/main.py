@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import abtest, agents, assistant, design_agent, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, agents, rollout, assistant, design_agent, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -41,7 +41,8 @@ def auth(credentials: HTTPBasicCredentials | None = Depends(security)):
 
 
 def review_auth(request: Request):
-    """Claude Code's reviewer access (X-Review-Token). Read the agents' work, give verdicts, start QA; nothing else."""
+    """Claude Code's reviewer access (X-Review-Token). Read the agents' work, give verdicts, start QA, and turn a design roll-out
+    Layton has approved into drafts (never publishes); nothing else."""
     tok = request.headers.get("x-review-token", "")
     if len(config.REVIEW_TOKEN) < 24 or not secrets.compare_digest(tok, config.REVIEW_TOKEN):
         raise HTTPException(404)
@@ -904,6 +905,23 @@ async def review_finding(fid: str, request: Request, who=Depends(review_auth)):
         return agents.review(fid, str(b.get("verdict", "")), b.get("reason", ""), who, str(b.get("scope", "one")), b.get("severity"))
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+
+@app.get("/review/rollout/{name}")
+def review_rollout_plan(name: str, who=Depends(review_auth)):
+    try:
+        return rollout.plan(name)
+    except KeyError:
+        raise HTTPException(404)
+
+
+@app.post("/review/rollout/{name}")
+def review_rollout_apply(name: str, who=Depends(review_auth)):
+    """Drafts only: Layton publishes them from Agents > Fixes."""
+    try:
+        return rollout.apply(name, f"{who}, for Layton")
+    except KeyError:
+        raise HTTPException(404)
 
 
 @app.post("/review/request-fix")

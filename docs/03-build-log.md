@@ -536,3 +536,17 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   on the Brand theme page (publishing re-sends every email to Evoflows, switched off).
 - Members section redesign: `docs/design/members-section-options.html` (current vs A price-led / B card-as-badge), from the
   design agent's repeated finding that the member card and benefits table push the only button below the first phone screen.
+
+## 23 Nov 2026: members section Option B rolled out (Layton: "lets roll out option B")
+- `feature(card=True)` in build_f1.py is now Option B: card as a 112px badge beside eyebrow + heading, lede, button, then the
+  benefits as a two-column grid (one column on phones), then fine print. "10% off monthly" row dropped where the heading/lede
+  already says it; deals row shortened to "Plus 48 hours' early access to new kit." (both part of the approved option).
+- F9 reminder copy from Option B: heading "10% off one order, every month", lede "Starting with 10% back on your order." (the
+  canvas said "this order"; "your order" because the reminder comes after the order), free line "Or start free: 5% off everything."
+- Rebuilt: f1_e1, f1_e4, f3_e1hi, f3_e2hi, f9_e1e, f9_e1h, f9_rem change; nothing else (baseline rebuild was byte-identical).
+  F1/F2 live HTML written without the preview-image step (same output as build()).
+- F2 not changed: it shows the card as a standalone picture (Free E2/E3 upsell, Annual welcome/renewal), not this section.
+- App: `rollout.py` + `rollouts/members_b.json` (old/new block per email). Each email gets a draft built on its newest
+  version (pending fixes kept; an email whose section was hand-edited is skipped). Drafts are listed with the agents' fixes for
+  Layton to publish; nothing is published by the roll-out. Reviewer routes GET/POST /review/rollout/{name}.
+- Headlines: every headline (not only H1) now takes the headline font's weight (600 for Montserrat); default theme unchanged.
