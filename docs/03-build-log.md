@@ -529,3 +529,5 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   the brand theme stays Fraunces + Inter until Layton publishes a change.
 - New flows page: flows already on Evoflows and matching the build now say "switched off: ready for go-live" with who signed off;
   the re-push button reads "Re-upload this version (switched off; only if Evoflows lost it)".
+- Fix: the Brand theme preview was blank. The design agent's before/after function in agents.js was also called `dsPreview` and
+  replaced the theme page's own; renamed it `agDesignPreview` (no other duplicate function names across the scripts). Checked in a browser.

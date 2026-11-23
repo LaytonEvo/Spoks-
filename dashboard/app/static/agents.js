@@ -264,7 +264,7 @@ document.addEventListener("click", async (e) => {
 });
 
 // side-by-side preview of a design suggestion: the email now, and with the ticked changes (nothing is saved)
-async function dsPreview(pid, audience) {
+async function agDesignPreview(pid, audience) {
   const p = (AG.d.design || []).find((x) => x.id === pid);
   const ops = [...(AG.dsel[pid] || [])];
   let ov = document.getElementById("ds-modal");
@@ -277,7 +277,7 @@ async function dsPreview(pid, audience) {
       <div><p class="small"><b>With the changes</b></p><iframe id="ds-after" title="With the changes" sandbox=""></iframe></div></div></div>`;
   ov.onclick = (e) => {
     if (e.target === ov || e.target.dataset.dsclose) { ov.remove(); return; }
-    const a = e.target.closest("[data-dsaud]"); if (a) dsPreview(pid, a.dataset.dsaud);
+    const a = e.target.closest("[data-dsaud]"); if (a) agDesignPreview(pid, a.dataset.dsaud);
   };
   try {
     const r = await api(`/api/agents/design/${pid}/preview`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ops, audience }) });
@@ -286,7 +286,7 @@ async function dsPreview(pid, audience) {
 }
 document.addEventListener("click", (e) => {
   if (state.page !== "agents") return;
-  const b = e.target.closest("[data-dsprev]"); if (b) dsPreview(b.dataset.dsprev, "non");
+  const b = e.target.closest("[data-dsprev]"); if (b) agDesignPreview(b.dataset.dsprev, "non");
 });
 
 document.addEventListener("click", (e) => {
