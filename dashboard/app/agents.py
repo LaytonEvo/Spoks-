@@ -194,13 +194,17 @@ def _check_urls(urls, imgs, out):
             if u in seen:
                 continue
             try:
-                r = c.head(u)
-                if r.status_code >= 400:
-                    r = c.get(u)
+                for attempt in range(3):
+                    r = c.head(u)
+                    if r.status_code >= 400:
+                        r = c.get(u)
+                    if r.status_code != 429:
+                        break
+                    time.sleep(min(int(r.headers.get("retry-after", "3") or 3), 10))  # the site asked us to slow down
                 seen[u] = r.status_code
             except httpx.HTTPError as e:
                 seen[u] = type(e).__name__
-            time.sleep(0.1)
+            time.sleep(0.5)  # pace requests to our own shop
             st = seen[u]
             if isinstance(st, int) and st < 400:
                 continue
@@ -210,7 +214,9 @@ def _check_urls(urls, imgs, out):
             emails = sorted(keys)
             where = f" (in {len(emails)} email{'s' if len(emails) > 1 else ''}: {', '.join(emails[:5])}{'…' if len(emails) > 5 else ''})"
             uid = hashlib.sha1(u.encode()).hexdigest()[:8]
-            if own or st in (404, 410) or (isinstance(st, str) and "ConnectError" in st):
+            if st == 429:
+                sev, detail, fix = "low", f"Couldn't verify (429, the site asked the checker to slow down): {u[:100]}{where}", "Nothing to do unless it repeats."
+            elif own or st in (404, 410) or (isinstance(st, str) and "ConnectError" in st):
                 sev, detail, fix = "high", f"Broken {kind} ({st}): {u[:120]}{where}", "Fix the address in the email, or swap the image."
             elif isinstance(st, int) and st >= 500 or st in ("ReadTimeout", "ConnectTimeout"):
                 sev, detail, fix = "medium", f"{kind.title()} didn't load ({st}): {u[:120]}{where}", "Open it to check; if it works, it was a hiccup."
@@ -450,6 +456,8 @@ def run_qa(reason="manual", who="QA agent"):
             f["action"] = fix_kind(f)
             if f["id"] in revs:
                 f["review"] = revs[f["id"]]
+                if revs[f["id"]].get("severity"):
+                    f["severity"] = revs[f["id"]]["severity"]  # the reviewer's severity stands
         prev = (latest_qa() or {}).get("findings", [])
         prev_ids = {f["id"]: f for f in prev}
         first_seen = state.setdefault("first_seen", {})
@@ -466,7 +474,8 @@ def run_qa(reason="manual", who="QA agent"):
                "emails": len(keys), "links_checked": len(seen), "ai_checked": ai_n, "counts": counts,
                "new": sum(1 for f in out if f["status"] == "new" and f["severity"] != "info"), "fixed": len(resolved),
                "findings": out, "resolved": resolved[:50], "dismissed": dismissed, "checks_run": CHECKS_RUN,
-               "ai_pending": sum(1 for k in keys if k not in state.get("ai_hashes", {}))}
+               "ai_pending": sum(1 for k in keys if k not in state.get("ai_hashes", {})),
+               "ai_note": ("No email changed since Claude last read it, so its earlier findings stand." if not ai_n else "")}
         by = {}
         for f in out:
             by[(f["severity"], f["check"].split(":")[0])] = by.get((f["severity"], f["check"].split(":")[0]), 0) + 1
@@ -538,26 +547,37 @@ def fix_kind(f):
     return {"type": "person", "label": "Needs a person"}
 
 
-def review(fid, verdict, reason, who):
+def review(fid, verdict, reason, who, scope="one", severity=None):
     """The reviewer's verdict on a finding: confirmed (real), false_alarm (dismissed with the reason), or a note."""
     if verdict not in ("confirmed", "false_alarm", "note"):
         raise ValueError("verdict: confirmed, false_alarm or note")
     reason = str(reason or "").strip()[:500]
     if verdict != "confirmed" and not reason:
         raise ValueError("Give the reason.")
+    ids = [fid]
+    if scope == "all":  # the same finding (same check and wording) in every email
+        check = fid.rsplit(":", 1)[0]
+        ids = [f["id"] for f in (latest_qa() or {}).get("findings", []) if f["check"] == check] or [fid]
+    if severity not in (None, "high", "medium", "low"):
+        raise ValueError("severity: high, medium or low")
     if verdict == "false_alarm":
-        dismiss([fid], reason, who)
+        dismiss(ids, reason, who)
     state = _read("qa_state.json", {})
-    state.setdefault("reviews", {})[fid] = {"verdict": verdict, "reason": reason, "by": who, "at": _now()}
+    for i in ids:
+        state.setdefault("reviews", {})[i] = {"verdict": verdict, "reason": reason, "by": who, "at": _now(),
+                                              **({"severity": severity} if severity else {})}
     _write("qa_state.json", state)
     rep = latest_qa()
     if rep:
         for f in rep["findings"]:
-            if f["id"] == fid:
-                f["review"] = state["reviews"][fid]
+            if f["id"] in ids:
+                f["review"] = state["reviews"][f["id"]]
+                if severity:
+                    f["severity"] = severity
+        rep["counts"] = {s_: sum(1 for f in rep["findings"] if f["severity"] == s_) for s_ in ("high", "medium", "low", "info")}
         _write("qa_latest.json", rep)
-    _log_event(who, f"review {verdict}: {fid}")
-    return state["reviews"][fid]
+    _log_event(who, f"review {verdict}: {fid}" + (f" (+{len(ids) - 1} more)" if len(ids) > 1 else ""))
+    return {**state["reviews"][fid], "applied_to": len(ids)}
 
 
 def request_fix(item, detail, fix, who):
@@ -583,7 +603,7 @@ def request_fix(item, detail, fix, who):
 
 def _request_finding(rid, r):
     f = {**_find("medium", "copy", r["item"], rid, f"Requested by {r['by']}: {r['detail']}", r["fix"], f"#edit/{r['item']}"),
-         "review": {"verdict": "confirmed", "reason": "Fix: " + r["fix"], "by": r["by"], "at": r["at"]}, "status": "new"}
+         "review": {"verdict": "confirmed", "reason": "Fix: " + r["fix"], "by": r["by"], "at": r["at"]}, "status": "new", "id": rid}
     f["action"] = fix_kind(f)
     return f
 
@@ -1023,6 +1043,17 @@ def decide(brief_n, rec_id, decision, note, who):
                      "status": "to do", "approved_by": who, "approved_at": _now()})
     _write("actions.json", acts)
     return {"decisions": ds[-40:], "actions": acts}
+
+
+def record_decision(title, decision, note, who, owner="layton"):
+    """A decision Layton made outside the Agents page (e.g. in conversation with the reviewer), so the log is complete."""
+    if decision not in ("approve", "reject", "later"):
+        raise ValueError("approve, reject or later")
+    ds = decisions()
+    rid = f"chat-{len(ds) + 1}"
+    ds.append({"rec": rid, "title": str(title)[:200], "owner": owner, "decision": decision, "note": str(note or "")[:500], "by": who, "at": _now()})
+    _write("decisions.json", ds[-300:])
+    return {"rec": rid}
 
 
 def actions():

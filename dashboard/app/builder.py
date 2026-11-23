@@ -145,7 +145,12 @@ GO_FIELD = {"is_annual": "annual member", "is_free_member": "Free member", "is_m
 def go_label(expr):
     e = expr.strip()
     if e.startswith("not "):
-        return "not " + go_label(e[4:])
+        rest = e[4:].strip()
+        m = re.fullmatch(r"\((or|and) (.+)\)", rest)
+        if m:  # "not (or a b)" = neither a nor b; "not (and a b)" = not both
+            parts = [go_label(p) for p in re.findall(r"\.[\w.]+|\([^)]*\)", m.group(2))]
+            return ("neither " + " nor ".join(parts)) if m.group(1) == "or" else ("not both " + " and ".join(parts))
+        return "not " + go_label(rest)
     m = re.fullmatch(r"\(?(or|and) (.+?)\)?", e)
     if m and m.group(0).startswith(("(or", "(and", "or ", "and ")):
         parts = re.findall(r"\.[\w.]+|\([^)]*\)", m.group(2))

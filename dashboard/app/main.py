@@ -892,7 +892,7 @@ def review_flows(who=Depends(review_auth)):
 async def review_finding(fid: str, request: Request, who=Depends(review_auth)):
     b = await request.json()
     try:
-        return agents.review(fid, str(b.get("verdict", "")), b.get("reason", ""), who)
+        return agents.review(fid, str(b.get("verdict", "")), b.get("reason", ""), who, str(b.get("scope", "one")), b.get("severity"))
     except ValueError as e:
         raise HTTPException(400, str(e))
 
@@ -921,6 +921,21 @@ def review_run_manager(who=Depends(review_auth)):
         raise HTTPException(409, "The manager is already writing.")
     threading.Thread(target=agents._safe, args=(agents.run_manager, "manual (reviewer)"), daemon=True).start()
     return {"started": True}
+
+
+@app.post("/review/decision")
+async def review_decision(request: Request, who=Depends(review_auth)):
+    """Record a decision Layton gave the reviewer in conversation (the decisions log feeds the manager)."""
+    b = await request.json()
+    try:
+        return agents.record_decision(b.get("title", ""), str(b.get("decision", "")), b.get("note", ""), "Layton (recorded by Claude)", str(b.get("owner", "layton")))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/review/context")
+async def review_context(request: Request, who=Depends(review_auth)):
+    return agents.save_context((await request.json()).get("text", ""), who)
 
 
 @app.post("/review/run/qa")

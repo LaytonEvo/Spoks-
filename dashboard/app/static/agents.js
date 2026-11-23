@@ -70,7 +70,7 @@ function agQa(d) {
   const trend = d.qa_history.slice(-14);
   const max = Math.max(1, ...trend.map((t) => t.counts.high + t.counts.medium + t.counts.low));
   return `<section class="panel">${head}
-    <p class="muted small">Last run ${esc(when(q.at))} (${esc(q.reason)}): ${q.emails} emails, ${q.links_checked} different link and image addresses loaded, ${q.ai_checked || 0} email${q.ai_checked === 1 ? "" : "s"} read by Claude this run${q.ai_pending ? ` (${q.ai_pending} still to read)` : ""}, ${q.seconds}s.</p>
+    <p class="muted small">Last run ${esc(when(q.at))} (${esc(q.reason)}): ${q.emails} emails, ${q.links_checked} different link and image addresses loaded, ${q.ai_checked || 0} email${q.ai_checked === 1 ? "" : "s"} read by Claude this run${q.ai_pending ? ` (${q.ai_pending} still to read)` : ""}, ${q.seconds}s.${q.ai_note ? ` ${esc(q.ai_note)}` : ""}</p>
     ${q.checks_run ? `<details><summary class="small">What was checked</summary><ul class="small">${q.checks_run.map((c) => `<li>${esc(c)}</li>`).join("")}</ul></details>` : ""}
     <div class="ag-counts">${["high", "medium", "low", "info"].map((s) => `<button type="button" data-agsev="${s}" aria-pressed="${AG.sev === s}"><span class="stat ${SEV[s][0]}">${q.counts[s]}</span> ${SEV[s][1]}</button>`).join("")}
       <button type="button" data-agsev="open" aria-pressed="${AG.sev === "open"}">All open</button><button type="button" data-agsev="new" aria-pressed="${AG.sev === "new"}">New (${q.new})</button>
