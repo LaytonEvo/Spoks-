@@ -938,6 +938,16 @@ async def review_context(request: Request, who=Depends(review_auth)):
     return agents.save_context((await request.json()).get("text", ""), who)
 
 
+@app.post("/review/restore/{fid:path}")
+def review_restore(fid: str, who=Depends(review_auth)):
+    """Undo a dismissal (the finding comes back on the next QA run)."""
+    agents.undismiss(fid, who)
+    st = agents._read("qa_state.json", {})
+    st.get("reviews", {}).pop(fid, None)
+    agents._write("qa_state.json", st)
+    return {"ok": True}
+
+
 @app.post("/review/run/qa")
 def review_run_qa(who=Depends(review_auth)):
     if agents.running["qa"]:
