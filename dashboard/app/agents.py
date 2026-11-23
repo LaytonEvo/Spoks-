@@ -805,6 +805,11 @@ class AreaStatus(BaseModel):
     summary: str = Field(description="One or two sentences")
 
 
+class Link(BaseModel):
+    label: str = Field(description="Two to five words, e.g. 'Approve F3'")
+    page: str = Field(description="One of the dashboard pages listed in 'dashboard_pages'")
+
+
 class Rec(BaseModel):
     title: str = Field(description="What to do, in under 12 words")
     why: str
@@ -813,6 +818,7 @@ class Rec(BaseModel):
     impact: Literal["high", "medium", "low"]
     effort: Literal["small", "medium", "large"]
     decision: str = Field(description="The yes/no decision Layton is making")
+    links: List[Link] = Field(default_factory=list, description="1-3 links to where Layton reviews or makes this decision")
 
 
 class Brief(BaseModel):
@@ -822,6 +828,55 @@ class Brief(BaseModel):
     questions: List[str] = Field(description="Questions only Layton (or Luke) can answer")
     fyi: List[str] = Field(description="Short notes Layton should know; no action needed")
     agent_feedback: List[str] = Field(description="Feedback to the agents (prefix with the agent, e.g. 'qa: ...')")
+
+
+REQUIREMENTS_DOC = "https://claude.ai/artifact/3h9uGLJXoNx3dqJsLBskpV"
+PAGES = {"#agents": "Agents page: briefs, QA findings, fixes from the agents, design suggestions",
+         "#drafts": "New flows to approve (approve a flow such as F3; it stays switched off)",
+         "#emails": "All emails", "#edit/<email key>": "One email in the editor, e.g. #edit/f3_e1hi",
+         "#flow/<flow key>": "One flow's page with its numbers and journey, e.g. #flow/f3_checkout",
+         "#abtests": "A/B tests", "#theme": "Brand theme", "#media": "Brand & media", "#evoflows": "Engine & events (push flags)",
+         REQUIREMENTS_DOC: "The requirements doc for Luke (numbered items)"}
+FLOW_WORDS = {"F3": "f3_checkout", "F9": "f9_after_delivery", "F1": "f1_welcome"}
+
+
+def _ok_page(page):
+    page = (page or "").strip()
+    if page in PAGES and "<" not in page:
+        return page
+    m = re.fullmatch(r"#edit/([a-z0-9_]+)", page)
+    if m and builder.is_template(m.group(1)):
+        return page
+    m = re.fullmatch(r"#flow/([a-z0-9_]+)", page)
+    if m and m.group(1) in evoflows.manifest()["flows"]:
+        return page
+    return None
+
+
+def rec_links(rec):
+    """The recommendation's links, checked; plus links found from what it mentions (emails, flows, approvals)."""
+    out, seen = [], set()
+
+    def add(label, page):
+        page = _ok_page(page)
+        if page and page not in seen and len(out) < 4:
+            seen.add(page)
+            out.append({"label": str(label)[:40], "page": page})
+    for l in rec.get("links") or []:
+        add(l.get("label") or "Open", l.get("page"))
+    text = " ".join(str(rec.get(k, "")) for k in ("title", "why", "evidence", "decision"))
+    for k in sorted(set(re.findall(r"\b(f\d_[a-z0-9]+)\b", text)))[:2]:
+        add(f"Open {k}", f"#edit/{k}")
+    for word, flow in FLOW_WORDS.items():
+        if re.search(rf"\b{word}\b", text):
+            if re.search(r"\bapprov", text, re.I) and word in rec.get("title", ""):
+                add(f"Approve {word}", "#drafts")
+            add(f"{word} flow page", f"#flow/{flow}")
+    if re.search(r"requirements item|item \d+\b|\bLuke\b", text):
+        add("Requirements doc", REQUIREMENTS_DOC)
+    if re.search(r"QA|finding|Trustpilot|fix", text):
+        add("QA findings", "#agents")
+    return out
 
 
 def context():
@@ -884,30 +939,45 @@ def run_manager(reason="manual", who="Manager agent"):
             "standing_context": context(),
             "qa_report": {"at": qa["at"], "counts": qa["counts"], "emails_checked": qa["emails"], "links_checked": qa["links_checked"],
                           "new_this_run": qa["new"], "fixed_since_last_run": [f"{r['id']}: {r['detail']}" for r in qa.get("resolved", [])][:20],
-                          "reviewer_verdicts": {k: v for k, v in reviews().items()},
-                          "open_findings": [{k: f[k] for k in ("id", "severity", "area", "item", "detail", "fix", "status", "since")}
-                                            for f in qa["findings"] if f["severity"] != "info"][:60],
+                          "reviewer_verdicts": {k: {"verdict": v["verdict"], "reason": v.get("reason", "")[:160]} for k, v in list(reviews().items())[-30:]},
+                          "open_findings_by_check": {c: n for c, n in __import__("collections").Counter(
+                              f"{f['severity']}/{f['check'].split(':')[0]}" for f in qa["findings"]).most_common()},
+                          "open_findings": [{"id": f["id"], "severity": f["severity"], "item": f["item"], "detail": f["detail"][:180],
+                                             "status": f["status"], "since": f.get("since"), "flow_status": f.get("flow_status")}
+                                            for f in qa["findings"] if f["severity"] in ("high", "medium")][:40],
                           "info": [f"{f['item']}: {f['detail']}" for f in qa["findings"] if f["severity"] == "info"][:20]},
             "qa_trend": _read("qa_history.json", [])[-14:],
             "flows": _flow_numbers(),
             "ab_tests": [{k: t.get(k) for k in ("name", "flow", "status", "share_b", "started_at")} for t in abtest._load()][-10:],
-            "design_agent": [{"email": p["key"], "status": p["status"], "verdict": p.get("verdict"), "changes": [c["label"] for c in p["changes"]],
-                              "test_ideas": p.get("ideas", [])} for p in design_agent.proposals()[-30:]],
-            "decisions_log": decisions()[-40:],
-            "last_brief": (prev[-1]["brief"] if prev else None),
+            "design_agent": [{"email": p["key"], "status": p["status"], "changes": [c["label"][:90] for c in p["changes"]][:3]}
+                             for p in design_agent.proposals()[-30:] if p["changes"]],
+            "agent_fixes": [{"email": x["key"], "status": x["status"]} for x in fixes()[-30:]],
+            "decisions_log": [{k: d.get(k) for k in ("title", "decision", "note", "at")} for d in decisions()[-30:]],
+            "last_brief": ({"at": prev[-1]["at"], "headline": prev[-1]["brief"]["headline"],
+                            "recommendations": [r["title"] for r in prev[-1]["brief"]["recommendations"]]} if prev else None),
+            "dashboard_pages": PAGES,
         }
         client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
-        r = client.beta.messages.parse(
-            model=MANAGER_MODEL, max_tokens=16000, system=MANAGER_SYSTEM, output_config={"effort": "high"},
-            betas=["server-side-fallback-2026-07-01"], fallbacks="default",
-            messages=[{"role": "user", "content": "Write this week's brief for Layton.\n\n" + json.dumps(payload, ensure_ascii=False, default=str)}],
-            output_format=Brief)
+        r = None
+        for attempt in (1, 2):
+            r = client.beta.messages.parse(
+                model=MANAGER_MODEL, max_tokens=20000, system=MANAGER_SYSTEM, output_config={"effort": "high"},
+                betas=["server-side-fallback-2026-07-01"], fallbacks="default",
+                messages=[{"role": "user", "content": "Write this week's brief for Layton. Give each recommendation 1-3 links to the "
+                           "dashboard_pages where he reviews or decides it.\n\n" + json.dumps(payload, ensure_ascii=False, default=str)}],
+                output_format=Brief)
+            if r.stop_reason != "refusal" and r.parsed_output is not None:
+                break
+            log.warning("Manager brief attempt %s failed: stop_reason=%s output_tokens=%s", attempt, r.stop_reason, r.usage.output_tokens)
         if r.stop_reason == "refusal" or r.parsed_output is None:
-            raise RuntimeError("The manager couldn't write a brief this time; try again.")
+            why = {"max_tokens": "it ran out of room", "refusal": "Claude declined it"}.get(r.stop_reason, f"stop reason {r.stop_reason}")
+            _write("manager_error.json", {"at": _now(), "reason": reason, "why": why})
+            raise RuntimeError(f"The manager couldn't write a brief ({why}).")
         b = r.parsed_output.model_dump()
         n = (prev[-1]["n"] + 1) if prev else 1
         for i, rec in enumerate(b["recommendations"][:5]):
             rec["id"] = f"b{n}-r{i + 1}"
+            rec["links"] = rec_links(rec)
         b["recommendations"] = b["recommendations"][:5]
         served = getattr(r, "model", MANAGER_MODEL)
         rec = {"n": n, "at": _now(), "reason": reason, "model": served, "qa_at": qa["at"], "brief": b,
@@ -978,7 +1048,14 @@ def _log_event(who, what):
 
 def overview():
     b = briefs()
-    return {"qa": latest_qa(), "qa_history": _read("qa_history.json", [])[-30:], "brief": b[-1] if b else None,
+    cur = b[-1] if b else None
+    if cur:
+        for r_ in cur["brief"]["recommendations"]:
+            r_["links"] = rec_links(r_)  # older briefs: links found from what they mention
+    err = _read("manager_error.json", None)
+    if err and cur and err["at"] < cur["at"]:
+        err = None
+    return {"qa": latest_qa(), "qa_history": _read("qa_history.json", [])[-30:], "brief": cur, "manager_error": err,
             "briefs": [{"n": x["n"], "at": x["at"], "headline": x["brief"]["headline"]} for x in b][::-1][:20],
             "decisions": decisions()[-60:][::-1], "actions": actions(), "fixes": fixes()[-100:][::-1], "fixing": fix_state["running"], "context": context(), "running": {**running, "fix": fix_state["running"], "design": design_agent.state["running"]},
             "manager_model": MANAGER_MODEL, "slack": bool(config.SLACK_WEBHOOK_URL), "ai": bool(config.ANTHROPIC_API_KEY),
@@ -988,7 +1065,11 @@ def overview():
 
 
 def brief(n):
-    return next((x for x in briefs() if x["n"] == n), None)
+    b = next((x for x in briefs() if x["n"] == n), None)
+    if b:
+        for r_ in b["brief"]["recommendations"]:
+            r_["links"] = rec_links(r_)
+    return b
 
 
 # =====================================================================================================================

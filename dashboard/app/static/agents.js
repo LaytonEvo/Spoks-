@@ -48,10 +48,12 @@ function agBrief(d) {
     const dd = dec[x.id];
     return `<div class="ag-rec"><div class="ag-rec-h"><b>${i + 1}. ${esc(x.title)}</b> <span class="stat ${x.impact === "high" ? "high" : x.impact === "medium" ? "todo" : "skip"}">${esc(x.impact)} impact</span> <span class="muted small">${esc(x.effort)} effort · ${esc(OWNER[x.owner] || x.owner)}</span></div>
       <p>${esc(x.why)}</p><p class="small muted"><b>Evidence:</b> ${esc(x.evidence)}</p><p class="small"><b>Your decision:</b> ${esc(x.decision)}</p>
+      ${x.links && x.links.length ? `<p class="ag-links small">Review it: ${x.links.map((l) => `<a href="${esc(l.page.startsWith("#") ? "/" + l.page : l.page)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join(" · ")}</p>` : ""}
       ${dd ? `<p class="small"><span class="stat ${dd.decision === "approve" ? "live" : dd.decision === "reject" ? "high" : "todo"}">${{ approve: "Approved", reject: "Rejected", later: "Later" }[dd.decision]}</span> by ${esc(dd.by)} ${esc(when(dd.at))}${dd.note ? ` · “${esc(dd.note)}”` : ""} <button type="button" class="link-btn small" data-agchange="${esc(x.id)}">Change</button></p>`
       : `<div class="ag-dec" data-rec="${esc(x.id)}"><input placeholder="Note for the agents (optional)" maxlength="500"><button type="button" class="btn" data-agdec="approve">Approve</button><button type="button" class="btn-line" data-agdec="later">Later</button><button type="button" class="btn-line" data-agdec="reject">Reject</button></div>`}</div>`;
   };
-  return `<section class="panel">${head}<p class="muted small">Written ${esc(when(r.at))} (${esc(r.reason)}) from the QA run of ${esc(when(r.qa_at))}.</p>
+  const errNote = d.manager_error ? `<div class="flag high">The ${esc(d.manager_error.reason)} brief on ${esc(when(d.manager_error.at))} failed (${esc(d.manager_error.why)}). Showing the last good one; press “Write a brief now” to try again.</div>` : "";
+  return `<section class="panel">${head}${errNote}<p class="muted small">Written ${esc(when(r.at))} (${esc(r.reason)}) from the QA run of ${esc(when(r.qa_at))}.</p>
     <p class="ag-headline">${esc(b.headline)}</p>
     <div class="ag-status">${b.status.map((s) => `<div><span class="stat ${RATE[s.rating][0]}">${RATE[s.rating][1]}</span> <b>${esc(s.area)}</b><p class="small">${esc(s.summary)}</p></div>`).join("")}</div>
     ${b.recommendations.length ? `<h3>Recommendations</h3>${b.recommendations.map(rec).join("")}` : `<p class="muted">No recommendations this week.</p>`}

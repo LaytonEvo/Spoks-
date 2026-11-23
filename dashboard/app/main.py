@@ -915,6 +915,14 @@ async def review_run_design(request: Request, who=Depends(review_auth)):
         raise HTTPException(400, str(e))
 
 
+@app.post("/review/run/manager")
+def review_run_manager(who=Depends(review_auth)):
+    if agents.running["manager"]:
+        raise HTTPException(409, "The manager is already writing.")
+    threading.Thread(target=agents._safe, args=(agents.run_manager, "manual (reviewer)"), daemon=True).start()
+    return {"started": True}
+
+
 @app.post("/review/run/qa")
 def review_run_qa(who=Depends(review_auth)):
     if agents.running["qa"]:
