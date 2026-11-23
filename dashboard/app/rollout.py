@@ -24,6 +24,10 @@ def _start(key):
     return v
 
 
+def _card(b):
+    return 'alt="The Evolution Golf annual member card"' in b
+
+
 def plan(name):
     if name not in ROLLOUTS:
         raise KeyError(name)
@@ -34,8 +38,12 @@ def plan(name):
         ht = builder._ht(v)
         counts = [ht.count(old) for old, _ in ps]
         done = all(ht.count(new) == 1 for _, new in ps)
-        out.append({"key": key, "based_on": v.get("n", 0), "based_status": v.get("status"), "blocks": len(ps), "found": counts,
-                    "ok": all(c == 1 for c in counts), "already": done})
+        row = {"key": key, "based_on": v.get("n", 0), "based_status": v.get("status"), "blocks": len(ps), "found": counts,
+               "ok": all(c == 1 for c in counts), "already": done}
+        if not row["ok"] and not done:  # show what's there now, so a hand-made pair can carry the edit over
+            row["current"] = [b for b in builder.split(ht)[1] if any(_card(b) and _card(old) for old, _ in ps)
+                              or any(old.split(">", 1)[0] in b and c == 0 for (old, _), c in zip(ps, counts))][:3]
+        out.append(row)
     return out
 
 
