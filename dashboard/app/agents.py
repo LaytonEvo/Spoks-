@@ -639,7 +639,21 @@ def _drop_from_latest(ids):
 
 
 def fixes():
-    return _read("fixes.json", [])
+    """The fixer's drafts. One whose draft was replaced by a newer one (which includes it) is marked superseded."""
+    rec = _read("fixes.json", [])
+    changed = False
+    for x in rec:
+        if x.get("status") == "drafted" and x.get("version"):
+            try:
+                v = next((v for v in builder._load(x["key"])["versions"] if v["n"] == x["version"]), None)
+            except Exception:
+                continue
+            if v is None or v["status"] in ("replaced", "superseded"):
+                x.update(status="superseded", summary=(x.get("summary", "") + " Replaced by a newer draft of this email, which includes it.")[:600])
+                changed = True
+    if changed:
+        _write("fixes.json", rec[-500:])
+    return rec
 
 
 def approve_fixes(ids, who):

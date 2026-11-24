@@ -557,3 +557,4 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   "2 stone panels" warning on f9_e1e/f9_e1h predates this (the panels are alternative branches: annual vs Free).
 - New flows page: a flow now counts as changed when any of its emails differs from what's on Evoflows (published builder
   version or rebuilt approved build vs GET /templates), not only its definition. Badge names how many emails changed.
+- 24 Nov: fix entries whose draft was replaced by a newer draft (which includes it) now show as superseded, not as ready to publish.
