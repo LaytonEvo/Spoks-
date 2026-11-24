@@ -558,3 +558,13 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
 - New flows page: a flow now counts as changed when any of its emails differs from what's on Evoflows (published builder
   version or rebuilt approved build vs GET /templates), not only its definition. Badge names how many emails changed.
 - 24 Nov: fix entries whose draft was replaced by a newer draft (which includes it) now show as superseded, not as ready to publish.
+
+## 24 Nov 2026: Team page: admins invite users (Layton)
+- `users.py` + Team page (#team, admins only). Admin creates an invite (name, sign-in name, role); the app shows a one-time
+  link (7 days) to send by hand; the person opens it and sets their own password (12+ characters; PBKDF2-hashed on the volume,
+  users.json). Admins can change roles, switch people off/on, or issue a new link (resets the password).
+- Roles: Admin (everything + team), Approver (everything but team), Editor (drafts, comments, images, AI, staff tests; no
+  approve/publish/push/theme publish/agent decisions), Viewer (read, preview, comment). Enforced server-side on every change
+  request (middleware), not just hidden in the UI. Railway logins (DASHBOARD_PASSWORD/USERS) are always admins.
+- Tested locally: invite, short password refused, link single-use (410), editor blocked from publish/theme publish/team,
+  viewer blocked from save but can comment, switched-off user gets 401, no plaintext passwords stored.

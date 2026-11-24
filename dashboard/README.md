@@ -76,7 +76,7 @@ push approved builds, which land switched off (Luke switches them on after a sta
 | `KLAVIYO_REVISION` | optional | Defaults to `2025-10-15`; change if Klaviyo rejects the revision |
 | `USE_FIXTURES` | optional | `1` to run on the saved test data in `fixtures/` |
 | `KLAVIYO_WRITE_KEY` | to apply fixes | A second Klaviyo private key with **Templates: read + write** only. Unset = read-only app |
-| `DASHBOARD_USERS` | recommended | Named logins so approvals show who made them: `layton:pass1,karin:pass2` |
+| `DASHBOARD_USERS` | optional | Extra admin logins set in Railway (`layton:pass1`). Normally invite people from the Team page instead: they get a role and set their own password |
 | `SLACK_WEBHOOK_URL` | optional | Slack incoming-webhook address for the Monday summary. Unset = nothing is ever posted |
 | `PUBLIC_URL` | optional | Dashboard address for links in the summary (defaults to Railway's public domain) |
 

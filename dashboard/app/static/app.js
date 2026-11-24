@@ -8,7 +8,7 @@ const TF_LABEL = { last_30_days: "last 30 days", last_90_days: "last 90 days", l
 
 const state = { snap: null, status: null, tf: "last_90_days", flowId: null, draftId: null, tab: "journey", search: "", pvId: null, pvWidth: "600", sort: null, show: "evo", page: null, cmp: null };
 // Klaviyo-only pages (Fixes, A/B tests, Flow map) are retired from the menu; their code stays for reference.
-const PAGES = { agents: "Agents", drafts: "New flows to approve", emails: "Emails", media: "Brand & media", theme: "Brand theme", abtests: "A/B tests", programme: "Programme", compare: "Compare", summary: "Monday summary", evoflows: "Engine & events" };
+const PAGES = { agents: "Agents", drafts: "New flows to approve", emails: "Emails", media: "Brand & media", theme: "Brand theme", abtests: "A/B tests", programme: "Programme", compare: "Compare", summary: "Monday summary", evoflows: "Engine & events", team: "Team" };
 const isEvo = (f) => f && f.platform === "evoflows";
 const STATUS_LABEL = { live: "live", off: "switched off", not_pushed: "not pushed", manual: "manual", draft: "draft" };
 const WIDE = window.matchMedia("(min-width: 1200px)");
@@ -71,7 +71,7 @@ function renderSidebar() {
   }).join("");
   let html = `<button type="button" class="flow-link" data-id="" ${!state.flowId && !state.page ? 'aria-current="true"' : ""}><span class="fname">All flows overview</span></button>`;
   const pageLink = (k) => `<a class="flow-link page-link" href="#${k}" ${state.page === k ? 'aria-current="true"' : ""}><span class="fname">${PAGES[k]}</span></a>`;
-  const TECH = ["evoflows"];  // operational pages sit at the bottom, below the flows
+  const TECH = ["evoflows", "team"];  // operational pages sit at the bottom, below the flows
   for (const k of Object.keys(PAGES).filter((k) => !TECH.includes(k))) html += pageLink(k);
   // Each platform is a fold-out section; it opens by itself when you're on one of its flows or searching.
   const fold = (id, label, flows, groups) => {
@@ -84,7 +84,7 @@ function renderSidebar() {
     [["evo:live", "Live"], ["evo:off", "Built, switched off"], ["evo:not_pushed", "Not pushed yet"]]);
   html += fold("kl-group", "Klaviyo (being replaced)", state.snap.flows.filter((f) => !isEvo(f) && f.name.toLowerCase().includes(q)),
     [["klaviyo:live", "Live"], ["klaviyo:manual", "Manual"]]);
-  html += `<div class="nav-tech"><p class="group-label">Technical</p>${TECH.map(pageLink).join("")}</div>`;
+  html += `<div class="nav-tech"><p class="group-label">Technical</p>${TECH.filter((k) => k !== "team" || (state.status || {}).role === "admin").map(pageLink).join("")}</div>`;
   nav.innerHTML = html;
 }
 document.addEventListener("toggle", (e) => {
@@ -471,6 +471,7 @@ function render() {
   else if (state.page === "compare") renderCompare();
   else if (state.page === "tests") renderTests();
   else if (state.page === "summary") renderSummary();
+  else if (state.page === "team") renderTeam();
   else if (state.flowId) renderFlow(); else renderOverview();
 }
 function route() {

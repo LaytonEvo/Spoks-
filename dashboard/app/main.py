@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 
-from . import abtest, agents, rollout, assistant, design_agent, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
+from . import abtest, agents, rollout, users, assistant, design_agent, builder, sources, config, design, media, digest, drafts, evoflows, evosnap, fixes, review, snapshot
 
 security = HTTPBasic(auto_error=False)
 STATIC = config.BASE_DIR / "app" / "static"
@@ -25,19 +25,18 @@ FIX_RE = re.compile(r"^[A-Za-z0-9-]{4,80}$")
 
 
 def auth(credentials: HTTPBasicCredentials | None = Depends(security)):
-    users = dict(config.DASHBOARD_USERS)
-    if config.DASHBOARD_PASSWORD:
-        users.setdefault(config.DASHBOARD_USER, config.DASHBOARD_PASSWORD)
-    if not users:
+    if not users.any_users():
         return "local"
-    ok = False
-    if credentials:
-        for name, pw in users.items():
-            if secrets.compare_digest(credentials.username, name) and secrets.compare_digest(credentials.password, pw):
-                ok = True
-    if not ok:
+    name = users.check(credentials.username, credentials.password) if credentials else None
+    if not name:
         raise HTTPException(401, "Login required", headers={"WWW-Authenticate": 'Basic realm="Evolution Golf"'})
-    return credentials.username
+    return name
+
+
+def admin(user=Depends(auth)):
+    if users.role(user) != "admin":
+        raise HTTPException(403, "Only admins can manage the team.")
+    return user
 
 
 def review_auth(request: Request):
@@ -97,6 +96,25 @@ async def lifespan(_app):
 app = FastAPI(title="Evolution Golf Flow Dashboard", docs_url=None, redoc_url=None, lifespan=lifespan)
 
 
+@app.middleware("http")
+async def role_gate(request: Request, call_next):
+    """Every change request is checked against the signer-in's role (users.allowed). Reads are open to anyone signed in."""
+    path = request.url.path
+    if request.method not in ("GET", "HEAD", "OPTIONS") and not path.startswith(("/review/", "/invite/", "/evoflows/hook")):
+        hdr = request.headers.get("authorization", "")
+        if hdr.lower().startswith("basic ") and users.any_users():
+            import base64
+            try:
+                name, _, pw = base64.b64decode(hdr[6:]).decode().partition(":")
+            except Exception:
+                name, pw = "", ""
+            who = users.check(name, pw)
+            if who and not users.allowed(users.role(who), request.method, path):
+                r = users.role(who)
+                return JSONResponse({"detail": f"Your role ({users.ROLES[r]}) can't do this. Ask an admin or approver."}, status_code=403)
+    return await call_next(request)
+
+
 @app.get("/health")
 def health():
     return {"ok": True}
@@ -126,7 +144,7 @@ def api_status(user=Depends(auth)):
             "evoflows": {"enabled": evoflows.enabled(), **evosnap.status, "generated_at": evo["generated_at"] if evo else None,
                          "admin_url": config.EVOFLOWS_BASE.replace("/api/v1", "/admin")},
             "show_klaviyo": config.SHOW_KLAVIYO, "reviews_enabled": bool(config.ANTHROPIC_API_KEY), "slack_enabled": bool(config.SLACK_WEBHOOK_URL),
-            "writes_enabled": bool(config.KLAVIYO_WRITE_KEY), "user": user}
+            "writes_enabled": bool(config.KLAVIYO_WRITE_KEY), "user": user, "role": users.role(user)}
 
 
 @app.get("/api/snapshot")
@@ -1023,3 +1041,89 @@ async def design_preview(request: Request, user=Depends(auth)):
     key = _tpl_key(str(b.get("key", "")))
     out = _b(builder.preview, key, None, b.get("audience", "non"), None, None, design.merge(design.DEFAULT, b.get("theme") or {}))
     return HTMLResponse(out, headers={"Content-Security-Policy": "script-src 'none'"})
+
+
+# ---------- team: admins invite people; each person sets their own password ----------
+def _invite_url(request: Request, token):
+    base = str(request.base_url).rstrip("/")
+    if request.url.hostname not in ("127.0.0.1", "localhost"):
+        base = base.replace("http://", "https://", 1)  # Railway's proxy speaks https to the browser
+    return base + f"/invite/{token}"
+
+
+@app.get("/api/team")
+def api_team(user=Depends(admin)):
+    return users.listing()
+
+
+@app.post("/api/team/invite")
+async def api_team_invite(request: Request, user=Depends(admin)):
+    b = await request.json()
+    try:
+        r = users.invite(b.get("name"), b.get("label"), b.get("role"), user)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return {**users.listing(), "invite": {"name": r["name"], "url": _invite_url(request, r["token"]), "expires": r["expires"]}}
+
+
+@app.post("/api/team/{name}/reinvite")
+def api_team_reinvite(name: str, request: Request, user=Depends(admin)):
+    try:
+        r = users.reinvite(name, user)
+    except KeyError:
+        raise HTTPException(404)
+    return {**users.listing(), "invite": {"name": r["name"], "url": _invite_url(request, r["token"]), "expires": r["expires"]}}
+
+
+@app.post("/api/team/{name}")
+async def api_team_update(name: str, request: Request, user=Depends(admin)):
+    b = await request.json()
+    try:
+        return users.update(name, user, b.get("role"), b.get("status"))
+    except KeyError:
+        raise HTTPException(404)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+def _invite_page(body, status=200):
+    import html as h
+    _ = h
+    return HTMLResponse(f"""<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Join Evolution Golf Flows</title><style>body{{margin:0;background:#F4F3EE;font:16px/1.6 Inter,Arial,sans-serif;color:#1d2621}}
+main{{max-width:440px;margin:8vh auto;padding:32px;background:#fff;border:1px solid #DCE1DD}}h1{{font:600 24px/1.3 Montserrat,Arial,sans-serif;color:#0F3B2A;margin:0 0 8px}}
+label{{display:block;margin:16px 0 4px;font-weight:600}}input{{width:100%;box-sizing:border-box;padding:10px;border:1px solid #9aa5a0;font:inherit}}
+button,a.btn{{display:inline-block;margin-top:20px;background:#0F3B2A;color:#fff;border:0;padding:12px 22px;font:500 15px Inter,Arial,sans-serif;text-decoration:none;cursor:pointer}}
+.err{{background:#fbeaea;color:#7a1f1f;padding:10px 12px;margin:12px 0}}.muted{{color:#5E6B64;font-size:14px}}</style></head><body><main>{body}</main></body></html>""",
+                        status_code=status, headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"})
+
+
+@app.get("/invite/{token}", response_class=HTMLResponse)
+def invite_page(token: str, err: str = ""):
+    import html as h
+    name, u = users.invite_lookup(token)
+    if not name:
+        return _invite_page("<h1>This link has expired</h1><p>Invite links work once and last 7 days. Ask your admin for a new one.</p>", 410)
+    return _invite_page(f"""<h1>Join Evolution Golf Flows</h1>
+<p>Hi {h.escape(u.get('label') or name)}. {h.escape(u.get('invited_by') or 'Your admin')} has invited you as <b>{users.ROLES[u['role']]}</b>: {h.escape(users.ROLE_TEXT[u['role']])}</p>
+<p>Your sign-in name is <b>{h.escape(name)}</b>. Choose a password (at least 12 characters).</p>
+{f'<p class="err">{h.escape(err)}</p>' if err else ''}
+<form method="post"><label for="pw">Password</label><input id="pw" name="pw" type="password" autocomplete="new-password" minlength="12" required>
+<label for="pw2">Password again</label><input id="pw2" name="pw2" type="password" autocomplete="new-password" minlength="12" required>
+<button type="submit">Set my password</button></form>""")
+
+
+@app.post("/invite/{token}", response_class=HTMLResponse)
+async def invite_accept(token: str, request: Request):
+    import html as h
+    import urllib.parse
+    form = urllib.parse.parse_qs((await request.body()).decode(), keep_blank_values=True)
+    try:
+        name = users.accept(token, (form.get("pw") or [""])[0], (form.get("pw2") or [""])[0])
+    except ValueError as e:
+        name, _u = users.invite_lookup(token)
+        if not name:
+            return _invite_page(f"<h1>This link has expired</h1><p>{h.escape(str(e))}</p>", 410)
+        return invite_page(token, str(e))
+    return _invite_page(f"""<h1>You're in</h1><p>Your password is set. Sign in with the name <b>{h.escape(name)}</b> and your new password.</p>
+<a class="btn" href="/">Open the dashboard</a><p class="muted">Your browser asks for the name and password the first time. Keep the password to yourself: what you approve is recorded under your name.</p>""")
