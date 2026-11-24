@@ -1126,4 +1126,4 @@ async def invite_accept(token: str, request: Request):
             return _invite_page(f"<h1>This link has expired</h1><p>{h.escape(str(e))}</p>", 410)
         return invite_page(token, str(e))
     return _invite_page(f"""<h1>You're in</h1><p>Your password is set. Sign in with the name <b>{h.escape(name)}</b> and your new password.</p>
-<a class="btn" href="/">Open the dashboard</a><p class="muted">Your browser asks for the name and password the first time. Keep the password to yourself: what you approve is recorded under your name.</p>""")
+<a class="btn" href="/">Open the dashboard</a><p class="muted">Your browser asks for a username and password the first time: the username is <b>{h.escape(name)}</b> (not your full name or email). Keep the password to yourself: what you approve is recorded under your name.</p>""")

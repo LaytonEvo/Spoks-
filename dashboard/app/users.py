@@ -75,6 +75,7 @@ def check(name, pw):
     for n, p in env_users().items():
         if secrets.compare_digest(name, n) and secrets.compare_digest(pw, p):
             return n
+    name = name.strip().lower()  # invited sign-in names are lower case; "Luke " still finds luke
     key = hashlib.sha256(f"{name}:{pw}".encode()).hexdigest()
     if _ok.get(key) == name:
         u = _load()["users"].get(name)

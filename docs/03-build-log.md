@@ -568,3 +568,4 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   request (middleware), not just hidden in the UI. Railway logins (DASHBOARD_PASSWORD/USERS) are always admins.
 - Tested locally: invite, short password refused, link single-use (410), editor blocked from publish/theme publish/team,
   viewer blocked from save but can comment, switched-off user gets 401, no plaintext passwords stored.
+- 24 Nov: sign-in names ignore case/spaces; reset button renamed "Reset password (new link)"; the welcome page says the username is the sign-in name. (Luke's password saved at 11:15; the six 401s after were wrong sign-in details.)

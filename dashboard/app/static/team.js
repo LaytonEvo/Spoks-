@@ -17,7 +17,7 @@ function drawTeam() {
     const mine = u.name === (state.status || {}).user;
     const acts = u.source === "railway" ? `<span class="small muted">Set in Railway</span>`
       : mine ? `<span class="small muted">You</span>`
-      : `<button type="button" class="link-btn small" data-team-reinvite="${esc(u.name)}">New invite link</button>
+      : `<button type="button" class="link-btn small" data-team-reinvite="${esc(u.name)}">Reset password (new link)</button>
          ${u.status === "disabled" ? `<button type="button" class="link-btn small" data-team-status="${esc(u.name)}" data-to="active">Switch back on</button>`
            : `<button type="button" class="link-btn small" data-team-status="${esc(u.name)}" data-to="disabled">Switch off</button>`}`;
     return `<tr><td><b>${esc(u.label)}</b><br><span class="small muted">${esc(u.name)}</span></td>
@@ -31,7 +31,7 @@ function drawTeam() {
     ${TEAM.link ? `<div class="panel" style="margin:16px 0"><p><b>Invite link for ${esc(TEAM.link.name)}</b> (works once, until ${esc(when(TEAM.link.expires))}):</p>
       <p style="display:flex;gap:8px;flex-wrap:wrap"><input id="team-link" readonly value="${esc(TEAM.link.url)}" style="flex:1 1 360px;min-width:0" aria-label="Invite link">
       <button type="button" class="btn" id="team-copy">Copy link</button></p>
-      <p class="small muted">This is the only time the link is shown. Lost it? Use “New invite link” on their row.</p></div>` : ""}
+      <p class="small muted">This is the only time the link is shown. Lost it, or they forgot their password? Use “Reset password (new link)” on their row.</p></div>` : ""}
     <div class="panel" style="margin:16px 0"><h3 style="margin-top:0">Invite someone</h3>
       <form id="team-form" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
         <label>Name <input id="team-label" required maxlength="60" placeholder="Luke Smith"></label>
@@ -56,7 +56,7 @@ document.addEventListener("click", async (e) => {
   if (t.id === "team-copy") { try { await navigator.clipboard.writeText($("#team-link").value); t.textContent = "Copied"; } catch (err) { $("#team-link").select(); } return; }
   const ri = t.closest("[data-team-reinvite]");
   if (ri) {
-    if (!confirm(`Make a new invite link for ${ri.dataset.teamReinvite}? Their current password stops working until they use it.`)) return;
+    if (!confirm(`Reset ${ri.dataset.teamReinvite}'s password? You get a new one-time link to send them; their current password stops working until they use it.`)) return;
     try { const r = await api(`/api/team/${encodeURIComponent(ri.dataset.teamReinvite)}/reinvite`, { method: "POST" }); TEAM.d = r; TEAM.link = r.invite; drawTeam(); } catch (err) { alert(err.message); }
     return;
   }
