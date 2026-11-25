@@ -574,3 +574,4 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
 - evoflows.py `_electric_only` now also covers f3_e2hi / f3_e2lo / f3_e2m: the "Range." battery check shows only when
   has_electric_trolley; Boot and Hills renumber 1-2 otherwise. Checked with Go html/template for both cases. Only those three
   templates changed. Rolled out to drafts with `rollouts/f3_electric.json` (keeps pending fixes).
+- 25 Nov: Layton ruled: keep the membership 5% on trolley/club baskets (membership benefit, not a coupon). Findings ai:4aee593b:f3_e1lo and ai:c8f0f59b:f3_e2lo dismissed with that reason; rule added to the assistant's SYSTEM prompt so QA stops flagging it. f3_e1hi 'missing space' dismissed as a false alarm (Go keeps the space).

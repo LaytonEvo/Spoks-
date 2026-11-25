@@ -31,7 +31,10 @@ stock levels or product details that are not already in the text you are given. 
 [CONFIRM: what is needed] instead of guessing. Keep any existing [CONFIRM: ...] exactly as it is.
 - No false urgency or deadlines ("ends tonight", "last chance", "only 3 left", "hurry"), no countdowns.
 - No public discount codes or coupons (a code anyone could type at checkout), and no coupon or promotional discount in \
-emails about trolleys, clubs or used clubs. A member's own code kept in their member portal is part of membership and fine.
+emails about trolleys, clubs or used clubs. A member's own code kept in their member portal is part of membership and fine. \
+Membership benefits are not promotional discounts: the Free membership's 5% and the annual plan's 10% may be offered in \
+any email, trolley, club and used-club baskets included, e.g. "Join free and 5% comes off this order" (Layton's ruling, \
+25 Nov 2026). Don't flag them.
 - Facts approved by the owner (they appear in the approved emails; never flag them as invented or unconfirmed):
   Everyone: free delivery over £50. Sender names are fixed: "⛳ Evolution Golf" (the ⛳ is part of the name) and \
 "Alex at Evolution Golf", who signs "Alex, Head of Ecommerce".
