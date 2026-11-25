@@ -579,3 +579,9 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   900 characters, so later findings in a busy email arrived half-written and it guessed (now 6000 for the fixer, 900 stays for
   the editor's AI box); findings dismissed after approval are now skipped. Publishing is blocked while a [CONFIRM: …] placeholder
   is in an email. New reviewer action POST /review/correct/{key}: exact word swaps on the open draft, as a new draft.
+- 25 Nov: reviewer corrections (drafts, for Layton to publish): f3_e1lo (5% wording restored per ruling; returns line without
+  [CONFIRM]), f3_e1hi (returns line), f3_e2m (redundant "If it's electric"), f9_e1h (five stars), f1_e4 (Way 1/Way 2), f9_e1e
+  (sentence the fixer broke). Trustpilot rewording finished in 13 emails: the fixer had only replaced "4.8 out of 5", leaving
+  "…on Trustpilot from 611 reviews"; now "★★★★★ Read our reviews on Trustpilot", no figures. Full text diff of every open draft vs
+  live checked. Left for Layton: f2_fe1 and f2_pe5 carry [CONFIRM] (publishing blocked until answered); F9's annual-member line
+  now has four different wordings across f9_e1e/e1en/e1h/e1hn.
