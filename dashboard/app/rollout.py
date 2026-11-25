@@ -12,7 +12,8 @@ import re
 from . import builder, design
 
 DIR = pathlib.Path(__file__).resolve().parent / "rollouts"
-ROLLOUTS = {"members_b": "Members section Option B (Layton, 23 Nov 2026): small card badge, button after the lede, benefits grid"}
+ROLLOUTS = {"members_b": "Members section Option B (Layton, 23 Nov 2026): small card badge, button after the lede, benefits grid",
+            "f3_electric": "Trolley checks: the battery 'Range' check only for electric trolleys; push trolleys see Boot and Hills as 1-2 (Layton, 23 Nov 2026)"}
 
 
 def _start(key):

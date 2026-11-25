@@ -176,7 +176,7 @@ PREVIEWS = {}  # template key -> preview HTML (the builders' sample render where
 
 
 def _electric_only(key, html):
-    """F9: battery advice and the lithium-battery warranty go to electric-trolley buyers only (push trolleys have no battery).
+    """F9 and F3 E2: battery advice and the lithium-battery warranty go to electric-trolley buyers only (push trolleys have no battery).
     Push-trolley buyers keep 'New trolley?' with the set-up and warranty tips, renumbered 1-2."""
     el = "{{ if .Tx.Data.has_electric_trolley }}"
     if key in ("f9_e1h", "f9_e1hn"):
@@ -192,6 +192,15 @@ def _electric_only(key, html):
         html, n = re.subn(r"\{\{ if \.Tx\.Data\.has_motocaddy_trolley \}\}(\s*Your trolley and charger)",
                           r"{{ if (and .Tx.Data.has_motocaddy_trolley .Tx.Data.has_electric_trolley) }}\1", html)
         assert n == 1, key
+    if key in ("f3_e2hi", "f3_e2lo", "f3_e2m"):  # F3 E2 trolley checks: "Range." (battery) for electric trolleys only (Layton, 23 Nov)
+        r = html.index("<strong style=\"font-weight:600;color:#161816;\">Range.</strong>")
+        start = html.rindex("<tr>", 0, r)
+        end = html.index("</tr>", r) + len("</tr>")
+        tail_end = html.index("</table>", end)
+        tail = html[end:tail_end].replace(">2</td>", ">{{ if .Tx.Data.has_electric_trolley }}2{{ else }}1{{ end }}</td>", 1) \
+                                 .replace(">3</td>", ">{{ if .Tx.Data.has_electric_trolley }}3{{ else }}2{{ end }}</td>", 1)
+        assert "{{ else }}1" in tail and "{{ else }}2" in tail, key
+        html = html[:start] + el + html[start:end] + "{{ end }}" + tail + html[tail_end:]
     if key == "f9_e2h":
         c = html.index("Charge the battery after every round")
         i = html.rindex("{{ if .Tx.Data.has_trolley }}", 0, c)

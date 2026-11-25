@@ -569,3 +569,8 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
 - Tested locally: invite, short password refused, link single-use (410), editor blocked from publish/theme publish/team,
   viewer blocked from save but can comment, switched-off user gets 401, no plaintext passwords stored.
 - 24 Nov: sign-in names ignore case/spaces; reset button renamed "Reset password (new link)"; the welcome page says the username is the sign-in name. (Luke's password saved at 11:15; the six 401s after were wrong sign-in details.)
+
+## 25 Nov 2026: F3 E2 trolley checks, electric only (push trolleys excluded from battery advice, as F9)
+- evoflows.py `_electric_only` now also covers f3_e2hi / f3_e2lo / f3_e2m: the "Range." battery check shows only when
+  has_electric_trolley; Boot and Hills renumber 1-2 otherwise. Checked with Go html/template for both cases. Only those three
+  templates changed. Rolled out to drafts with `rollouts/f3_electric.json` (keeps pending fixes).
