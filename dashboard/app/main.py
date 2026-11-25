@@ -907,7 +907,17 @@ def review_email(key: str, who=Depends(review_auth)):
     rec = builder._load(key)
     return {"key": key, "name": v["name"], "subject": v["subject"], "preview_text": v["preview_text"], "from_name": v["from_name"],
             "html": v["html"], "status": v["status"], "versions": [{k: x.get(k) for k in ("n", "status", "by", "at", "note", "approved_by", "published_by")} for x in rec["versions"]],
-            "comments": builder.comments(key)}
+            "comments": builder.comments(key), "draft": _open_draft(key)}
+
+
+def _open_draft(key):
+    """The open draft as customers would get it (what publishing would send), for vetting the agents' drafts."""
+    rec = builder._load(key)
+    open_ = [x for x in rec["versions"] if x["status"] in ("draft", "approved")]
+    if not open_:
+        return None
+    v = max(open_, key=lambda x: x["n"])
+    return {"n": v["n"], "subject": v["subject"], "preview_text": v["preview_text"], "html": builder._final(v)}
 
 
 @app.get("/review/flows")
