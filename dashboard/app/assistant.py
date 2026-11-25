@@ -288,8 +288,9 @@ class Change(BaseModel):
     notes: List[str] = Field(description="Anything you couldn't do with words alone (layout, images, new sections) or facts to confirm")
 
 
-def change(key, instruction, subject, preview, blocks, labels, who):
-    instruction = re.sub(r"\s+", " ", str(instruction or "")).strip()[:900]
+def change(key, instruction, subject, preview, blocks, labels, who, limit=900):
+    """limit: 900 for a person's request in the editor; the QA fixer sends every approved finding for an email at once."""
+    instruction = re.sub(r"\s+", " ", str(instruction or "")).strip()[:limit]
     if len(instruction) < 4:
         raise AssistantError("Say what you'd like changed.")
     clean_blocks = []

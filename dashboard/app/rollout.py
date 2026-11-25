@@ -107,3 +107,38 @@ def apply(name, who):
         res.append({**row, "result": f"drafted v{n}", "warnings": c["warnings"] + c["errors"]})
     agents.qa_soon(f"roll-out {name}")
     return res
+
+
+def correct(key, pairs, note, who):
+    """The reviewer's word corrections to an email's open draft (e.g. undoing a fixer edit that broke a ruling), as a new
+    draft for Layton to publish. Each 'now' text must appear exactly once; personalisation and layout can't change."""
+    import html as htmllib
+    from . import agents
+    v = _start(key)
+    ht = builder._ht(v)
+    before_tokens = builder.tokens(ht)
+    done = []
+    for now, was in pairs:
+        hits = [x for x in dict.fromkeys([now, htmllib.escape(now, quote=False)]) if ht.count(x) == 1]
+        if not hits:
+            raise ValueError(f"{key}: “{now[:60]}” isn't in the draft exactly once ({ht.count(now)} times).")
+        ht = ht.replace(hits[0], htmllib.escape(was, quote=False) if hits[0] != now else was, 1)
+        done.append({"before": now, "text": was})
+    if builder.tokens(ht) != before_tokens or builder._tags(ht) != builder._tags(builder._ht(v)):
+        raise ValueError(f"{key}: a correction touched layout or personalisation.")
+    overrides = v.get("overrides") or {}
+    html = design.render(ht, design.merge(design.brand(), overrides))
+    with builder._lock:
+        rec = builder._load(key)
+        n = max([x["n"] for x in rec["versions"]] + [0]) + 1
+        for x in rec["versions"]:
+            if x["status"] in ("draft", "approved"):
+                x["status"] = "replaced"
+        rec["versions"].append({"n": n, "status": "draft", "subject": v["subject"], "preview_text": v["preview_text"],
+                                "from_name": v["from_name"], "html_t": ht, "overrides": overrides, "html": html, "by": who,
+                                "at": builder._now(), "note": f"Reviewer correction: {note}"[:300]})
+        builder._save(key, rec)
+    c = builder.checks(html, v["subject"])
+    agents._record(key, [{"id": f"correction:{key}:{n}", "detail": f"Reviewer correction: {note}"}], "drafted", who,
+                   (f"Draft v{n} saved, built on v{v.get('n', 0)}. " + " ".join(c["errors"] + c["warnings"]))[:500], n, done)
+    return {"key": key, "n": n, "based_on": v.get("n", 0), "edits": done, "errors": c["errors"], "warnings": c["warnings"]}

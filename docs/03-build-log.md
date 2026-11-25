@@ -575,3 +575,7 @@ Run of 13:07 (old link check): 32 high, 48 medium, 30 low. Verdicts:
   has_electric_trolley; Boot and Hills renumber 1-2 otherwise. Checked with Go html/template for both cases. Only those three
   templates changed. Rolled out to drafts with `rollouts/f3_electric.json` (keeps pending fixes).
 - 25 Nov: Layton ruled: keep the membership 5% on trolley/club baskets (membership benefit, not a coupon). Findings ai:4aee593b:f3_e1lo and ai:c8f0f59b:f3_e2lo dismissed with that reason; rule added to the assistant's SYSTEM prompt so QA stops flagging it. f3_e1hi 'missing space' dismissed as a false alarm (Go keeps the space).
+- 25 Nov: vetted the fixer's 27 drafts (Layton approved 118 findings at 13:05). Fixes to the fixer: its instruction was cut at
+  900 characters, so later findings in a busy email arrived half-written and it guessed (now 6000 for the fixer, 900 stays for
+  the editor's AI box); findings dismissed after approval are now skipped. Publishing is blocked while a [CONFIRM: …] placeholder
+  is in an email. New reviewer action POST /review/correct/{key}: exact word swaps on the open draft, as a new draft.

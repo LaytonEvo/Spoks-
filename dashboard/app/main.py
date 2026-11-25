@@ -942,6 +942,17 @@ def review_rollout_apply(name: str, who=Depends(review_auth)):
         raise HTTPException(404)
 
 
+@app.post("/review/correct/{key}")
+async def review_correct(key: str, request: Request, who=Depends(review_auth)):
+    """Word corrections to an email's open draft, as a new draft (never published here)."""
+    _tpl_key(key)
+    b = await request.json()
+    try:
+        return rollout.correct(key, [(str(a), str(z)) for a, z in b.get("pairs", [])], str(b.get("note", ""))[:200], f"{who}, for Layton")
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
 @app.post("/review/request-fix")
 async def review_request_fix(request: Request, who=Depends(review_auth)):
     b = await request.json()

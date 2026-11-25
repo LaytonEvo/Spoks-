@@ -582,6 +582,8 @@ def checks(html, subject):
         errors.append("Looks like a discount code: codes aren't allowed in flows.")
     if URGENCY_RE.search(text):
         errors.append("Deadline or urgency wording: only allowed with a real expiry (DMCC Act).")
+    if "[CONFIRM" in text.upper():
+        errors.append("A [CONFIRM: …] placeholder is still in the email: replace it with the confirmed wording first.")
     ht = design.tokenize(html)
     if ht.count(PANEL_SIG) > 1:
         warnings.append(f"{ht.count(PANEL_SIG)} stone panels: the design allows at most one.")

@@ -676,6 +676,11 @@ def _run_fixes(chosen, who):
         for f in chosen:
             by_email.setdefault(f["item"], []).append(f)
         for key, fs in by_email.items():
+            # dismissed since Layton approved (e.g. he ruled on it meanwhile): leave it alone
+            gone = _read("qa_state.json", {}).get("dismissed", {})
+            fs = [f for f in fs if f["id"] not in gone]
+            if not fs:
+                continue
             try:
                 if any(f["action"]["type"] == "republish" for f in fs):
                     res = builder.republish_for_theme(key, f"QA fixer (approved by {who})", "re-published by the QA fixer")
@@ -733,7 +738,7 @@ def _fix_email(key, fs, who):
                 return f"{f['detail'][:200]} REQUIRED FIX, use these exact words: {rv['reason'][4:].strip()}"
             return f"{f['detail']}" + (f" (suggested: {f['fix']})" if f.get("fix") else "")
         instr = ("Fix only these problems a QA check found, changing as few words as possible and nothing else: "
-                 + " | ".join(one(f) for f in words))[:900]
+                 + " | ".join(one(f) for f in words))[:6000]  # all of them: a cut-off finding made the fixer guess
         parts_blocks = []
         for i, b in enumerate(blocks):
             if b["meta"]["kind"] in ("Header", "Footer"):
@@ -741,7 +746,8 @@ def _fix_email(key, fs, who):
             parts = [{"i": si, "text": htmllib.unescape(v)} if k == "text" else {"tok": builder.tok_label(v)} for si, (k, v) in enumerate(b["segs"]) if k in ("text", "tok")]
             if any("i" in p for p in parts):
                 parts_blocks.append({"block": i, "kind": b["meta"]["kind"], "only_if": b["meta"]["only_if"], "parts": parts})
-        res = assistant.change(key, instr, re.sub(r"\{\{.*?\}\}", "[…]", subject), preview, parts_blocks, [], f"QA fixer (approved by {who})")
+        res = assistant.change(key, instr, re.sub(r"\{\{.*?\}\}", "[…]", subject), preview, parts_blocks, [], f"QA fixer (approved by {who})",
+                               limit=6000)
         for ed in res["edits"]:
             if ed["problems"]:
                 notes.append(f"Skipped a suggestion that itself looked wrong ({', '.join(ed['problems'])}).")
