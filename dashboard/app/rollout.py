@@ -1,7 +1,7 @@
 """Layton-approved design roll-outs to existing emails, as drafts (never published here).
 
 A roll-out is a file in rollouts/: {email key: [[old block, new block], ...]}, cut from the approved builds before and after
-the design change (tokenised, personalisation identical). Each email gets a new draft built on its newest version, so pending
+the design change (tokenised). Each email gets a new draft built on its open draft (else what is live), so pending
 fixes are kept: every old block must appear exactly once, else that email is skipped and reported. The drafts appear with the
 agents' fixes, where Layton publishes them.
 """
@@ -17,13 +17,16 @@ ROLLOUTS = {"members_b": "Members section Option B (Layton, 23 Nov 2026): small 
 
 
 def _start(key):
-    """The newest version: an open draft/approved one if it's the latest, else what's live (published or the approved build)."""
+    """What the next draft builds on: the open (draft/approved) version if there is one, since it carries changes waiting to be
+    published (a theme publish republishes the live version but leaves open drafts open), else what's live."""
     rec = builder._load(key)
-    vs = [v for v in rec["versions"] if v["status"] in ("draft", "approved", "published")]
-    v = max(vs, key=lambda v: v["n"]) if vs else None
-    if v is None or v["status"] == "published":
+    open_ = [v for v in rec["versions"] if v["status"] in ("draft", "approved")]
+    if not open_:
         return builder.live(key)
-    return v
+    d = max(open_, key=lambda v: v["n"])
+    # a real publish after the draft (not a theme republish, which copies the live version) makes the draft out of date
+    later = [v for v in rec["versions"] if v["n"] > d["n"] and v.get("published_by") and not (v.get("note") or "").startswith("brand theme")]
+    return builder.live(key) if later else d
 
 
 SEG = re.compile(r"(<[^>]+>|\{\{.*?\}\})", re.S)
